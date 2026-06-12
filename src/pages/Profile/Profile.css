@@ -1,0 +1,353 @@
+/* Custom Profile Scoped Component Styles Modules */
+.profile-workspace-view {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+/* Identity Profile Banner Block Panel */
+.profile-identity-banner {
+  background-color: #121215;
+  border: 1px solid #23232a;
+  border-radius: 8px;
+  padding: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.profile-identity-main {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.profile-large-avatar {
+  width: 80px;
+  height: 80px;
+  background-color: #23232a;
+  border: 2px solid #b5ff14;
+  color: #b5ff14;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.profile-name-row h1 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.availability-chip {
+  background-color: rgba(181, 255, 20, 0.1);
+  color: #b5ff14;
+  border: 1px solid rgba(181, 255, 20, 0.3);
+  padding: 4px 10px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.profile-subtitle-text {
+  color: #8a8f98;
+  font-size: 0.95rem;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.meta-contact-links-grid {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  color: #6c727f;
+  font-size: 0.82rem;
+}
+
+.meta-contact-links-grid span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.edit-profile-action-btn {
+  background-color: #1c1c22;
+  border: 1px solid #23232a;
+  color: #fff;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: border-color 0.15s;
+}
+
+.edit-profile-action-btn:hover {
+  border-color: #b5ff14;
+}
+
+/* Quick Performance Metrics Blocks Styling Row */
+.profile-quick-stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.stat-metric-box {
+  background-color: #121215;
+  border: 1px solid #23232a;
+  padding: 20px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  color: #8a8f98;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #fff;
+  margin-top: 6px;
+}
+
+.recommendation-highlight-box {
+  background: linear-gradient(135deg, #121215 0%, #152005 100%);
+  border-color: #384e0c;
+}
+
+.recommendation-desc-text {
+  font-size: 0.78rem;
+  color: #cbff5c;
+  margin-top: 4px;
+  line-height: 1.3;
+}
+
+/* Profile Content Detail Layout Splits Structure */
+.profile-details-split-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.pane-content-card {
+  background-color: #121215;
+  border: 1px solid #23232a;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.pane-content-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.narrative-biography-text {
+  color: #8a8f98;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* Experience timeline sub structures modules */
+.history-timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.history-item {
+  border-left: 2px solid #23232a;
+  padding-left: 16px;
+  position: relative;
+}
+
+.history-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.history-meta-row strong {
+  font-size: 0.92rem;
+  color: #fff;
+}
+
+.timeline-badge-year {
+  font-size: 0.75rem;
+  background-color: #1c1c22;
+  color: #8a8f98;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.company-attribution-text {
+  font-size: 0.8rem;
+  color: #b5ff14;
+  display: block;
+  margin-top: 2px;
+}
+
+.job-summary-details {
+  font-size: 0.85rem;
+  color: #6c727f;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+/* Agency Team Metrics Cards */
+.team-distribution-matrix {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 12px;
+}
+
+.team-segment-card {
+  background-color: #0c0c0e;
+  border: 1px solid #23232a;
+  padding: 16px 12px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.segment-number {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+  display: block;
+}
+
+.segment-title {
+  font-size: 0.65rem;
+  color: #6c727f;
+  font-weight: 700;
+  margin-top: 4px;
+  display: block;
+  letter-spacing: 0.5px;
+}
+
+/* Skills clouds structural configurations */
+.skills-pill-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skill-pill-node {
+  background-color: #0c0c0e;
+  border: 1px solid #23232a;
+  color: #cbd5e1;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+/* Upload Verification Documents Placeholder Framework styles block */
+.card-header-flex-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.card-header-flex-row h3 { margin-bottom: 0; }
+
+.add-document-action-trigger {
+  background: transparent;
+  border: 1px dashed #6c727f;
+  color: #8a8f98;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.add-document-action-trigger:hover {
+  border-color: #b5ff14;
+  color: #fff;
+}
+
+.empty-documents-status-placeholder {
+  background-color: #0c0c0e;
+  border: 1px solid #23232a;
+  border-radius: 6px;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.primary-empty-msg {
+  color: #8a8f98;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.secondary-empty-msg {
+  color: #52525b;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* Animation utilities */
+.animate-fade-in {
+  animation: fadeInFrame 0.25s ease-out forwards;
+}
+
+@keyframes fadeInFrame {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Profile Module Media Breaks Scaling Queries --- */
+@media (max-width: 992px) {
+  .profile-details-split-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-identity-banner {
+    padding: 16px;
+    flex-direction: column;
+  }
+  .edit-profile-action-btn { width: 100%; justify-content: center; }
+  .meta-contact-links-grid { flex-direction: column; gap: 8px; }
+}

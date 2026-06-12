@@ -1,0 +1,171 @@
+.portal-sidebar {
+  width: 250px;
+  background-color: #121215;
+  border-right: 1px solid #23232a;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  flex-shrink: 0;
+}
+
+.sidebar-brand-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 24px;
+  padding: 0 4px;
+}
+
+/* Fluid responsive handling for the widescreen text graphic */
+.sidebar-brand-img {
+  width: 100%;
+  max-width: 180px;   /* Fits comfortably inside your 250px wide sidebar block */
+  height: auto;        /* Preserves the original layout aspect ratios perfectly */
+  object-fit: contain;
+  display: block;
+}
+
+/* Fallback adjustments if viewport sizes scale downward */
+@media (max-width: 1024px) {
+  .sidebar-brand-wrapper {
+    justify-content: flex-start;
+    max-width: 150px;
+    margin-bottom: 0;
+  }
+}
+
+.brand-logo-accent {
+  font-size: 1.3rem;
+  background-color: #1e1e24;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.brand-text {
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.role-simulator-box {
+  background-color: #1a1a22;
+  border: 1px dashed #b5ff14;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.role-simulator-box label {
+  display: block;
+  font-size: 0.75rem;
+  color: #b5ff14;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.role-simulator-box select {
+  width: 100%;
+  background-color: #0c0c0e;
+  color: white;
+  border: 1px solid #2d2d38;
+  padding: 4px;
+  border-radius: 4px;
+  outline: none;
+}
+
+.sidebar-user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #18181c;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  border: 1px solid #23232a;
+}
+
+
+/* Styling updates for the clickable profile interaction framework */
+.sidebar-user-profile.clickable-profile-card {
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Subtle background illumination styling on hover */
+.sidebar-user-profile.clickable-profile-card:hover {
+  background-color: #1c1c22;
+  border-color: #31313c;
+}
+
+/* Highlight style matching your layout when the profile view is currently active */
+.sidebar-user-profile.clickable-profile-card.active {
+  border-color: #b5ff14;
+  background-color: #161a0d;
+}
+
+/* Optional keyboard focus state indicator for better accessibility */
+.sidebar-user-profile.clickable-profile-card:focus-visible {
+  outline: 2px solid #b5ff14;
+  outline-offset: 2px;
+}
+
+.profile-avatar {
+  width: 38px;
+  height: 38px;
+  background-color: #b5ff14;
+  color: #000;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.profile-details h4 { color: white; font-size: 0.85rem; font-weight: 600; }
+.profile-details p { color: #8a8f98; font-size: 0.7rem; font-weight: 500; margin-top: 2px;}
+
+.sidebar-navigation-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-grow: 1;
+}
+
+.menu-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  color: #8a8f98;
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.menu-link:hover, .menu-link.active {
+  color: white;
+  background-color: #1c1c22;
+}
+
+.menu-link.active {
+  color: #b5ff14;
+  font-weight: 600;
+}
+
+.sidebar-logout-action {
+  background: none;
+  border: none;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  font-size: 0.88rem;
+  cursor: pointer;
+  text-align: left;
+}
