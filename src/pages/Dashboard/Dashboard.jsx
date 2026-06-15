@@ -1,22 +1,109 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
-  useReactTable, getCoreRowModel, flexRender
+  useReactTable, getCoreRowModel
 } from '@tanstack/react-table';
 import {
-  Briefcase, Users, Building, FileText, Search,
-  Filter, Eye, Check, X, RotateCcw, TrendingUp, Clock,
-  User
+  Briefcase, Check, X, RotateCcw, Eye
 } from 'lucide-react';
-import { Sidebar } from '../../components/Sidebar/Sidebar';
 import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { api } from '../../utils/api';
+import { toast } from 'react-toastify';
+import { useAuthStore } from '../../store/useAuthStore';
+
+// Import split subcomponents
+import { RejectModal } from '../../components/Dashboard/RejectModal';
+import { DashboardMetrics } from '../../components/Dashboard/DashboardMetrics';
+import { ProjectsTable } from '../../components/Dashboard/ProjectsTable';
+import { ActivityTimeline } from '../../components/Dashboard/ActivityTimeline';
 
 export const Dashboard = () => {
-  const [role, setRole] = useState('admin'); // State handles multi-role dynamic swapping
+  const loggedInUser = useAuthStore((state) => state.user);
+  const initialRole = loggedInUser ? loggedInUser.role : 'admin';
+  
+  const [role, setRole] = useState(initialRole);
+  const [activeAdminTab, setActiveAdminTab] = useState('applications');
+  const [rejectTarget, setRejectTarget] = useState(null); // drives reject modal
 
+  const navigate    = useNavigate();
+  const queryClient = useQueryClient();
 
-  const navigate = useNavigate();
-  // const [view,setView]=useState('');
+  // ── Fetch registration requests ────────────────────────────────────────────
+  const { data: registrationRequests = [], isLoading: isRequestsLoading } = useQuery({
+    queryKey: ['registrationRequests'],
+    queryFn: async () => {
+      const response = await api.get('/auth/registration-requests');
+      return response.requests || [];
+    },
+    enabled: role === 'admin',
+  });
+
+  // Re-fetch when role becomes admin
+  useEffect(() => {
+    if (role === 'admin') {
+      queryClient.invalidateQueries({ queryKey: ['registrationRequests'] });
+    }
+  }, [role, queryClient]);
+
+  // ── Query Mutations ────────────────────────────────────────────────────────
+  const [approveId, setApproveId] = useState(null);
+  const approveQuery = useQuery({
+    queryKey: ['registration-approve', approveId],
+    queryFn: () => api.post(`/auth/registration-requests/${approveId}/review`, { status: 'approved' }),
+    enabled: !!approveId,
+    retry: false,
+    staleTime: 0,
+    gcTime: 0,
+  });
+
+  useEffect(() => {
+    if (approveQuery.data) {
+      toast.success('Registration request approved!');
+      queryClient.invalidateQueries({ queryKey: ['registrationRequests'] });
+      setApproveId(null);
+    }
+  }, [approveQuery.data, queryClient]);
+
+  useEffect(() => {
+    if (approveQuery.error) {
+      toast.error(approveQuery.error.message || 'Approve failed.');
+      setApproveId(null);
+    }
+  }, [approveQuery.error]);
+
+  const [rejectParams, setRejectParams] = useState(null);
+  const rejectQuery = useQuery({
+    queryKey: ['registration-reject', rejectParams],
+    queryFn: () => api.post(`/auth/registration-requests/${rejectParams.id}/review`, {
+      status: 'rejected',
+      rejectionReason: rejectParams.reason,
+    }),
+    enabled: !!rejectParams,
+    retry: false,
+    staleTime: 0,
+    gcTime: 0,
+  });
+
+  useEffect(() => {
+    if (rejectQuery.data) {
+      toast.success('Registration request rejected.');
+      queryClient.invalidateQueries({ queryKey: ['registrationRequests'] });
+      setRejectTarget(null);
+      setRejectParams(null);
+    }
+  }, [rejectQuery.data, queryClient]);
+
+  useEffect(() => {
+    if (rejectQuery.error) {
+      toast.error(rejectQuery.error.message || 'Rejection failed.');
+      setRejectParams(null);
+    }
+  }, [rejectQuery.error]);
+
+  const handleApproveRequest = (id)         => setApproveId(id);
+  const handleOpenReject     = (req)        => setRejectTarget(req);
+  const handleConfirmReject  = (id, reason) => setRejectParams({ id, reason });
 
   /* Mock Datasets mapped for Admin and User states */
   const [adminApplications, setAdminApplications] = useState([
@@ -50,7 +137,7 @@ export const Dashboard = () => {
       cell: info => (
         <div className="name-details-cell">
           <strong>{info.getValue()}</strong>
-          <span className="project-reference-text">For: {info.row.original.project}</span> {/* [cite: 130, 142] */}
+          <span className="project-reference-text">For: {info.row.original.project}</span>
         </div>
       )
     },
@@ -118,170 +205,42 @@ export const Dashboard = () => {
   });
 
   return (
-    <div className="app-portal-layout-frame">
-      <Sidebar currentRole={role} onRoleChange={setRole} />
+    <div>
+      {/* Dynamic Contextual Metrics Cards Blocks */}
+      <DashboardMetrics
+        role={role}
+        isRequestsLoading={isRequestsLoading}
+        registrationRequests={registrationRequests}
+      />
 
-      <main className="portal-main-workspace">
-        {/* Global Structural Header */}
-        <header className="workspace-header-node">
-          <div>
-            <h1>{role === 'admin' ? 'Admin Dashboard' : 'Dashboard Overview'}</h1>
-            <p>{role === 'admin' ? 'Manage project applications and platform activity' : "Here is what's happening with your projects today."}</p>
-          </div>
-          {/* <div className="header-greeting-banner">
-            Welcome back, {role === 'admin' ? 'Admin' : 'Alex'} 
-          </div> */}
+      {/* Primary Data Content Area splits: Table Left, Activity Timeline Right if User */}
+      <div className="portal-content-split-row">
+        <ProjectsTable
+          role={role}
+          activeAdminTab={activeAdminTab}
+          setActiveAdminTab={setActiveAdminTab}
+          registrationRequests={registrationRequests}
+          isRequestsLoading={isRequestsLoading}
+          approveQuery={approveQuery}
+          rejectQuery={rejectQuery}
+          handleApproveRequest={handleApproveRequest}
+          handleOpenReject={handleOpenReject}
+          tableInstance={tableInstance}
+          tableData={tableData}
+        />
 
-          <div 
-              className="header-avatar-circle-btn"
-              onClick={() => navigate('/profile')}
-              role="button"
-              tabIndex={0}
-              title="Open profile photo"
-            >
-              <User size={20} className="header-avatar-icon" />
+        {/* Contextual Side Activity Panel rendered for Freelancer / Agency views */}
+        <ActivityTimeline role={role} />
+      </div>
 
-            </div>
-
-          {/* <div className={`sidebar-user-profile clickable-profile-card ${view === 'profile' ? 'active' : ''}`}
-            onClick={() => setView('profile')}
-            role="button"
-            tabIndex={0}
-            title="View My Profile">
-            <div className="profile-avatar">
-              {role === 'admin' ? 'AD' : 'SJ'}
-            </div>
-            <div className="profile-details">
-              <h4>{role === 'admin' ? 'Admin User' : 'Sarah Johnson'}</h4>
-              <p>{role.toUpperCase()}</p>
-            </div>
-          </div> */}
-
-
-
-        </header>
-
-        {/* Dynamic Contextual Metrics Cards Blocks */}
-        <section className="portal-metrics-grid">
-          {role === 'admin' ? (
-            <>
-              <div className="metric-card-item">
-                <div className="m-card-head"><span>TOTAL PROJECTS</span><Briefcase size={16} /></div>
-                <div className="m-card-val">3</div>
-              </div>
-              <div className="metric-card-item">
-                <div className="m-card-head"><span>TOTAL FREELANCERS</span><Users size={16} /></div>
-                <div className="m-card-val">0</div>
-              </div>
-              <div className="metric-card-item">
-                <div className="m-card-head"><span>TOTAL AGENCY</span><Building size={16} /></div>
-                <div className="m-card-val">1</div>
-              </div>
-              <div className="metric-card-item">
-                <div className="m-card-head"><span>NEW REQUESTS</span><FileText size={16} /></div>
-                <div className="m-card-val">0</div>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="metric-card-item">
-                <div className="m-card-head"><span>APPLICATIONS</span><FileText size={16} /></div>
-                <div className="m-card-val">2</div>
-              </div>
-              <div className="metric-card-item">
-                <div className="m-card-head"><span>ACTIVE PROJECTS</span><Briefcase size={16} /></div>
-                <div className="m-card-val">1</div>
-              </div>
-              <div className="metric-card-item">
-                <div className="m-card-head"><span>COMPLETED PROJECTS</span><Briefcase size={16} /></div>
-                <div className="m-card-val">14</div>
-              </div>
-              <div className="metric-card-item insight-gradient">
-                <div className="m-card-head"><span>PERFORMANCE INSIGHT</span><TrendingUp size={16} /></div>
-                <div className="m-card-desc">You are in the top 10% of modelers this month.</div>
-              </div>
-            </>
-          )}
-        </section>
-
-        {/* Primary Data Content Area splits: Table Left, Activity Timeline Right if User */}
-        <div className="portal-content-split-row">
-          <div className="content-table-card">
-            <div className="table-card-top-controls">
-              <h3>{role === 'admin' ? 'Project Applications' : 'Active Projects'}</h3>
-              <div className="controls-inputs-cluster">
-                <div className="search-field-wrapper">
-                  <Search size={14} />
-                  <input type="text" placeholder="Search entries..." />
-                </div>
-                <button className="ctrl-filter-btn"><Filter size={14} /> Filter</button>
-              </div>
-            </div>
-
-            {/* TanStack Responsive Table Core implementation Container */}
-            <div className="tanstack-table-overflow-frame">
-              <table className="portal-tanstack-native-table">
-                <thead>
-                  {tableInstance.getHeaderGroups().map(headerGroup => (
-                    <tr key={headerGroup.id}>
-                      {headerGroup.headers.map(header => (
-                        <th key={header.id}>
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                        </th>
-                      ))}
-                    </tr>
-                  ))}
-                </thead>
-                <tbody>
-                  {tableInstance.getRowModel().rows.map(row => (
-                    <tr key={row.id}>
-                      {row.getVisibleCells().map(cell => (
-                        <td key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <footer className="table-footer-pagination-bar">
-              <span>Showing 1 to {tableData.length} entries</span>
-              <div className="btn-pagination-nav-group">
-                <button className="p-nav disabled">Prev</button>
-                <button className="p-num active">1</button>
-                <button className="p-nav disabled">Next</button>
-              </div>
-            </footer>
-          </div>
-
-          {/* Contextual Side Activity Panel rendered for Freelancer / Agency views */}
-          {role !== 'admin' && (
-            <div className="content-activity-card">
-              <h3>Recent Activity</h3> {/* [cite: 76, 174] */}
-              <div className="activity-timeline">
-                <div className="timeline-node-item">
-                  <Clock size={14} className="node-icon" />
-                  <div className="node-body">
-                    <strong>Milestone 1 approved</strong>
-                    <p className="text-muted">BIM Modeling for Airport Expansion</p>
-                    <span className="node-time">2 hours ago</span>
-                  </div>
-                </div>
-                <div className="timeline-node-item">
-                  <Clock size={14} className="node-icon" />
-                  <div className="node-body">
-                    <strong>Payment received</strong>
-                    <p className="text-muted">Structural Drafting - Phase 2</p>
-                    <span className="node-time">Yesterday</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </main>
+      {rejectTarget && (
+        <RejectModal
+          request={rejectTarget}
+          onClose={() => setRejectTarget(null)}
+          onConfirm={handleConfirmReject}
+          isPending={rejectQuery.isFetching}
+        />
+      )}
     </div>
   );
 };

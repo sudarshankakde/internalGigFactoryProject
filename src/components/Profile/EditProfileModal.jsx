@@ -1,0 +1,594 @@
+import React from 'react';
+import { createPortal } from 'react-dom';
+import { Check } from 'lucide-react';
+
+const getInitials = (name) => {
+  if (!name) return 'U';
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+};
+
+export const EditProfileModal = ({
+  isFreelancer,
+  formData,
+  setFormData,
+  activeTab,
+  setActiveTab,
+  isSaving,
+  onClose,
+  onSubmit,
+  profile,
+  handlePhotoUpload,
+  handleServiceToggle,
+  handleSoftwareToggle,
+  handleNestedChange
+}) => {
+  return createPortal(
+    <div className="profile-modal-overlay">
+      <div className="profile-modal-card">
+        <div className="profile-modal-header">
+          <h2>Edit Profile Details</h2>
+          <button type="button" className="profile-modal-close-btn" onClick={onClose}>
+            &times;
+          </button>
+        </div>
+        
+        <div className="profile-modal-tabs">
+          {['basic', 'services', 'commercials', 'legal'].map((tab) => (
+            <button 
+              key={tab}
+              type="button" 
+              className={`tab-link ${activeTab === tab ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab === 'basic' && 'Basic Info'}
+              {tab === 'services' && 'Services Offered'}
+              {tab === 'commercials' && 'Commercials & Links'}
+              {tab === 'legal' && 'Legal & Tax'}
+            </button>
+          ))}
+        </div>
+
+        <form onSubmit={onSubmit} className="profile-modal-form">
+          <div className="profile-modal-scroll-area">
+            {activeTab === 'basic' && (
+              <>
+                <div className="form-group avatar-upload-group" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '20px', marginBottom: '20px', borderBottom: '1px solid #23232a', paddingBottom: '20px' }}>
+                  <div className="avatar-preview-box" style={{ width: '80px', height: '80px', borderRadius: '12px', border: '1px solid #23232a', backgroundColor: '#1c1c22', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', color: '#8a8f98', fontSize: '1.5rem', fontWeight: '800' }}>
+                    {isFreelancer ? (
+                      formData.profilePhoto ? (
+                        <img src={formData.profilePhoto} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        getInitials(profile?.user?.full_name)
+                      )
+                    ) : (
+                      formData.logo ? (
+                        <img src={formData.logo} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        getInitials(profile?.agency_name)
+                      )
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label style={{ margin: 0 }}>{isFreelancer ? 'Profile Photo' : 'Agency Logo'}</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoUpload}
+                      style={{ display: 'none' }}
+                      id="avatar-file-input"
+                    />
+                    <button
+                      type="button"
+                      className="edit-profile-action-btn"
+                      onClick={() => document.getElementById('avatar-file-input').click()}
+                      style={{ fontSize: '0.8rem', padding: '6px 12px' }}
+                    >
+                      Upload Photo
+                    </button>
+                  </div>
+                </div>
+
+                {isFreelancer ? (
+                  <>
+                    <div className="form-row-2">
+                      <div className="form-group">
+                        <label>Professional Title</label>
+                        <input
+                          type="text"
+                          value={formData.title || ''}
+                          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                          placeholder="e.g. Senior BIM Modeler"
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Availability Status</label>
+                        <select
+                          value={formData.availability || 'AVAILABLE'}
+                          onChange={(e) => setFormData({ ...formData, availability: e.target.value })}
+                        >
+                          <option value="AVAILABLE">AVAILABLE</option>
+                          <option value="NOT AVAILABLE">NOT AVAILABLE</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div className="form-row-2">
+                      <div className="form-group">
+                        <label>Years of Experience</label>
+                        <input
+                          type="number"
+                          value={formData.experienceYears || ''}
+                          onChange={(e) => setFormData({ ...formData, experienceYears: e.target.value })}
+                          placeholder="e.g. 5"
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Hourly Rate (INR)</label>
+                        <input
+                          type="number"
+                          value={formData.hourlyRate || ''}
+                          onChange={(e) => setFormData({ ...formData, hourlyRate: e.target.value })}
+                          placeholder="e.g. 1500"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label>Biography</label>
+                      <textarea
+                        rows={4}
+                        value={formData.bio || ''}
+                        onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                        placeholder="Write a short summary about your professional background..."
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="form-row-2">
+                      <div className="form-group">
+                        <label>Agency Name</label>
+                        <input
+                          type="text"
+                          value={formData.agencyName || ''}
+                          onChange={(e) => setFormData({ ...formData, agencyName: e.target.value })}
+                          placeholder="e.g. Matrix Design Studios"
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Industry Sector</label>
+                        <input
+                          type="text"
+                          value={formData.industry || ''}
+                          onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+                          placeholder="e.g. Construction & Engineering"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label>About Our Agency</label>
+                      <textarea
+                        rows={4}
+                        value={formData.description || ''}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        placeholder="Describe your agency's services and focus areas..."
+                      />
+                    </div>
+
+                    <div className="form-row-2">
+                      <div className="form-group">
+                        <label>Total Employees</label>
+                        <input
+                          type="number"
+                          value={formData.employeeCount || ''}
+                          onChange={(e) => setFormData({ ...formData, employeeCount: e.target.value })}
+                          placeholder="e.g. 50"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Founded Year</label>
+                        <input
+                          type="number"
+                          value={formData.foundedYear || ''}
+                          onChange={(e) => setFormData({ ...formData, foundedYear: e.target.value })}
+                          placeholder="e.g. 2018"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-row-2">
+                      <div className="form-group">
+                        <label>City</label>
+                        <input
+                          type="text"
+                          value={formData.city || ''}
+                          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                          placeholder="e.g. Mumbai"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Country</label>
+                        <input
+                          type="text"
+                          value={formData.country || ''}
+                          onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                          placeholder="e.g. India"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+
+            {activeTab === 'services' && (
+              <div className="form-group">
+                <label style={{ marginBottom: '12px' }}>Services Provided (Select at least one)</label>
+                <div className="services-checkbox-grid">
+                  {[
+                    { id: 'BIM', label: 'BIM & 2D Drafting' },
+                    { id: 'Audit', label: 'As-Built Audit' },
+                    { id: 'Peer', label: 'Peer Review' },
+                    { id: 'BOQ', label: 'BOQ Creation' },
+                    { id: 'Viz', label: '3D Visualisation' }
+                  ].map((service) => {
+                    const isChecked = (formData.selectedServices || []).includes(service.id);
+                    return (
+                      <div 
+                        key={service.id} 
+                        className={`service-checkbox-card ${isChecked ? 'active' : ''}`}
+                        onClick={() => handleServiceToggle(service.id)}
+                      >
+                        <div className="checkbox-indicator">
+                          {isChecked && <Check size={12} strokeWidth={3} color="#000" />}
+                        </div>
+                        <span className="checkbox-label">{service.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="dynamic-panels-container" style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px' }}>
+                  {(formData.selectedServices || []).includes('BIM') && (
+                    <div className="nested-service-panel">
+                      <h4 className="nested-panel-title">BIM &amp; 2D Drafting Details</h4>
+                      <div className="form-group" style={{ marginBottom: '15px' }}>
+                        <label>SOFTWARE STACK</label>
+                        <div className="software-chips">
+                          {['Revit', 'AutoCAD', 'Navisworks', 'Tekla', 'Civil 3D'].map((sw) => {
+                            const isSel = (formData.bimDetails?.softwareStack || []).includes(sw);
+                            return (
+                              <div 
+                                key={sw} 
+                                className={`software-chip ${isSel ? 'active' : ''}`}
+                                onClick={() => handleSoftwareToggle(sw)}
+                              >
+                                {sw}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      <div className="form-row-2">
+                        <div className="form-group">
+                          <label>MAX LOD CAPABILITY</label>
+                          <select 
+                            value={formData.bimDetails?.maxLod || ''}
+                            onChange={(e) => handleNestedChange('bimDetails', 'maxLod', e.target.value)}
+                          >
+                            <option value="">Select option</option>
+                            <option value="LOD 300">LOD 300</option>
+                            <option value="LOD 350">LOD 350</option>
+                            <option value="LOD 400">LOD 400</option>
+                            <option value="LOD 500">LOD 500</option>
+                          </select>
+                        </div>
+                        <div className="form-group">
+                          <label>CDE EXPERIENCE</label>
+                          <input 
+                            type="text"
+                            placeholder="e.g., BIM 360, ACC, ProjectWise"
+                            value={formData.bimDetails?.cdeExperience || ''}
+                            onChange={(e) => handleNestedChange('bimDetails', 'cdeExperience', e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {(formData.selectedServices || []).includes('Audit') && (
+                    <div className="nested-service-panel">
+                      <h4 className="nested-panel-title">As-Built Audit Details</h4>
+                      <div className="form-row-2">
+                        <div className="form-group">
+                          <label>EQUIPMENT OWNED</label>
+                          <input 
+                            type="text"
+                            placeholder="e.g., Laser Scanner, Total Station, Drone"
+                            value={formData.auditDetails?.equipmentOwned || ''}
+                            onChange={(e) => handleNestedChange('auditDetails', 'equipmentOwned', e.target.value)}
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>SERVICE RADIUS</label>
+                          <select 
+                            value={formData.auditDetails?.serviceRadius || ''}
+                            onChange={(e) => handleNestedChange('auditDetails', 'serviceRadius', e.target.value)}
+                          >
+                            <option value="">Select option</option>
+                            <option value="City-wide">City-wide</option>
+                            <option value="State-wide">State-wide</option>
+                            <option value="Nationwide">Nationwide</option>
+                            <option value="Pan-India + Export">Pan-India + Export</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {(formData.selectedServices || []).includes('Peer') && (
+                    <div className="nested-service-panel">
+                      <h4 className="nested-panel-title">Peer Review Details</h4>
+                      <div className="form-row-2">
+                        <div className="form-group">
+                          <label>{isFreelancer ? 'TOTAL YEARS OF EXPERIENCE *' : 'TOTAL TEAM EXPERIENCE *'}</label>
+                          <input 
+                            type="text"
+                            placeholder="e.g., 5, 8"
+                            value={formData.peerReviewDetails?.teamExperience || ''}
+                            onChange={(e) => handleNestedChange('peerReviewDetails', 'teamExperience', e.target.value)}
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>SPECIALISATION</label>
+                          <select 
+                            value={formData.peerReviewDetails?.specialisation || ''}
+                            onChange={(e) => handleNestedChange('peerReviewDetails', 'specialisation', e.target.value)}
+                          >
+                            <option value="">Select option</option>
+                            <option value="Structural">Structural</option>
+                            <option value="MEP">MEP</option>
+                            <option value="Architectural">Architectural</option>
+                            <option value="Fire &amp; Life Safety">Fire &amp; Life Safety</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {(formData.selectedServices || []).includes('BOQ') && (
+                    <div className="nested-service-panel">
+                      <h4 className="nested-panel-title">BOQ Details</h4>
+                      <div className="form-row-2">
+                        <div className="form-group">
+                          <label>MEASUREMENT STANDARDS</label>
+                          <select 
+                            value={formData.boqDetails?.measurementStandards || ''}
+                            onChange={(e) => handleNestedChange('boqDetails', 'measurementStandards', e.target.value)}
+                          >
+                            <option value="">Select option</option>
+                            <option value="IS 1200">IS 1200</option>
+                            <option value="RICS">RICS</option>
+                            <option value="NRM2">NRM2</option>
+                            <option value="SMM7">SMM7</option>
+                          </select>
+                        </div>
+                        <div className="form-group">
+                          <label>ESTIMATION SOFTWARE</label>
+                          <input 
+                            type="text"
+                            placeholder="e.g., CostX, PlanSwift, Excel"
+                            value={formData.boqDetails?.estimationSoftware || ''}
+                            onChange={(e) => handleNestedChange('boqDetails', 'estimationSoftware', e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {(formData.selectedServices || []).includes('Viz') && (
+                    <div className="nested-service-panel">
+                      <h4 className="nested-panel-title">3D Visualisation Details</h4>
+                      <div className="form-group" style={{ marginBottom: '15px' }}>
+                        <label>RENDERING ENGINE(S)</label>
+                        <input 
+                          type="text"
+                          placeholder="e.g., V-Ray, Corona, Lumion, Unreal Engine"
+                          value={formData.vizDetails?.renderingEngines || ''}
+                          onChange={(e) => handleNestedChange('vizDetails', 'renderingEngines', e.target.value)}
+                        />
+                      </div>
+                      <div className="form-row-2">
+                        <div className="form-group">
+                          <label>HARDWARE CAPACITY</label>
+                          <select 
+                            value={formData.vizDetails?.hardwareCapacity || ''}
+                            onChange={(e) => handleNestedChange('vizDetails', 'hardwareCapacity', e.target.value)}
+                          >
+                            <option value="">Select option</option>
+                            <option value="Dedicated Render Farm / High-end GPU">Dedicated Render Farm / High-end GPU</option>
+                            <option value="Cloud Rendering">Cloud Rendering</option>
+                            <option value="Standard Workstation">Standard Workstation</option>
+                          </select>
+                        </div>
+                        <div className="form-group">
+                          <label>ANIMATION CAPABILITY</label>
+                          <select 
+                            value={formData.vizDetails?.animationCapability || 'No'}
+                            onChange={(e) => handleNestedChange('vizDetails', 'animationCapability', e.target.value)}
+                          >
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {isFreelancer && (
+                  <div className="form-group" style={{ marginTop: '20px' }}>
+                    <label>Additional Custom Skills (comma separated)</label>
+                    <input
+                      type="text"
+                      value={formData.skillsList || ''}
+                      onChange={(e) => setFormData({ ...formData, skillsList: e.target.value })}
+                      placeholder="e.g. Revit, AutoCAD, Dynamo"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'commercials' && (
+              <>
+                <div className="form-row-2">
+                  <div className="form-group">
+                    <label>Standard Commercial Basis</label>
+                    <select
+                      value={formData.commercialBasis || ''}
+                      onChange={(e) => setFormData({ ...formData, commercialBasis: e.target.value })}
+                    >
+                      <option value="">Select Option</option>
+                      <option value="Hourly Rate">Hourly Rate</option>
+                      <option value="Per Sq. Ft.">Per Sq. Ft.</option>
+                      <option value="Per Sheet">Per Sheet</option>
+                      <option value="Fixed Project Fee">Fixed Project Fee / Lump Sum</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Notice Period / Lead Time</label>
+                    <select
+                      value={formData.noticePeriod || ''}
+                      onChange={(e) => setFormData({ ...formData, noticePeriod: e.target.value })}
+                    >
+                      <option value="">Select Option</option>
+                      <option value="Immediate">Immediate</option>
+                      <option value="1 Week">1 Week</option>
+                      <option value="2 Weeks">2 Weeks</option>
+                      <option value="4 Weeks">4 Weeks</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-row-2">
+                  <div className="form-group">
+                    <label>{isFreelancer ? 'Portfolio URL' : 'Website URL'}</label>
+                    <input
+                      type="url"
+                      value={isFreelancer ? (formData.portfolioUrl || '') : (formData.website || '')}
+                      onChange={(e) => {
+                        if (isFreelancer) {
+                          setFormData({ ...formData, portfolioUrl: e.target.value });
+                        } else {
+                          setFormData({ ...formData, website: e.target.value });
+                        }
+                      }}
+                      placeholder="https://mywebsite.com"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>LinkedIn URL</label>
+                    <input
+                      type="url"
+                      value={formData.linkedinUrl || ''}
+                      onChange={(e) => setFormData({ ...formData, linkedinUrl: e.target.value })}
+                      placeholder="https://linkedin.com/in/username"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === 'legal' && (
+              isFreelancer ? (
+                <>
+                  <div className="form-row-2">
+                    <div className="form-group">
+                      <label>Legal Name (as on PAN)</label>
+                      <input
+                        type="text"
+                        value={formData.legalNamePan || ''}
+                        onChange={(e) => setFormData({ ...formData, legalNamePan: e.target.value })}
+                        placeholder="Full Name as per PAN document"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Personal PAN Card</label>
+                      <input
+                        type="text"
+                        value={formData.personalPan || ''}
+                        onChange={(e) => setFormData({ ...formData, personalPan: e.target.value.toUpperCase() })}
+                        placeholder="10-digit PAN code"
+                        maxLength={10}
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label>Resume / CV URL</label>
+                    <input
+                      type="url"
+                      value={formData.resumeUrl || ''}
+                      onChange={(e) => setFormData({ ...formData, resumeUrl: e.target.value })}
+                      placeholder="Link to uploaded Resume PDF"
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="form-row-2">
+                    <div className="form-group">
+                      <label>Company PAN Card</label>
+                      <input
+                        type="text"
+                        value={formData.companyPan || ''}
+                        onChange={(e) => setFormData({ ...formData, companyPan: e.target.value.toUpperCase() })}
+                        placeholder="10-digit Company PAN code"
+                        maxLength={10}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>GST Number</label>
+                      <input
+                        type="text"
+                        value={formData.gstNumber || ''}
+                        onChange={(e) => setFormData({ ...formData, gstNumber: e.target.value.toUpperCase() })}
+                        placeholder="15-digit GST number"
+                        maxLength={15}
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label>CIN (Corporate Identification Number)</label>
+                    <input
+                      type="text"
+                      value={formData.cin || ''}
+                      onChange={(e) => setFormData({ ...formData, cin: e.target.value.toUpperCase() })}
+                      placeholder="21-character CIN code"
+                      maxLength={21}
+                    />
+                  </div>
+                </>
+              )
+            )}
+          </div>
+          <div className="profile-modal-footer">
+            <button type="button" className="btn-cancel" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="btn-save" disabled={isSaving}>
+              {isSaving ? 'Saving Changes...' : 'Save Changes'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>,
+    document.body
+  );
+};

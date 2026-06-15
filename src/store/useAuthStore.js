@@ -1,0 +1,86 @@
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+
+export const useAuthStore = create(
+  persist(
+    (set, get) => ({
+      token: null,
+      refreshToken: null,
+      user: null,
+      profile: null,
+      isProfileLoading: false,
+      profileError: null,
+
+      setAuth: (token, refreshToken, user) => {
+        set({ token, refreshToken, user });
+        // Defensive double-writing to keep raw localStorage in sync for any legacy files
+        localStorage.setItem('token', token);
+        localStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('user', JSON.stringify(user));
+      },
+
+      clearAuth: () => {
+        set({ token: null, refreshToken: null, user: null, profile: null, profileError: null });
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+      },
+
+      setProfile: (profile) => {
+        set({ profile });
+      },
+
+      fetchProfile: async () => {
+        const { token, user } = get();
+        if (!token || !user) return;
+        const role = user.role || 'freelancer';
+        
+        set({ isProfileLoading: true, profileError: null });
+        try {
+          const { api } = await import('../utils/api');
+          const response = await api.get(`/profiles/${role}`);
+          if (response && response.success) {
+            set({ profile: response.profile, isProfileLoading: false });
+          } else {
+            set({ isProfileLoading: false, profileError: 'Failed to retrieve profile.' });
+          }
+        } catch (error) {
+          set({ isProfileLoading: false, profileError: error.message || 'Error loading profile.' });
+        }
+      },
+
+      updateProfile: async (profileData) => {
+        const { user } = get();
+        if (!user) return;
+        const role = user.role || 'freelancer';
+        
+        set({ isProfileLoading: true, profileError: null });
+        try {
+          const { api } = await import('../utils/api');
+          const response = await api.put(`/profiles/${role}`, profileData);
+          if (response && response.success) {
+            set({ profile: response.profile, isProfileLoading: false });
+            return { success: true };
+          } else {
+            set({ isProfileLoading: false, profileError: 'Failed to update profile.' });
+            return { success: false, error: 'Failed to update profile.' };
+          }
+        } catch (error) {
+          const errMsg = error.message || 'Error updating profile.';
+          set({ isProfileLoading: false, profileError: errMsg });
+          return { success: false, error: errMsg };
+        }
+      },
+    }),
+    {
+      name: 'auth-storage',
+      storage: createJSONStorage(() => localStorage),
+      // Hydrate Zustand from initial values, only persisting specific fields
+      partialize: (state) => ({
+        token: state.token,
+        refreshToken: state.refreshToken,
+        user: state.user,
+      }),
+    }
+  )
+);

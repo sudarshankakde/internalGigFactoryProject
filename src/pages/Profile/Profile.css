@@ -351,3 +351,413 @@
   .edit-profile-action-btn { width: 100%; justify-content: center; }
   .meta-contact-links-grid { flex-direction: column; gap: 8px; }
 }
+
+/* --- Edit Profile Modal Styles --- */
+body.modal-open {
+  overflow: hidden !important;
+}
+
+.profile-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(10, 10, 12, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeInFrame 0.2s ease-out forwards;
+}
+
+.profile-modal-card {
+  width: 90vw;
+  max-width: 800px;
+  max-height: 90vh;
+  background-color: #121215;
+  border: 1px solid #23232a;
+  border-radius: 12px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalInFrame 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalInFrame {
+  from { opacity: 0; transform: scale(0.96) translateY(16px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.profile-modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #23232a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.profile-modal-header h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+}
+
+.profile-modal-close-btn {
+  background: none;
+  border: none;
+  color: #8a8f98;
+  font-size: 1.8rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+  transition: color 0.15s;
+}
+
+.profile-modal-close-btn:hover {
+  color: #fff;
+}
+
+.profile-modal-form {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.profile-modal-scroll-area {
+  padding: 24px;
+  flex-grow: 1;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Custom scrollbar for modal scroll area */
+.profile-modal-scroll-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.profile-modal-scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.profile-modal-scroll-area::-webkit-scrollbar-thumb {
+  background: #23232a;
+  border-radius: 3px;
+}
+
+.profile-modal-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .form-row-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #8a8f98;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  background-color: #1c1c22;
+  border: 1px solid #23232a;
+  border-radius: 6px;
+  color: #fff;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #b5ff14;
+  box-shadow: 0 0 0 2px rgba(181, 255, 20, 0.15);
+}
+
+.form-group textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+.field-hint-text {
+  font-size: 0.72rem;
+  color: #52525b;
+  margin-top: -4px;
+}
+
+.profile-modal-footer {
+  padding: 18px 24px;
+  border-top: 1px solid #23232a;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background-color: #0c0c0e;
+}
+
+.profile-modal-footer button {
+  padding: 10px 20px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.profile-modal-footer .btn-cancel {
+  background: transparent;
+  border: 1px solid #23232a;
+  color: #8a8f98;
+}
+
+.profile-modal-footer .btn-cancel:hover {
+  color: #fff;
+  border-color: #3f3f46;
+}
+
+.profile-modal-footer .btn-save {
+  background-color: #b5ff14;
+  border: none;
+  color: #000;
+  font-weight: 700;
+}
+
+.profile-modal-footer .btn-save:hover {
+  opacity: 0.9;
+}
+
+.profile-modal-footer .btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Modal Navigation Tabs */
+.profile-modal-tabs {
+  display: flex;
+  background-color: #0c0c0e;
+  border-bottom: 1px solid #23232a;
+  padding: 0 16px;
+  overflow-x: auto;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.tab-link {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #8a8f98;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 14px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tab-link:hover {
+  color: #fff;
+}
+
+.tab-link.active {
+  color: #b5ff14;
+  border-bottom-color: #b5ff14;
+}
+
+/* Services checkbox grid */
+.services-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.service-checkbox-card {
+  background-color: #1c1c22;
+  border: 1px solid #23232a;
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.service-checkbox-card:hover {
+  border-color: #b5ff14;
+}
+
+.service-checkbox-card.active {
+  border-color: #b5ff14;
+  background-color: rgba(181, 255, 20, 0.05);
+}
+
+.checkbox-indicator {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid #8a8f98;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #121215;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.service-checkbox-card.active .checkbox-indicator {
+  border-color: #b5ff14;
+  background-color: #b5ff14;
+}
+
+.checkbox-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* --- Nested Service Detail Configuration Panels --- */
+.nested-service-panel {
+  background-color: #0c0c0e !important;
+  border: 1px solid #23232a !important;
+  border-radius: 8px !important;
+  padding: 20px !important;
+  margin-top: 12px !important;
+  animation: modalInFrame 0.25s ease-out;
+}
+
+.nested-panel-title {
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+  margin-bottom: 12px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  border-bottom: 1px solid #23232a !important;
+  padding-bottom: 6px !important;
+}
+
+.software-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.software-chip {
+  padding: 6px 14px !important;
+  border-radius: 20px !important;
+  border: 1px solid #25252a !important;
+  background-color: #16161a !important;
+  color: #8a8f98 !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  transition: all 0.15s ease !important;
+  user-select: none;
+}
+
+.software-chip:hover {
+  border-color: #3f3f46 !important;
+  color: #fff !important;
+}
+
+.software-chip.active {
+  background-color: rgba(181, 255, 20, 0.1) !important;
+  border-color: #b5ff14 !important;
+  color: #b5ff14 !important;
+}
+
+/* --- Service Details Display Card --- */
+.service-details-display-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.service-spec-item {
+  border-bottom: 1px solid #23232a;
+  padding-bottom: 16px;
+}
+
+.service-spec-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.spec-service-title {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #b5ff14;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.spec-details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.spec-detail-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.82rem;
+}
+
+.spec-label {
+  color: #6c727f;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.spec-val {
+  color: #fff;
+}
+
+.spec-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.spec-chip {
+  font-size: 0.75rem;
+  background-color: #1c1c22;
+  border: 1px solid #23232a;
+  color: #cbd5e1;
+  padding: 2px 8px;
+  border-radius: 4px;
+}

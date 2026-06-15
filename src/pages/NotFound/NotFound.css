@@ -1,0 +1,137 @@
+.notfound-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0c0c0e;
+  padding: 24px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #ffffff;
+}
+
+.notfound-glass-card {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(24, 24, 28, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 48px 36px;
+  text-align: center;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8),
+              inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  animation: notfound-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.notfound-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  background: rgba(112, 214, 77, 0.08);
+  border: 1px solid rgba(112, 214, 77, 0.25);
+  border-radius: 50%;
+  margin-bottom: 24px;
+  box-shadow: 0 0 30px rgba(112, 214, 77, 0.15);
+}
+
+.notfound-code {
+  font-size: 6rem;
+  font-weight: 900;
+  line-height: 1;
+  margin: 0;
+  background: linear-gradient(135deg, #ffffff 30%, #70d64d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -2px;
+}
+
+.notfound-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-top: 12px;
+  margin-bottom: 8px;
+  color: #ffffff;
+}
+
+.notfound-desc {
+  color: #8a8f98;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0 0 28px 0;
+}
+
+.notfound-divider {
+  height: 1px;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 80%);
+  margin-bottom: 28px;
+}
+
+.notfound-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.notfound-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.notfound-btn.primary {
+  background-color: #70d64d;
+  color: #000000;
+  border: none;
+  box-shadow: 0 8px 20px rgba(112, 214, 77, 0.15);
+}
+
+.notfound-btn.primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(112, 214, 77, 0.25);
+}
+
+.notfound-btn.secondary {
+  background-color: transparent;
+  color: #8a8f98;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.notfound-btn.secondary:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+@keyframes notfound-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .notfound-glass-card {
+    padding: 36px 20px;
+  }
+  .notfound-actions {
+    flex-direction: column;
+  }
+  .notfound-btn {
+    width: 100%;
+  }
+}

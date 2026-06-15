@@ -1,379 +1,312 @@
-import React, { useState } from 'react';
-
-import { 
-
-  Mail, MapPin, Phone, Globe, Calendar, Briefcase, Plus, Edit2, 
-
-  Layers, Cpu, Award
-
-} from 'lucide-react';
-
-import { Sidebar } from '../../components/Sidebar/Sidebar';
-
+import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { useAuthStore } from '../../store/useAuthStore';
 import './Profile.css';
 
+// Import subcomponents
+import { ProfileSkeleton } from '../../components/Profile/ProfileSkeleton';
+import { ProfileHeader } from '../../components/Profile/ProfileHeader';
+import { ProfileStats } from '../../components/Profile/ProfileStats';
+import { ProfileAbout } from '../../components/Profile/ProfileAbout';
+import { WorkHistory } from '../../components/Profile/WorkHistory';
+import { TeamStructure } from '../../components/Profile/TeamStructure';
+import { CapabilityCloud } from '../../components/Profile/CapabilityCloud';
+import { ServiceSpecs } from '../../components/Profile/ServiceSpecs';
+import { DocumentsList } from '../../components/Profile/DocumentsList';
+import { EditProfileModal } from '../../components/Profile/EditProfileModal';
 
+const getInitials = (name) => {
+  if (!name) return 'U';
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+};
+
+const SERVICE_LABELS = {
+  BIM: 'BIM & 2D Drafting',
+  Audit: 'As-Built Audit',
+  Peer: 'Peer Review',
+  BOQ: 'BOQ Creation',
+  Viz: '3D Visualisation',
+};
 
 export const Profile = () => {
+  const user = useAuthStore((state) => state.user);
+  const profile = useAuthStore((state) => state.profile);
+  const isLoading = useAuthStore((state) => state.isProfileLoading);
+  const error = useAuthStore((state) => state.profileError);
+  const fetchProfile = useAuthStore((state) => state.fetchProfile);
+  const updateProfile = useAuthStore((state) => state.updateProfile);
 
-  const [role, setRole] = useState('freelancer'); // Default state simulator
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [formData, setFormData] = useState({});
+  const [activeTab, setActiveTab] = useState('basic');
 
-  const [view, setView] = useState('profile');     // Toggles between 'dashboard' and 'profile'
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
+  useEffect(() => {
+    if (isEditModalOpen) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [isEditModalOpen]);
 
+  const handleEditClick = () => {
+    setActiveTab('basic');
+    const isFreelancerRole = user?.role === 'freelancer';
+    const initialSelectedServices = profile?.service_details?.selectedServices || [];
+    const bimDetails = profile?.service_details?.bimDetails || { softwareStack: [], maxLod: '', cdeExperience: '' };
+    const auditDetails = profile?.service_details?.auditDetails || { equipmentOwned: '', serviceRadius: '' };
+    const peerReviewDetails = profile?.service_details?.peerReviewDetails || { teamExperience: '', specialisation: '' };
+    const boqDetails = profile?.service_details?.boqDetails || { measurementStandards: '', estimationSoftware: '' };
+    const vizDetails = profile?.service_details?.vizDetails || { renderingEngines: '', hardwareCapacity: '', animationCapability: 'No' };
+    
+    if (isFreelancerRole) {
+      setFormData({
+        title: profile?.title || '',
+        bio: profile?.bio || '',
+        experienceYears: profile?.experience_years || 0,
+        hourlyRate: profile?.hourly_rate || 0,
+        availability: profile?.availability || 'AVAILABLE',
+        portfolioUrl: profile?.portfolio_url || '',
+        resumeUrl: profile?.resume_url || '',
+        linkedinUrl: profile?.linkedin_url || '',
+        legalNamePan: profile?.legal_name_pan || '',
+        personalPan: profile?.personal_pan || '',
+        commercialBasis: profile?.commercial_basis || '',
+        noticePeriod: profile?.notice_period || '',
+        selectedServices: initialSelectedServices,
+        skillsList: (profile?.freelancer_skills || []).map(s => s.skill_name).join(', '),
+        bimDetails,
+        auditDetails,
+        peerReviewDetails,
+        boqDetails,
+        vizDetails,
+        profilePhoto: profile?.user?.profile_photo || '',
+      });
+    } else {
+      setFormData({
+        agencyName: profile?.agency_name || '',
+        description: profile?.description || '',
+        gstNumber: profile?.gst_number || '',
+        website: profile?.website || '',
+        employeeCount: profile?.employee_count || 0,
+        foundedYear: profile?.founded_year || 2020,
+        industry: profile?.industry || '',
+        city: profile?.city || '',
+        country: profile?.country || '',
+        linkedinUrl: profile?.linkedin_url || '',
+        cin: profile?.cin || '',
+        companyPan: profile?.company_pan || '',
+        commercialBasis: profile?.commercial_basis || '',
+        noticePeriod: profile?.notice_period || '',
+        selectedServices: initialSelectedServices,
+        bimDetails,
+        auditDetails,
+        peerReviewDetails,
+        boqDetails,
+        vizDetails,
+        logo: profile?.logo || '',
+      });
+    }
+    setIsEditModalOpen(true);
+  };
+
+  const handleServiceToggle = (serviceId) => {
+    const currentSelected = formData.selectedServices || [];
+    const newSelected = currentSelected.includes(serviceId)
+      ? currentSelected.filter(id => id !== serviceId)
+      : [...currentSelected, serviceId];
+    
+    setFormData({ ...formData, selectedServices: newSelected });
+  };
+
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (isFreelancer) {
+          setFormData((prev) => ({ ...prev, profilePhoto: reader.result }));
+        } else {
+          setFormData((prev) => ({ ...prev, logo: reader.result }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleNestedChange = (section, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [section]: { ...prev[section], [field]: value },
+    }));
+  };
+
+  const handleSoftwareToggle = (swName) => {
+    setFormData((prev) => {
+      const stack = prev.bimDetails?.softwareStack || [];
+      const newStack = stack.includes(swName)
+        ? stack.filter((s) => s !== swName)
+        : [...stack, swName];
+      return {
+        ...prev,
+        bimDetails: { ...prev.bimDetails, softwareStack: newStack }
+      };
+    });
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    const isFreelancerRole = user?.role === 'freelancer';
+    let payload = { ...formData };
+    
+    const serviceDetails = {
+      selectedServices: formData.selectedServices || [],
+      bimDetails: formData.bimDetails || { softwareStack: [], maxLod: '', cdeExperience: '' },
+      auditDetails: formData.auditDetails || { equipmentOwned: '', serviceRadius: '' },
+      peerReviewDetails: formData.peerReviewDetails || { teamExperience: '', specialisation: '' },
+      boqDetails: formData.boqDetails || { measurementStandards: '', estimationSoftware: '' },
+      vizDetails: formData.vizDetails || { renderingEngines: '', hardwareCapacity: '', animationCapability: 'No' }
+    };
+    
+    payload.serviceDetails = serviceDetails;
+
+    if (isFreelancerRole) {
+      const customSkills = formData.skillsList
+        ? formData.skillsList.split(',').map(s => s.trim()).filter(Boolean)
+        : [];
+      payload.skillsList = Array.from(new Set([...customSkills, ...formData.selectedServices]));
+      payload.experienceYears = parseInt(formData.experienceYears, 10) || 0;
+      payload.hourlyRate = parseFloat(formData.hourlyRate) || 0;
+    } else {
+      payload.employeeCount = parseInt(formData.employeeCount, 10) || 0;
+      payload.foundedYear = parseInt(formData.foundedYear, 10) || 2020;
+    }
+    
+    delete payload.selectedServices;
+    delete payload.bimDetails;
+    delete payload.auditDetails;
+    delete payload.peerReviewDetails;
+    delete payload.boqDetails;
+    delete payload.vizDetails;
+
+    const res = await updateProfile(payload);
+    setIsSaving(false);
+    if (res && res.success) {
+      toast.success('Settings updated successfully!');
+      setIsEditModalOpen(false);
+    } else {
+      toast.error(res?.error || 'Failed to update settings.');
+    }
+  };
+
+  if (isLoading) {
+    return <ProfileSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="profile-workspace-view" style={{ textAlign: 'center', padding: '40px' }}>
+        <p style={{ color: '#ef4444', fontWeight: 600 }}>Failed to load profile details: {error}</p>
+      </div>
+    );
+  }
+
+  const role = user?.role || 'freelancer';
+  const isFreelancer = role === 'freelancer';
+  const name = isFreelancer ? profile?.user?.full_name : profile?.agency_name;
+  const avatar = isFreelancer ? profile?.user?.profile_photo : profile?.logo;
+  const subtitle = isFreelancer ? profile?.title : profile?.industry || 'Digital Services Agency';
+  const emailVal = profile?.user?.email;
+  const phoneVal = profile?.user?.mobile;
+  const locationVal = profile?.city && profile?.country ? `${profile.city}, ${profile.country}` : 'Not Specified';
+  const webVal = isFreelancer ? profile?.portfolio_url : profile?.website;
+  const initials = getInitials(name);
+
+  const skills = isFreelancer 
+    ? (profile?.freelancer_skills || [])
+    : (profile?.service_details?.selectedServices || []).map(code => ({ skill_name: SERVICE_LABELS[code] || code }));
 
   return (
-
-    <div className="app-portal-layout-frame">
-
-      <Sidebar currentRole={role} onRoleChange={setRole} activeView={view} onViewChange={setView} />
-
-
-
-      <main className="portal-main-workspace">
-
-        {view === 'dashboard' ? (
-
-          <div className="dashboard-placeholder-view">
-
-            <h2>Dashboard Analytics Workspace View</h2>
-
-            <p>Your main analytical data tables and charts render here.</p>
-
-          </div>
-
-        ) : (
-
-          /* Profile Main Context View Container Block */
-
-          <div className="profile-workspace-view animate-fade-in">
-
-            
-
-            {/* Top Identity Header Profile Section Banner */}
-
-            <header className="profile-identity-banner">
-
-              <div className="profile-identity-main">
-
-                <div className="profile-large-avatar">
-
-                  {role === 'agency' ? 'CS' : 'SJ'} 
-
-                </div>
-
-                <div className="profile-title-details">
-
-                  <div className="profile-name-row">
-
-                    <h1>{role === 'agency' ? 'Creative Studios Inc.' : 'Sarah Johnson'}</h1> 
-
-                    <span className="availability-chip">AVAILABLE</span> 
-
-                  </div>
-
-                  <p className="profile-subtitle-text">
-
-                    {role === 'agency' ? 'Full-Service Digital Agency' : 'Senior Full Stack Developer'} 
-
-                  </p>
-
-                  <div className="meta-contact-links-grid">
-
-                    <span><Mail size={14} /> {role === 'agency' ? 'contact@creativestudios.com' : 'sarah.j@email.com'}</span> 
-
-                    <span><MapPin size={14} /> {role === 'agency' ? 'San Francisco, USA' : 'New York, USA'}</span> 
-
-                    <span><Phone size={14} /> +1 234 567 8900</span> 
-
-                    <span><Globe size={14} /> {role === 'agency' ? 'www.creativestudios.com' : 'portfolio.sarahjohnson.com'}</span> 
-
-                    {role === 'agency' && <span><Calendar size={14} /> Est. 2018</span>} 
-
-                  </div>
-
-                </div>
-
-              </div>
-
-              <button className="edit-profile-action-btn">
-
-                <Edit2 size={14} /> Edit Profile 
-
-              </button>
-
-            </header>
-
-
-
-            {/* Metrics Row Blocks */}
-
-            <section className="profile-quick-stats-row">
-
-              <div className="stat-metric-box">
-
-                <span className="stat-label">Projects Assigned</span> 
-
-                <span className="stat-value">1</span> 
-
-              </div>
-
-              {role === 'freelancer' ? (
-
-                <div className="stat-metric-box">
-
-                  <span className="stat-label">Hourly Rate</span> 
-
-                  <span className="stat-value">$75/hr</span> 
-
-                </div>
-
-              ) : (
-
-                <div className="stat-metric-box">
-
-                  <span className="stat-label">Total Team Size</span> 
-
-                  <span className="stat-value">24 Members</span>
-
-                </div>
-
-              )}
-
-              {role === 'freelancer' && (
-
-                <div className="stat-metric-box recommendation-highlight-box">
-
-                  <span className="stat-label">Rating Score</span> 
-
-                  <span className="stat-value">⭐ 4.5</span> 
-
-                  <p className="recommendation-desc-text">Highly recommended for upcoming projects</p> 
-
-                </div>
-
-              )}
-
-            </section>
-
-
-
-            {/* Grid Layout Splitting Content Details */}
-
-            <div className="profile-details-split-grid">
-
-              
-
-              {/* Left Column Areas */}
-
-              <div className="profile-details-left-pane">
-
-                
-
-                {/* About Blocks Section */}
-
-                <div className="pane-content-card">
-
-                  <h3>{role === 'agency' ? 'About Our Agency' : 'About Me'}</h3> 
-
-                  <p className="narrative-biography-text">
-
-                    {role === 'agency' ? (
-
-                      'Creative Studios Inc. is a full-service digital agency specializing in web development, mobile applications, and digital design. Founded in 2018, we have grown to a team of 24 talented professionals dedicated to delivering exceptional digital experiences.' 
-
-                    ) : (
-
-                      'Experienced full-stack developer with over 8 years of expertise in building scalable web applications. Specialized in React, Node.js, and cloud technologies. Passionate about creating clean, maintainable code.' 
-
-                    )}
-
-                  </p>
-
-                </div>
-
-
-
-                {/* Experience History or Team Breakdown conditionally generated mapping */}
-
-                {role === 'freelancer' ? (
-
-                  <div className="pane-content-card">
-
-                    <h3><Briefcase size={18} /> Professional Experience</h3> 
-
-                    <div className="history-timeline-list">
-
-                      <div className="history-item">
-
-                        <div className="history-meta-row">
-
-                          <strong>Senior Full Stack Developer</strong> 
-
-                          <span className="timeline-badge-year">2020 - Present</span> 
-
-                        </div>
-
-                        <span className="company-attribution-text">Freelance Workspaces</span> 
-
-                        <p className="job-summary-details">Working with various clients on web application development, specializing in React and Node.js ecosystems.</p>
-
-                      </div>
-
-                      <div className="history-item">
-
-                        <div className="history-meta-row">
-
-                          <strong>Full Stack Developer</strong> 
-
-                          <span className="timeline-badge-year">2018 - 2020</span> 
-
-                        </div>
-
-                        <span className="company-attribution-text">Tech Company Inc.</span> 
-
-                        <p className="job-summary-details">Developed and maintained enterprise-level applications serving millions of users globally.</p> 
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                ) : (
-
-                  <div className="pane-content-card">
-
-                    <h3><Layers size={18} /> Agency Team Structure Overview</h3> 
-
-                    <div className="team-distribution-matrix">
-
-                      <div className="team-segment-card">
-
-                        <span className="segment-number">12</span> 
-
-                        <span className="segment-title">DEVELOPERS</span> 
-
-                      </div>
-
-                      <div className="team-segment-card">
-
-                        <span className="segment-number">7</span> 
-
-                        <span className="segment-title">DESIGNERS</span> 
-
-                      </div>
-
-                      <div className="team-segment-card">
-
-                        <span className="segment-number">4</span>
-
-                        <span className="segment-title">PROJECT MANAGERS</span> 
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                )}
-
-              </div>
-
-
-
-              {/* Right Column Areas */}
-
-              <div className="profile-details-right-pane">
-
-                
-
-                {/* Specializations / Expertise Skill pill blocks */}
-
-                <div className="pane-content-card">
-
-                  <h3>
-
-                    {role === 'agency' ? <Award size={18} /> : <Cpu size={18} />} 
-
-                    {role === 'agency' ? 'Agency Specializations' : 'Skills & Expertise'} 
-
-                  </h3>
-
-                  <div className="skills-pill-cloud">
-
-                    {role === 'agency' ? (
-
-                      ['Web Development', 'Mobile Apps', 'UI/UX Design', 'Branding', 'Digital Marketing', 'Cloud Solutions', 'E-commerce', 'Custom Software'].map(tag => (
-
-                        <span key={tag} className="skill-pill-node">{tag}</span> 
-
-                      ))
-
-                    ) : (
-
-                      ['React', 'Node.js', 'TypeScript', 'MongoDB', 'PostgreSQL', 'UI/UX Design', 'REST APIs', 'JavaScript', 'Python', 'AWS', 'Docker', 'Git'].map(tag => (
-
-                        <span key={tag} className="skill-pill-node">{tag}</span> 
-
-                      ))
-
-                    )}
-
-                  </div>
-
-                </div>
-
-
-
-                {/* Secure Documents Block Frame */}
-
-                <div className="pane-content-card">
-
-                  <div className="card-header-flex-row">
-
-                    <h3>{role === 'agency' ? 'Agency Documents' : 'Verified Documents'}</h3> 
-
-                    <button className="add-document-action-trigger">
-
-                      <Plus size={14} /> Add 
-
-                    </button>
-
-                  </div>
-
-                  <div className="empty-documents-status-placeholder">
-
-                    <p className="primary-empty-msg">
-
-                      {role === 'agency' ? 'No legal documents uploaded yet' : 'No documents uploaded yet'} 
-
-                    </p>
-
-                    <p className="secondary-empty-msg">
-
-                      {role === 'agency' ? 'Upload verification NDAs, MSAs, or W9 tax files here.' : 'Upload resumes, certifications, or identity documentation files.'} 
-
-                    </p>
-
-                  </div>
-
-                </div>
-
-
-
-              </div>
-
-            </div>
-
-          </div>
-
-        )}
-
-      </main>
-
+    <div className="profile-workspace-view animate-fade-in">
+      <ProfileHeader
+        isFreelancer={isFreelancer}
+        name={name}
+        avatar={avatar}
+        subtitle={subtitle}
+        emailVal={emailVal}
+        phoneVal={phoneVal}
+        locationVal={locationVal}
+        webVal={webVal}
+        foundedYear={profile?.founded_year}
+        initials={initials}
+        availability={profile?.availability}
+        handleEditClick={handleEditClick}
+      />
+
+      <ProfileStats
+        isFreelancer={isFreelancer}
+        totalProjects={profile?.total_projects}
+        hourlyRate={profile?.hourly_rate}
+        commercialBasis={profile?.commercial_basis}
+        employeeCount={profile?.employee_count}
+      />
+
+      <div className="profile-details-split-grid">
+        <div className="profile-details-left-pane">
+          <ProfileAbout
+            isFreelancer={isFreelancer}
+            bio={profile?.bio}
+            description={profile?.description}
+          />
+
+          {isFreelancer ? (
+            <WorkHistory workHistory={profile?.work_history} />
+          ) : (
+            <TeamStructure employeeCount={profile?.employee_count} />
+          )}
+        </div>
+
+        <div className="profile-details-right-pane">
+          <CapabilityCloud
+            isFreelancer={isFreelancer}
+            skills={skills}
+          />
+
+          <ServiceSpecs serviceDetails={profile?.service_details} />
+
+          <DocumentsList
+            isFreelancer={isFreelancer}
+            resumeUrl={profile?.resume_url}
+            verifications={profile?.verifications}
+          />
+        </div>
+      </div>
+
+      {isEditModalOpen && (
+        <EditProfileModal
+          isFreelancer={isFreelancer}
+          formData={formData}
+          setFormData={setFormData}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          isSaving={isSaving}
+          onClose={() => setIsEditModalOpen(false)}
+          onSubmit={handleFormSubmit}
+          profile={profile}
+          handlePhotoUpload={handlePhotoUpload}
+          handleServiceToggle={handleServiceToggle}
+          handleSoftwareToggle={handleSoftwareToggle}
+          handleNestedChange={handleNestedChange}
+        />
+      )}
     </div>
-
   );
-
 };

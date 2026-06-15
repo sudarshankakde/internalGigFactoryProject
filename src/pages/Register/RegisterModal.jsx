@@ -1,0 +1,1038 @@
+import React, { useState, useEffect } from 'react';
+import { Mail, Phone, User, Building2, FileText, ArrowRight, ArrowLeft, Check, CheckSquare, X } from 'lucide-react';
+import { toast } from 'react-toastify';
+import { api } from '../../utils/api';
+import { freelancerSchema, agencySchema } from './RegisterSchema';
+import './RegisterModal.css';
+import gigfactoryLogo from '../../assets/logo.png';
+
+const locationSuggestions = [
+  'Ahmedabad, Gujarat, India',
+  'Agra, Uttar Pradesh, India',
+  'Amritsar, Punjab, India',
+  'Aurangabad, Maharashtra, India',
+  'Bengaluru, Karnataka, India',
+  'Bhopal, Madhya Pradesh, India',
+  'Bhubaneswar, Odisha, India',
+  'Chandigarh, India',
+  'Chennai, Tamil Nadu, India',
+  'Coimbatore, Tamil Nadu, India',
+  'Dehradun, Uttarakhand, India',
+  'Delhi, NCR, India',
+  'Faridabad, Haryana, India',
+  'Ghaziabad, Uttar Pradesh, India',
+  'Gurgaon, Haryana, India',
+  'Guwahati, Assam, India',
+  'Gwalior, Madhya Pradesh, India',
+  'Hyderabad, Telangana, India',
+  'Indore, Madhya Pradesh, India',
+  'Jabalpur, Madhya Pradesh, India',
+  'Jaipur, Rajasthan, India',
+  'Jalandhar, Punjab, India',
+  'Jammu, Jammu and Kashmir, India',
+  'Jamshedpur, Jharkhand, India',
+  'Jodhpur, Rajasthan, India',
+  'Kanpur, Uttar Pradesh, India',
+  'Kochi, Kerala, India',
+  'Kolkata, West Bengal, India',
+  'Kota, Rajasthan, India',
+  'Kozhikode, Kerala, India',
+  'Lucknow, Uttar Pradesh, India',
+  'Ludhiana, Punjab, India',
+  'Madurai, Tamil Nadu, India',
+  'Mangalore, Karnataka, India',
+  'Mumbai, Maharashtra, India',
+  'Mysore, Karnataka, India',
+  'Nagpur, Maharashtra, India',
+  'Nashik, Maharashtra, India',
+  'Noida, Uttar Pradesh, India',
+  'Panaji, Goa, India',
+  'Patna, Bihar, India',
+  'Puducherry, India',
+  'Pune, Maharashtra, India',
+  'Raipur, Chhattisgarh, India',
+  'Rajkot, Gujarat, India',
+  'Ranchi, Jharkhand, India',
+  'Shimla, Himachal Pradesh, India',
+  'Siliguri, West Bengal, India',
+  'Srinagar, Jammu and Kashmir, India',
+  'Surat, Gujarat, India',
+  'Thiruvananthapuram, Kerala, India',
+  'Tiruchirappalli, Tamil Nadu, India',
+  'Udaipur, Rajasthan, India',
+  'Vadodara, Gujarat, India',
+  'Varanasi, Uttar Pradesh, India',
+  'Vijayawada, Andhra Pradesh, India',
+  'Visakhapatnam, Andhra Pradesh, India',
+  'Warangal, Telangana, India'
+];
+
+const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubmitSuccess }) => {
+  const [role, setRole] = useState('freelancer');
+  const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+
+  // Location Autocomplete States
+  const [filteredLocations, setFilteredLocations] = useState([]);
+  const [showLocations, setShowLocations] = useState(false);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0);
+
+  const [formData, setFormData] = useState({
+    // Basic details
+    fullName: '',
+    authPersonName: '',
+    designation: '',
+    email: '',
+    mobile: '',
+    location: '',
+    headquarters: '',
+    linkedinUrl: '',
+    website: '',
+
+    // Legal & Tax
+    legalNamePan: '',
+    personalPan: '',
+    registeredName: '',
+    gstNumber: '',
+    cin: '',
+    companyPan: '',
+
+    // Services
+    selectedServices: [],
+    bimDetails: { softwareStack: [], maxLod: '', cdeExperience: '' },
+    auditDetails: { equipmentOwned: '', serviceRadius: '' },
+    peerReviewDetails: { teamExperience: '', specialisation: '' },
+    boqDetails: { measurementStandards: '', estimationSoftware: '' },
+    vizDetails: { renderingEngines: '', hardwareCapacity: '', animationCapability: 'No' },
+
+    // Commercials
+    portfolioUrl: '',
+    commercialBasis: '',
+    baseRate: '',
+    noticePeriod: '',
+    availability: '',
+    teamSize: '',
+
+    // Declaration
+    declarationAccepted: false,
+    signatureName: '',
+  });
+
+  // Prefill check on mount / props change
+  useEffect(() => {
+    if (reapplyData) {
+      setRole(reapplyData.role || 'freelancer');
+      setFormData((prev) => ({
+        ...prev,
+        ...reapplyData,
+        email: email || reapplyData.email || prev.email,
+        fullName: reapplyData.role === 'freelancer' ? (reapplyData.fullName || reapplyData.fullName || prev.fullName) : prev.fullName,
+        authPersonName: reapplyData.role === 'agency' ? (reapplyData.authPersonName || reapplyData.fullName || prev.authPersonName) : prev.authPersonName,
+        mobile: reapplyData.mobile || prev.mobile,
+        declarationAccepted: false,
+        signatureName: ''
+      }));
+    } else if (email) {
+      setFormData((prev) => ({
+        ...prev,
+        email: email
+      }));
+    }
+  }, [reapplyData, email]);
+
+  if (!isOpen) return null;
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    const val = type === 'checkbox' ? checked : value;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: val,
+    }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const handleLocationSearch = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: '' }));
+    }
+
+    if (value.trim().length > 0) {
+      const matched = locationSuggestions.filter((city) =>
+        city.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredLocations(matched);
+      setShowLocations(true);
+      setActiveSuggestionIndex(0);
+    } else {
+      setShowLocations(false);
+    }
+  };
+
+  const handleSelectLocation = (fieldName, city) => {
+    setFormData((prev) => ({
+      ...prev,
+      [fieldName]: city,
+    }));
+    setShowLocations(false);
+  };
+
+  const handleLocationKeyDown = (e, fieldName) => {
+    if (!showLocations || filteredLocations.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveSuggestionIndex((prev) => (prev + 1) % filteredLocations.length);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveSuggestionIndex((prev) => (prev - 1 + filteredLocations.length) % filteredLocations.length);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const selectedCity = filteredLocations[activeSuggestionIndex];
+      if (selectedCity) {
+        handleSelectLocation(fieldName, selectedCity);
+      }
+    } else if (e.key === 'Tab') {
+      const selectedCity = filteredLocations[activeSuggestionIndex];
+      if (selectedCity) {
+        handleSelectLocation(fieldName, selectedCity);
+      }
+    } else if (e.key === 'Escape') {
+      setShowLocations(false);
+    }
+  };
+
+  const handleLocationBlur = () => {
+    setTimeout(() => {
+      setShowLocations(false);
+    }, 200);
+  };
+
+  const handleServiceToggle = (serviceId) => {
+    setFormData((prev) => {
+      const selected = prev.selectedServices.includes(serviceId)
+        ? prev.selectedServices.filter((s) => s !== serviceId)
+        : [...prev.selectedServices, serviceId];
+      
+      if (errors.selectedServices) {
+        setErrors((prevErr) => ({ ...prevErr, selectedServices: '' }));
+      }
+      return { ...prev, selectedServices: selected };
+    });
+  };
+
+  const handleSoftwareToggle = (swName) => {
+    setFormData((prev) => {
+      const stack = prev.bimDetails.softwareStack.includes(swName)
+        ? prev.bimDetails.softwareStack.filter((s) => s !== swName)
+        : [...prev.bimDetails.softwareStack, swName];
+      return { ...prev, bimDetails: { ...prev.bimDetails, softwareStack: stack } };
+    });
+  };
+
+  const handleNestedChange = (section, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [section]: { ...prev[section], [field]: value },
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const schema = role === 'freelancer' ? freelancerSchema : agencySchema;
+    try {
+      // Validate all fields together
+      await schema.validate(formData, { abortEarly: false });
+      setErrors({});
+      setSubmitting(true);
+
+      const payload = {
+        email: formData.email,
+        fullName: role === 'freelancer' ? formData.fullName : formData.authPersonName,
+        mobile: formData.mobile,
+        roleName: role,
+        applicationData: {
+          ...formData,
+          title: role === 'freelancer' ? formData.designation : undefined,
+          agencyName: role === 'agency' ? formData.registeredName : undefined,
+          bio: role === 'freelancer'
+            ? `Designation: ${formData.designation}. LinkedIn: ${formData.linkedinUrl || 'N/A'}. Legal PAN Name: ${formData.legalNamePan}`
+            : `Company Website: ${formData.website || 'N/A'}. Authorized signatory: ${formData.authPersonName}`,
+          experienceYears: role === 'freelancer' ? (parseInt(formData.peerReviewDetails?.teamExperience, 10) || 3) : undefined,
+          employeeCount: role === 'agency' ? (parseInt(formData.teamSize, 10) || 5) : undefined,
+          hourlyRate: role === 'freelancer' ? (parseFloat(formData.baseRate) || 0) : undefined,
+          availability: role === 'freelancer' ? (formData.availability ? formData.availability.toLowerCase() : 'project basis') : undefined,
+          portfolioUrl: formData.portfolioUrl || '',
+          gstNumber: role === 'agency' ? formData.gstNumber : undefined,
+          website: role === 'agency' ? formData.website : undefined,
+          address: role === 'agency' ? formData.headquarters : undefined,
+          city: role === 'freelancer'
+            ? (formData.location ? formData.location.split(',')[0]?.trim() || 'Mumbai' : 'Mumbai')
+            : (formData.headquarters ? formData.headquarters.split(',')[0]?.trim() || 'Mumbai' : 'Mumbai'),
+          country: role === 'freelancer'
+            ? (formData.location ? formData.location.split(',')[1]?.trim() || 'India' : 'India')
+            : (formData.headquarters ? formData.headquarters.split(',')[1]?.trim() || 'India' : 'India'),
+          skillsList: formData.selectedServices,
+          serviceDetails: {
+            selectedServices: formData.selectedServices,
+            bimDetails: formData.bimDetails,
+            auditDetails: formData.auditDetails,
+            peerReviewDetails: formData.peerReviewDetails,
+            boqDetails: formData.boqDetails,
+            vizDetails: formData.vizDetails
+          }
+        }
+      };
+
+      const response = await api.post('/auth/register', payload);
+      toast.success(response.message || 'Registration request submitted successfully!');
+      
+      if (onSubmitSuccess) {
+        onSubmitSuccess(response);
+      }
+    } catch (err) {
+      if (err.inner) {
+        const newErrors = {};
+        err.inner.forEach((validationError) => {
+          newErrors[validationError.path] = validationError.message;
+        });
+        setErrors(newErrors);
+        toast.warning('Please correct form validation errors before submitting.');
+      } else {
+        toast.error(err.message || 'Failed to submit registration request.');
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const servicesList = [
+    { id: 'BIM', label: 'BIM & 2D Drafting' },
+    { id: 'Audit', label: 'As-Built Audit' },
+    { id: 'Peer', label: 'Peer Review' },
+    { id: 'BOQ', label: 'BOQ Creation' },
+    { id: 'Viz', label: '3D Visualisation' }
+  ];
+
+  return (
+    <div className="register-modal-overlay" onClick={(e) => e.target.classList.contains('register-modal-overlay') && onClose()}>
+      <div className="register-card wizard register-modal-card">
+        
+        {/* Close Button */}
+        <button type="button" className="register-modal-close" onClick={onClose} aria-label="Close">
+          <X size={16} />
+        </button>
+
+        {/* Branding Logo */}
+        <div className="register-branding-logo-box">
+          <img src={gigfactoryLogo} alt="Gigfactory Logo" className="register-brand-img" />
+        </div>
+
+        {/* Header */}
+        <h1 className="register-title">{reapplyData ? 'EDIT & REAPPLY APPLICATION' : 'CREATE AN ACCOUNT'}</h1> 
+        <p className="register-subtitle">
+          {reapplyData 
+            ? "We've loaded your previous application details. Please review, edit, and submit again."
+            : "Join GigFactory and unlock opportunities"
+          }
+        </p> 
+
+        <hr className="divider-line" />
+
+        {/* Role Selection Tabs */}
+        {!reapplyData && (
+          <div className="role-tab-container">
+            <button 
+              type="button"
+              className={`role-tab-btn ${role === 'freelancer' ? 'active' : ''}`}
+              onClick={() => {
+                setRole('freelancer');
+                setErrors({});
+              }}
+            >
+              <User size={16} /> Freelancer
+            </button>
+            <button 
+              type="button"
+              className={`role-tab-btn ${role === 'agency' ? 'active' : ''}`}
+              onClick={() => {
+                setRole('agency');
+                setErrors({});
+              }}
+            >
+              <Building2 size={16} /> Agency / Company
+            </button>
+          </div>
+        )}
+
+        {/* Unified Scrollable Form */}
+        <form onSubmit={handleSubmit} className="register-form">
+          
+          {/* SECTION 1: PROFILE DETAILS */}
+          <div className="register-form-section">
+            <h3 className="register-section-title">1. Profile Details</h3>
+            <div className="form-grid-2">
+              <div className="input-group">
+                <label htmlFor="fullName">{role === 'freelancer' ? 'Full Name *' : 'Name of Authorised Person *'}</label>
+                <div className="input-wrapper">
+                  <span className="input-icon"><User size={18} /></span>
+                  <input 
+                    type="text" 
+                    id="fullName"
+                    name={role === 'freelancer' ? 'fullName' : 'authPersonName'}
+                    value={role === 'freelancer' ? formData.fullName : formData.authPersonName}
+                    placeholder={role === 'freelancer' ? 'Your professional name' : 'Submitting representative'}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                {errors[role === 'freelancer' ? 'fullName' : 'authPersonName'] && (
+                  <span className="validation-error">{errors[role === 'freelancer' ? 'fullName' : 'authPersonName']}</span>
+                )}
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="designation">Designation / Role *</label>
+                <div className="input-wrapper">
+                  <span className="input-icon"><User size={18} /></span>
+                  <input 
+                    type="text" 
+                    id="designation"
+                    name="designation"
+                    value={formData.designation}
+                    placeholder="e.g. BIM Modeller, Architect, Director"
+                    onChange={handleInputChange}
+                  />
+                </div>
+                {errors.designation && <span className="validation-error">{errors.designation}</span>}
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="email">Email Address *</label>
+                <div className="input-wrapper">
+                  <span className="input-icon"><Mail size={18} /></span>
+                  <input 
+                    type="email" 
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    placeholder="email@domain.com"
+                    onChange={handleInputChange}
+                    disabled={!!email}
+                  />
+                </div>
+                {errors.email && <span className="validation-error">{errors.email}</span>}
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="mobile">Mobile Number *</label>
+                <div className="input-wrapper">
+                  <span className="input-icon"><Phone size={18} /></span>
+                  <input 
+                    type="text" 
+                    id="mobile"
+                    name="mobile"
+                    value={formData.mobile}
+                    placeholder="10-digit number"
+                    onChange={handleInputChange}
+                  />
+                </div>
+                {errors.mobile && <span className="validation-error">{errors.mobile}</span>}
+              </div>
+
+              <div className="input-group" style={{ position: 'relative' }}>
+                <label htmlFor="location">{role === 'freelancer' ? 'Current Location *' : 'Company Headquarters *'}</label>
+                <div className="input-wrapper">
+                  <span className="input-icon"><Building2 size={18} /></span>
+                  <input 
+                    type="text" 
+                    id="location"
+                    name={role === 'freelancer' ? 'location' : 'headquarters'}
+                    value={role === 'freelancer' ? formData.location : formData.headquarters}
+                    placeholder="Type city..."
+                    onChange={handleLocationSearch}
+                    onKeyDown={(e) => handleLocationKeyDown(e, role === 'freelancer' ? 'location' : 'headquarters')}
+                    onBlur={handleLocationBlur}
+                    autoComplete="off"
+                  />
+                </div>
+                {showLocations && filteredLocations.length > 0 && (
+                  <ul className="suggestions-list">
+                    {filteredLocations.map((city, index) => (
+                      <li 
+                        key={city} 
+                        className={`suggestion-item ${index === activeSuggestionIndex ? 'highlighted' : ''}`}
+                        onMouseDown={() => handleSelectLocation(role === 'freelancer' ? 'location' : 'headquarters', city)}
+                      >
+                        {city}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {errors[role === 'freelancer' ? 'location' : 'headquarters'] && (
+                  <span className="validation-error">{errors[role === 'freelancer' ? 'location' : 'headquarters']}</span>
+                )}
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="linkedinUrl">LinkedIn URL</label>
+                <div className="input-wrapper">
+                  <span className="input-icon"><Building2 size={18} /></span>
+                  <input 
+                    type="text" 
+                    id="linkedinUrl"
+                    name="linkedinUrl"
+                    value={formData.linkedinUrl}
+                    placeholder="https://linkedin.com/in/..."
+                    onChange={handleInputChange}
+                  />
+                </div>
+                {errors.linkedinUrl && <span className="validation-error">{errors.linkedinUrl}</span>}
+              </div>
+
+              {role === 'agency' && (
+                <div className="input-group" style={{ gridColumn: 'span 2' }}>
+                  <label htmlFor="website">Company Website</label>
+                  <div className="input-wrapper">
+                    <span className="input-icon"><Building2 size={18} /></span>
+                    <input 
+                      type="text" 
+                      id="website"
+                      name="website"
+                      value={formData.website}
+                      placeholder="https://..."
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  {errors.website && <span className="validation-error">{errors.website}</span>}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* SECTION 2: LEGAL & TAX IDENTITY */}
+          <div className="register-form-section">
+            <h3 className="register-section-title">2. Legal &amp; Tax Identity</h3>
+            <div className="form-grid-2">
+              {role === 'freelancer' ? (
+                <>
+                  <div className="input-group">
+                    <label htmlFor="legalNamePan">Legal Name (as per PAN) *</label>
+                    <div className="input-wrapper">
+                      <span className="input-icon"><User size={18} /></span>
+                      <input 
+                        type="text" 
+                        id="legalNamePan"
+                        name="legalNamePan"
+                        value={formData.legalNamePan}
+                        placeholder="Exactly as written on PAN"
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                    {errors.legalNamePan && <span className="validation-error">{errors.legalNamePan}</span>}
+                  </div>
+
+                  <div className="input-group">
+                    <label htmlFor="personalPan">Personal PAN Card Number *</label>
+                    <div className="input-wrapper">
+                      <span className="input-icon"><FileText size={18} /></span>
+                      <input 
+                        type="text" 
+                        id="personalPan"
+                        name="personalPan"
+                        value={formData.personalPan}
+                        placeholder="10-character PAN"
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                    {errors.personalPan && <span className="validation-error">{errors.personalPan}</span>}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="input-group">
+                    <label htmlFor="registeredName">Registered Company Name *</label>
+                    <div className="input-wrapper">
+                      <span className="input-icon"><Building2 size={18} /></span>
+                      <input 
+                        type="text" 
+                        id="registeredName"
+                        name="registeredName"
+                        value={formData.registeredName}
+                        placeholder="As per official incorporation records"
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                    {errors.registeredName && <span className="validation-error">{errors.registeredName}</span>}
+                  </div>
+
+                  <div className="input-group">
+                    <label htmlFor="companyPan">Company PAN *</label>
+                    <div className="input-wrapper">
+                      <span className="input-icon"><FileText size={18} /></span>
+                      <input 
+                        type="text" 
+                        id="companyPan"
+                        name="companyPan"
+                        value={formData.companyPan}
+                        placeholder="10-character Company PAN"
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                    {errors.companyPan && <span className="validation-error">{errors.companyPan}</span>}
+                  </div>
+
+                  <div className="input-group">
+                    <label htmlFor="gstNumber">GST Number (GSTIN)</label>
+                    <div className="input-wrapper">
+                      <span className="input-icon"><FileText size={18} /></span>
+                      <input 
+                        type="text" 
+                        id="gstNumber"
+                        name="gstNumber"
+                        value={formData.gstNumber}
+                        placeholder="15-character GST"
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                    {errors.gstNumber && <span className="validation-error">{errors.gstNumber}</span>}
+                  </div>
+
+                  <div className="input-group">
+                    <label htmlFor="cin">CIN</label>
+                    <div className="input-wrapper">
+                      <span className="input-icon"><FileText size={18} /></span>
+                      <input 
+                        type="text" 
+                        id="cin"
+                        name="cin"
+                        value={formData.cin}
+                        placeholder="Corporate Identification Number"
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                    {errors.cin && <span className="validation-error">{errors.cin}</span>}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* SECTION 3: SERVICES */}
+          <div className="register-form-section">
+            <h3 className="register-section-title">3. Services &amp; Specialisation</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '15px' }}>
+              Select the services you offer (select at least one)
+            </p>
+            <div className="services-grid">
+              {servicesList.map((service) => {
+                const isActive = formData.selectedServices.includes(service.id);
+                return (
+                  <div 
+                    key={service.id} 
+                    className={`service-card ${isActive ? 'active' : ''}`}
+                    onClick={() => handleServiceToggle(service.id)}
+                  >
+                    <div className="service-checkbox-indicator">
+                      {isActive && <Check size={12} strokeWidth={3} />}
+                    </div>
+                    <span className="service-label-text">{service.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+            {errors.selectedServices && (
+              <div className="validation-error" style={{ marginBottom: '15px' }}>{errors.selectedServices}</div>
+            )}
+
+            {/* DYNAMIC SERVICE CONFIGURATION PANELS */}
+            <div className="dynamic-panels-container">
+              {formData.selectedServices.includes('BIM') && (
+                <div className="nested-service-panel">
+                  <h4 className="nested-panel-title">BIM &amp; 2D Drafting Details</h4>
+                  <div className="input-group" style={{ marginBottom: '15px' }}>
+                    <label>SOFTWARE STACK</label>
+                    <div className="software-chips">
+                      {['Revit', 'AutoCAD', 'Navisworks', 'Tekla', 'Civil 3D'].map((sw) => {
+                        const isSel = formData.bimDetails.softwareStack.includes(sw);
+                        return (
+                          <div 
+                            key={sw} 
+                            className={`software-chip ${isSel ? 'active' : ''}`}
+                            onClick={() => handleSoftwareToggle(sw)}
+                          >
+                            {sw}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="form-grid-2">
+                    <div className="input-group">
+                      <label>MAX LOD CAPABILITY</label>
+                      <select 
+                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--text-main)', outline: 'none' }}
+                        value={formData.bimDetails.maxLod}
+                        onChange={(e) => handleNestedChange('bimDetails', 'maxLod', e.target.value)}
+                      >
+                        <option value="">Select option</option>
+                        <option value="LOD 300">LOD 300</option>
+                        <option value="LOD 350">LOD 350</option>
+                        <option value="LOD 400">LOD 400</option>
+                        <option value="LOD 500">LOD 500</option>
+                      </select>
+                    </div>
+                    <div className="input-group">
+                      <label>CDE EXPERIENCE</label>
+                      <div className="input-wrapper">
+                        <input 
+                          type="text"
+                          placeholder="e.g., BIM 360, ACC, ProjectWise"
+                          value={formData.bimDetails.cdeExperience}
+                          onChange={(e) => handleNestedChange('bimDetails', 'cdeExperience', e.target.value)}
+                          style={{ paddingLeft: '14px' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {formData.selectedServices.includes('Audit') && (
+                <div className="nested-service-panel">
+                  <h4 className="nested-panel-title">As-Built Audit Details</h4>
+                  <div className="form-grid-2">
+                    <div className="input-group">
+                      <label>EQUIPMENT OWNED</label>
+                      <div className="input-wrapper">
+                        <input 
+                          type="text"
+                          placeholder="e.g., Laser Scanner, Total Station, Drone"
+                          value={formData.auditDetails.equipmentOwned}
+                          onChange={(e) => handleNestedChange('auditDetails', 'equipmentOwned', e.target.value)}
+                          style={{ paddingLeft: '14px' }}
+                        />
+                      </div>
+                    </div>
+                    <div className="input-group">
+                      <label>SERVICE RADIUS</label>
+                      <select 
+                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--text-main)', outline: 'none' }}
+                        value={formData.auditDetails.serviceRadius}
+                        onChange={(e) => handleNestedChange('auditDetails', 'serviceRadius', e.target.value)}
+                      >
+                        <option value="">Select option</option>
+                        <option value="City-wide">City-wide</option>
+                        <option value="State-wide">State-wide</option>
+                        <option value="Nationwide">Nationwide</option>
+                        <option value="Pan-India + Export">Pan-India + Export</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {formData.selectedServices.includes('Peer') && (
+                <div className="nested-service-panel">
+                  <h4 className="nested-panel-title">Peer Review Details</h4>
+                  <div className="form-grid-2">
+                    <div className="input-group">
+                      <label>{role === 'freelancer' ? 'TOTAL YEARS OF EXPERIENCE *' : 'TOTAL TEAM EXPERIENCE *'}</label>
+                      <div className="input-wrapper">
+                        <input 
+                          type="text"
+                          placeholder="e.g., 5, 8"
+                          value={formData.peerReviewDetails.teamExperience}
+                          onChange={(e) => handleNestedChange('peerReviewDetails', 'teamExperience', e.target.value)}
+                          style={{ paddingLeft: '14px' }}
+                        />
+                      </div>
+                    </div>
+                    <div className="input-group">
+                      <label>SPECIALISATION</label>
+                      <select 
+                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--text-main)', outline: 'none' }}
+                        value={formData.peerReviewDetails.specialisation}
+                        onChange={(e) => handleNestedChange('peerReviewDetails', 'specialisation', e.target.value)}
+                      >
+                        <option value="">Select option</option>
+                        <option value="Structural">Structural</option>
+                        <option value="MEP">MEP</option>
+                        <option value="Architectural">Architectural</option>
+                        <option value="Fire &amp; Life Safety">Fire &amp; Life Safety</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {formData.selectedServices.includes('BOQ') && (
+                <div className="nested-service-panel">
+                  <h4 className="nested-panel-title">BOQ Details</h4>
+                  <div className="form-grid-2">
+                    <div className="input-group">
+                      <label>MEASUREMENT STANDARDS</label>
+                      <select 
+                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--text-main)', outline: 'none' }}
+                        value={formData.boqDetails.measurementStandards}
+                        onChange={(e) => handleNestedChange('boqDetails', 'measurementStandards', e.target.value)}
+                      >
+                        <option value="">Select option</option>
+                        <option value="IS 1200">IS 1200</option>
+                        <option value="RICS">RICS</option>
+                        <option value="NRM2">NRM2</option>
+                        <option value="SMM7">SMM7</option>
+                      </select>
+                    </div>
+                    <div className="input-group">
+                      <label>ESTIMATION SOFTWARE</label>
+                      <div className="input-wrapper">
+                        <input 
+                          type="text"
+                          placeholder="e.g., CostX, PlanSwift, Excel"
+                          value={formData.boqDetails.estimationSoftware}
+                          onChange={(e) => handleNestedChange('boqDetails', 'estimationSoftware', e.target.value)}
+                          style={{ paddingLeft: '14px' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {formData.selectedServices.includes('Viz') && (
+                <div className="nested-service-panel">
+                  <h4 className="nested-panel-title">3D Visualisation Details</h4>
+                  <div className="input-group" style={{ marginBottom: '15px' }}>
+                    <label>RENDERING ENGINE(S)</label>
+                    <div className="input-wrapper">
+                      <input 
+                        type="text"
+                        placeholder="e.g., V-Ray, Corona, Lumion, Unreal Engine"
+                        value={formData.vizDetails.renderingEngines}
+                        onChange={(e) => handleNestedChange('vizDetails', 'renderingEngines', e.target.value)}
+                        style={{ paddingLeft: '14px' }}
+                      />
+                    </div>
+                  </div>
+                  <div className="form-grid-2">
+                    <div className="input-group">
+                      <label>HARDWARE CAPACITY</label>
+                      <select 
+                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--text-main)', outline: 'none' }}
+                        value={formData.vizDetails.hardwareCapacity}
+                        onChange={(e) => handleNestedChange('vizDetails', 'hardwareCapacity', e.target.value)}
+                      >
+                        <option value="">Select option</option>
+                        <option value="Dedicated Render Farm / High-end GPU">Dedicated Render Farm / High-end GPU</option>
+                        <option value="Cloud Rendering">Cloud Rendering</option>
+                        <option value="Standard Workstation">Standard Workstation</option>
+                      </select>
+                    </div>
+                    <div className="input-group">
+                      <label>ANIMATION CAPABILITY</label>
+                      <select 
+                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--text-main)', outline: 'none' }}
+                        value={formData.vizDetails.animationCapability}
+                        onChange={(e) => handleNestedChange('vizDetails', 'animationCapability', e.target.value)}
+                      >
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* SECTION 4: PORTFOLIO & COMMERCIALS */}
+          <div className="register-form-section">
+            <h3 className="register-section-title">4. Portfolio &amp; Commercials</h3>
+            <div className="form-grid-2">
+              <div className="input-group" style={{ gridColumn: 'span 2' }}>
+                <label htmlFor="portfolioUrl">Portfolio / Work Samples URL</label>
+                <div className="input-wrapper">
+                  <span className="input-icon"><FileText size={18} /></span>
+                  <input 
+                    type="text" 
+                    id="portfolioUrl"
+                    name="portfolioUrl"
+                    value={formData.portfolioUrl}
+                    placeholder="Dropbox / Drive / Website link"
+                    onChange={handleInputChange}
+                  />
+                </div>
+                {errors.portfolioUrl && <span className="validation-error">{errors.portfolioUrl}</span>}
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="commercialBasis">Standard Commercial Basis *</label>
+                <select 
+                  id="commercialBasis"
+                  name="commercialBasis"
+                  style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--text-main)', outline: 'none' }}
+                  value={formData.commercialBasis}
+                  onChange={handleInputChange}
+                >
+                  <option value="">Select Option</option>
+                  <option value="Hourly Rate">Hourly Rate</option>
+                  <option value="Per Sq. Ft.">Per Sq. Ft.</option>
+                  <option value="Per Sheet">Per Sheet</option>
+                  <option value="Fixed Project Fee">Fixed Project Fee / Lump Sum</option>
+                </select>
+                {errors.commercialBasis && <span className="validation-error">{errors.commercialBasis}</span>}
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="baseRate">Base Rate (INR / Unit) *</label>
+                <div className="input-wrapper">
+                  <span className="input-icon"><FileText size={18} /></span>
+                  <input 
+                    type="number" 
+                    id="baseRate"
+                    name="baseRate"
+                    value={formData.baseRate}
+                    placeholder="e.g. 500, 1500"
+                    onChange={handleInputChange}
+                  />
+                </div>
+                {errors.baseRate && <span className="validation-error">{errors.baseRate}</span>}
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="noticePeriod">Notice Period / Lead Time *</label>
+                <select 
+                  id="noticePeriod"
+                  name="noticePeriod"
+                  style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--text-main)', outline: 'none' }}
+                  value={formData.noticePeriod}
+                  onChange={handleInputChange}
+                >
+                  <option value="">Select Option</option>
+                  <option value="Immediate">Immediate</option>
+                  <option value="1 Week">1 Week</option>
+                  <option value="2 Weeks">2 Weeks</option>
+                  <option value="4 Weeks">4 Weeks</option>
+                </select>
+                {errors.noticePeriod && <span className="validation-error">{errors.noticePeriod}</span>}
+              </div>
+
+              {role === 'freelancer' ? (
+                <div className="input-group">
+                  <label htmlFor="availability">Availability *</label>
+                  <select 
+                    id="availability"
+                    name="availability"
+                    style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--text-main)', outline: 'none' }}
+                    value={formData.availability}
+                    onChange={handleInputChange}
+                  >
+                    <option value="">Select Option</option>
+                    <option value="Full-time">Full-time</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Project Basis">Project Basis</option>
+                  </select>
+                  {errors.availability && <span className="validation-error">{errors.availability}</span>}
+                </div>
+              ) : (
+                <div className="input-group">
+                  <label htmlFor="teamSize">Team Size *</label>
+                  <div className="input-wrapper">
+                    <span className="input-icon"><User size={18} /></span>
+                    <input 
+                      type="number" 
+                      id="teamSize"
+                      name="teamSize"
+                      value={formData.teamSize}
+                      placeholder="Approx. number of experts"
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  {errors.teamSize && <span className="validation-error">{errors.teamSize}</span>}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* SECTION 5: DECLARATION */}
+          <div className="register-form-section">
+            <h3 className="register-section-title">5. Declaration &amp; Signature</h3>
+            
+            <div className="declaration-box">
+              <label htmlFor="declarationAccepted" className="declaration-checkbox-wrapper">
+                <input 
+                  type="checkbox"
+                  id="declarationAccepted"
+                  name="declarationAccepted"
+                  checked={formData.declarationAccepted}
+                  onChange={handleInputChange}
+                />
+                <span className="declaration-text">
+                  I hereby certify that all PAN / GST / CIN details provided are authentic. I represent that I am authorized to register on this platform, and I understand that onboarding is subject to a technical audit of previous work.
+                </span>
+              </label>
+              {errors.declarationAccepted && <span className="validation-error">{errors.declarationAccepted}</span>}
+            </div>
+
+            <div className="form-grid-2">
+              <div className="input-group">
+                <label htmlFor="signatureName">Signature *</label>
+                <div className="input-wrapper">
+                  <span className="input-icon"><User size={18} /></span>
+                  <input 
+                    type="text" 
+                    id="signatureName"
+                    name="signatureName"
+                    value={formData.signatureName}
+                    placeholder="Type your full name as signature"
+                    onChange={handleInputChange}
+                  />
+                </div>
+                {errors.signatureName && <span className="validation-error">{errors.signatureName}</span>}
+              </div>
+
+              <div className="input-group">
+                <label>Submission Date</label>
+                <div className="input-wrapper">
+                  <span className="input-icon"><FileText size={18} /></span>
+                  <input 
+                    type="text" 
+                    value={new Date().toISOString().split('T')[0]} 
+                    disabled
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="wizard-footer-actions">
+            <button type="button" className="wizard-back-btn" onClick={onClose}>
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              className="register-submit-btn" 
+              disabled={submitting}
+              style={{ width: 'auto', padding: '12px 24px' }}
+            >
+              {submitting ? 'Submitting Application...' : (reapplyData ? 'Resubmit Application' : 'Submit Application')}
+              {!submitting && <CheckSquare size={16} style={{ marginLeft: '6px' }} />}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default RegisterModal;
