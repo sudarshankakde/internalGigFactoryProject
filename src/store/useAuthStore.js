@@ -65,6 +65,7 @@ export const useAuthStore = create(
         const { token, user } = get();
         if (!token || !user) return;
         const role = user.role || 'freelancer';
+        if (role === 'admin') return;
         
         set({ isProfileLoading: true, profileError: null });
         try {
