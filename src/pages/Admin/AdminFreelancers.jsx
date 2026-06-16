@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, RefreshCw, Filter, SortAsc, LayoutGrid, LayoutList } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../utils/api';
@@ -7,7 +8,7 @@ import { Pagination } from '../../components/AdminShared';
 // Import subcomponents
 import { FreelancerTable } from '../../components/Admin/FreelancerTable';
 import { FreelancerCard } from '../../components/Admin/FreelancerCard';
-import { FreelancerModal } from '../../components/Admin/FreelancerModal';
+
 
 export default function AdminFreelancers() {
   const [search, setSearch]   = useState('');
@@ -15,7 +16,7 @@ export default function AdminFreelancers() {
   const [sort, setSort]       = useState(() => localStorage.getItem('freelancer_sort') || 'newest');
   const [page, setPage]       = useState(1);
   const [viewMode, setViewMode] = useState(() => localStorage.getItem('admin_view_mode') || 'list');
-  const [selectedFreelancer, setSelectedFreelancer] = useState(null);
+  const navigate = useNavigate();
 
   // debounce search
   const [dSearch, setDSearch] = useState('');
@@ -149,13 +150,13 @@ export default function AdminFreelancers() {
         <FreelancerTable
           freelancers={freelancers}
           isLoading={isLoading}
-          onSelectFreelancer={setSelectedFreelancer}
+          onSelectFreelancer={(freelancer) => navigate(`/admin/users/${freelancer.id}/profile`)}
         />
       ) : (
         <FreelancerCard
           freelancers={freelancers}
           isLoading={isLoading}
-          onSelectFreelancer={setSelectedFreelancer}
+          onSelectFreelancer={(freelancer) => navigate(`/admin/users/${freelancer.id}/profile`)}
         />
       )}
 
@@ -166,11 +167,6 @@ export default function AdminFreelancers() {
         </span>
         <Pagination page={page} totalPages={totalPages} onPage={setPage} />
       </div>
-
-      {/* Detail Modal */}
-      {selectedFreelancer && (
-        <FreelancerModal freelancer={selectedFreelancer} onClose={() => setSelectedFreelancer(null)} />
-      )}
 
     </div>
   );

@@ -2,6 +2,26 @@ import { useAuthStore } from '../store/useAuthStore';
 
 const API_BASE_URL = "http://localhost:5000/api";
 
+async function checkResponseStatus(response) {
+  if (response.status === 401) {
+    useAuthStore.getState().clearAuth();
+    if (window.location.pathname !== "/") {
+      window.location.href = "/";
+    }
+  }
+  if (response.status === 503) {
+    try {
+      const clone = response.clone();
+      const data = await clone.json();
+      if (data.maintenance) {
+        useAuthStore.getState().setMaintenance(true, data.message);
+      }
+    } catch (e) {
+      // Ignore JSON parse errors on 503
+    }
+  }
+}
+
 async function request(endpoint, options = {}) {
   const token = useAuthStore.getState().token;
   const headers = {
@@ -21,13 +41,7 @@ async function request(endpoint, options = {}) {
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
 
-  // Handle logout on 401 Unauthorized
-  if (response.status === 401) {
-    useAuthStore.getState().clearAuth();
-    if (window.location.pathname !== "/") {
-      window.location.href = "/";
-    }
-  }
+  await checkResponseStatus(response);
 
   const data = await response.json();
 
@@ -52,12 +66,7 @@ async function uploadFile(endpoint, formData) {
     body: formData,
   });
 
-  if (response.status === 401) {
-    useAuthStore.getState().clearAuth();
-    if (window.location.pathname !== "/") {
-      window.location.href = "/";
-    }
-  }
+  await checkResponseStatus(response);
 
   const data = await response.json();
 
@@ -82,12 +91,7 @@ async function uploadFilePut(endpoint, formData) {
     body: formData,
   });
 
-  if (response.status === 401) {
-    useAuthStore.getState().clearAuth();
-    if (window.location.pathname !== "/") {
-      window.location.href = "/";
-    }
-  }
+  await checkResponseStatus(response);
 
   const data = await response.json();
 

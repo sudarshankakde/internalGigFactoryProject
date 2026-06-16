@@ -17,7 +17,9 @@ import {
   Handshake, Banknote, Check, ArrowRight,
   Calendar,
 } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../../store/useAuthStore';
+import { api } from '../../utils/api';
 import gigfactoryLogo  from '../../assets/logo.png';
 import gigfactoryIcon  from '../../assets/logo.png'; // same logo, smaller
 import './AppLayout.css';
@@ -25,12 +27,13 @@ import './AppLayout.css';
 /* ─── nav config per role ────────────────────────────────────────────── */
 const NAV_CONFIG = {
   admin: [
-    { label: 'Dashboard',    icon: LayoutDashboard, to: '/admin/dashboard' },
-    { label: 'Reg. Requests', icon: FileSearch,      to: '/admin/requests' },
-    { label: 'Freelancers',  icon: Users,            to: '/admin/freelancers' },
-    { label: 'Agencies',     icon: Building2,        to: '/admin/agencies' },
-    { label: 'Projects',     icon: Briefcase,        to: '/admin/projects' },
-    { label: 'Analytics',    icon: BarChart3,        to: '/admin/analytics' },
+    { label: 'Dashboard',     icon: LayoutDashboard, to: '/admin/dashboard' },
+    { label: 'Reg. Requests', icon: FileSearch,       to: '/admin/requests' },
+    { label: 'Freelancers',   icon: Users,            to: '/admin/freelancers' },
+    { label: 'Agencies',      icon: Building2,        to: '/admin/agencies' },
+    { label: 'Projects',      icon: Briefcase,        to: '/admin/projects' },
+    { label: 'Analytics',     icon: BarChart3,        to: '/admin/analytics' },
+    { label: 'Settings',      icon: Settings,         to: '/admin/settings' },
   ],
   freelancer: [
     { label: 'Dashboard',        icon: LayoutDashboard, to: '/dashboard' },
@@ -53,49 +56,26 @@ const NAV_CONFIG = {
 export const LayoutContext = createContext({});
 export const useLayout = () => useContext(LayoutContext);
 
-const MOCK_NOTIFICATIONS = [
-  {
-    id: 1,
-    title: 'New Project Match',
-    description: 'A new enterprise client is looking for senior UI designers. Budget: $10k-$15k.',
-    time: 'Just now',
-    unread: true,
-    type: 'project',
-  },
-  {
-    id: 2,
-    title: 'Payment Received',
-    description: 'Invoice #1041 to GlobalTech has been paid in full. Funds are processing.',
-    time: '45m ago',
-    unread: true,
-    type: 'payment',
-  },
-  {
-    id: 3,
-    title: 'Application Approved',
-    description: "You have been approved for the 'Pro Tier' freelancer pool.",
-    time: 'Yesterday',
-    unread: false,
-    type: 'approved',
-  },
-  {
-    id: 4,
-    title: 'Meeting Reminder',
-    description: 'Sync with Design Team at 14:00 EST.',
-    time: '2 days ago',
-    unread: false,
-    type: 'meeting',
-  }
-];
+function formatTimeAgo(dateString) {
+  if (!dateString) return '';
+  const now = new Date();
+  const past = new Date(dateString);
+  const diffMs = now - past;
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHour = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHour / 24);
+
+  if (diffSec < 10) return 'Just now';
+  if (diffSec < 60) return `${diffSec}s ago`;
+  if (diffMin < 60) return `${diffMin}m ago`;
+  if (diffHour < 24) return `${diffHour}h ago`;
+  if (diffDay === 1) return 'Yesterday';
+  return `${diffDay} days ago`;
+}
 
 /* ─── Notification dropdown ──────────────────────────────────────────── */
-function NotifDropdown({ onClose }) {
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
-
-  const handleMarkAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
-  };
-
+function NotifDropdown({ notifications, onMarkAllRead, onMarkRead, onDismiss, onClose }) {
   return (
     <div className="notif-dropdown">
       <div className="notif-header">
@@ -104,9 +84,11 @@ function NotifDropdown({ onClose }) {
           <span>Notifications</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <button className="notif-mark-all-btn" onClick={handleMarkAllAsRead}>
-            Mark all as read
-          </button>
+          {notifications.some(n => !n.is_read) && (
+            <button className="notif-mark-all-btn" onClick={onMarkAllRead}>
+              Mark all as read
+            </button>
+          )}
           <button onClick={onClose} className="notif-close">
             <X size={16} />
           </button>
@@ -114,51 +96,82 @@ function NotifDropdown({ onClose }) {
       </div>
 
       <div className="notif-list">
-        {notifications.map(n => {
-          let Icon = Bell;
-          let iconClass = 'icon-default';
-          if (n.type === 'project') {
-            Icon = Handshake;
-            iconClass = 'icon-project';
-          } else if (n.type === 'payment') {
-            Icon = Banknote;
-            iconClass = 'icon-payment';
-          } else if (n.type === 'approved') {
-            Icon = Check;
-            iconClass = 'icon-approved';
-          } else if (n.type === 'meeting') {
-            Icon = Calendar;
-            iconClass = 'icon-meeting';
-          }
+        {notifications.length === 0 ? (
+          <div style={{ padding: '40px 20px', textAlign: 'center', color: '#6b7280', fontSize: '0.88rem' }}>
+            No notifications yet.
+          </div>
+        ) : (
+          notifications.map(n => {
+            let Icon = Bell;
+            let iconClass = 'icon-default';
+            if (n.type === 'project' || n.type === 'new_project') {
+              Icon = Handshake;
+              iconClass = 'icon-project';
+            } else if (n.type === 'payment') {
+              Icon = Banknote;
+              iconClass = 'icon-payment';
+            } else if (n.type === 'approved') {
+              Icon = Check;
+              iconClass = 'icon-approved';
+            } else if (n.type === 'meeting') {
+              Icon = Calendar;
+              iconClass = 'icon-meeting';
+            }
 
-          return (
-            <div key={n.id} className={`notif-item ${n.unread ? 'unread' : ''}`}>
-              <div className={`notif-icon-circle ${iconClass}`}>
-                <Icon size={16} />
-              </div>
-              <div className="notif-body">
-                <div className="notif-title-row">
-                  <span className="notif-title-text">{n.title}</span>
-                  <span className="notif-time">{n.time}</span>
+            return (
+              <div 
+                key={n.id} 
+                className={`notif-item ${!n.is_read ? 'unread' : ''}`}
+                style={{ cursor: 'pointer' }}
+                onClick={() => {
+                  if (!n.is_read) {
+                    onMarkRead(n.id);
+                  }
+                  if (n.action_url) {
+                    if (n.action_url.startsWith('/')) {
+                      window.location.pathname = n.action_url;
+                    } else {
+                      window.open(n.action_url, '_blank');
+                    }
+                  }
+                }}
+              >
+                <div className={`notif-icon-circle ${iconClass}`}>
+                  <Icon size={16} />
                 </div>
-                <p className="notif-desc-text">{n.description}</p>
-                {n.type === 'project' && n.unread && (
-                  <div className="notif-actions-row">
-                    <button className="notif-action-btn primary">Review</button>
-                    <button className="notif-action-btn secondary">Dismiss</button>
+                <div className="notif-body">
+                  <div className="notif-title-row">
+                    <span className="notif-title-text">{n.title}</span>
+                    <span className="notif-time">{formatTimeAgo(n.created_at)}</span>
                   </div>
-                )}
+                  <p className="notif-desc-text">{n.message}</p>
+                  <div className="notif-actions-row">
+                    {!n.is_read && (
+                      <button 
+                        className="notif-action-btn primary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onMarkRead(n.id);
+                        }}
+                      >
+                        Mark Read
+                      </button>
+                    )}
+                    <button 
+                      className="notif-action-btn secondary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDismiss(n.id);
+                      }}
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="notif-footer">
-        <button className="notif-footer-btn">
-          <span>View all notifications</span>
-          <ArrowRight size={14} />
-        </button>
+            );
+          })
+        )}
       </div>
     </div>
   );
@@ -208,6 +221,45 @@ export default function AppLayout({ children, pageTitle }) {
   const [mobileOpen,    setMobileOpen]    = useState(false);
   const [showNotif,     setShowNotif]     = useState(false);
   const [showProfile,   setShowProfile]   = useState(false);
+
+  const queryClient = useQueryClient();
+
+  const { data: notifications = [] } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: async () => {
+      try {
+        const res = await api.get('/notifications');
+        return res.notifications || [];
+      } catch (err) {
+        console.error('Failed to fetch notifications:', err);
+        return [];
+      }
+    },
+    refetchInterval: 15000,
+  });
+
+  const unreadCount = notifications.filter(n => !n.is_read).length;
+
+  const markAllReadMutation = useMutation({
+    mutationFn: () => api.path('/notifications/read-all'),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    }
+  });
+
+  const markReadMutation = useMutation({
+    mutationFn: (id) => api.path(`/notifications/${id}/read`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    }
+  });
+
+  const dismissMutation = useMutation({
+    mutationFn: (id) => api.delete(`/notifications/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    }
+  });
 
   const notifRef   = useRef(null);
   const profileRef = useRef(null);
@@ -332,9 +384,17 @@ export default function AppLayout({ children, pageTitle }) {
                   aria-label="Notifications"
                 >
                   <Bell size={18} />
-                  <span className="notif-dot" aria-hidden />
+                  {unreadCount > 0 && <span className="notif-dot" aria-hidden />}
                 </button>
-                {showNotif && <NotifDropdown onClose={() => setShowNotif(false)} />}
+                {showNotif && (
+                  <NotifDropdown
+                    notifications={notifications}
+                    onMarkAllRead={() => markAllReadMutation.mutate()}
+                    onMarkRead={(id) => markReadMutation.mutate(id)}
+                    onDismiss={(id) => dismissMutation.mutate(id)}
+                    onClose={() => setShowNotif(false)}
+                  />
+                )}
               </div>
 
               {/* Settings */}

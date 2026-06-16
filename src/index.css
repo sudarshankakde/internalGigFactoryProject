@@ -43,3 +43,28 @@
   animation: skeleton-glow 1.5s ease-in-out infinite;
   background-color: rgba(255, 255, 255, 0.03);
 }
+
+/* ── Custom Scrollbars ────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0d;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2a35;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #70d64d;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2a2a35 #0a0a0d;
+}

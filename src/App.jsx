@@ -1,6 +1,6 @@
 import './App.css';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import React, { useEffect } from 'react';
 import { useAuthStore } from './store/useAuthStore';
@@ -17,15 +17,20 @@ import { Dashboard }    from './pages/Dashboard/Dashboard.jsx';
 import { Profile }      from './pages/Profile/Profile.jsx';
 import { ActiveProjects } from './pages/ActiveProject/ActiveProject.jsx';
 import { Team }         from './pages/Team/Team.jsx';
+import UserSettings     from './pages/UserSettings/UserSettings.jsx';
 
 /* ── Admin pages ── */
 import AdminOverview          from './pages/Admin/AdminOverview.jsx';
 import RegistrationRequests   from './pages/Admin/RegistrationRequests.jsx';
 import AdminFreelancers        from './pages/Admin/AdminFreelancers.jsx';
 import AdminAgencies           from './pages/Admin/AdminAgencies.jsx';
+import AdminUserProfile        from './pages/Admin/AdminUserProfile.jsx';
+import AdminSettings           from './pages/Admin/AdminSettings.jsx';
+
 
 /* ── Layout ── */
 import AppLayout from './components/Layout/AppLayout.jsx';
+import Maintenance from './pages/Maintenance/Maintenance.jsx';
 
 /* ─────────────────────────────────────────────────────────────── */
 /* Route guards                                                     */
@@ -54,12 +59,49 @@ function App() {
   const token = useAuthStore((state) => state.token);
   const user = useAuthStore((state) => state.user);
   const fetchProfile = useAuthStore((state) => state.fetchProfile);
+  const fetchPublicSettings = useAuthStore((state) => state.fetchPublicSettings);
+  const maintenanceMode = useAuthStore((state) => state.maintenanceMode);
+  const sessionTimeoutMins = useAuthStore((state) => state.sessionTimeoutMins) || 60;
+  const clearAuth = useAuthStore((state) => state.clearAuth);
+
+  useEffect(() => {
+    fetchPublicSettings();
+  }, [fetchPublicSettings]);
 
   useEffect(() => {
     if (token && user) {
       fetchProfile();
     }
   }, [token, user, fetchProfile]);
+
+  useEffect(() => {
+    if (!token || !user) return;
+
+    let timeoutId;
+    const timeoutMs = sessionTimeoutMins * 60 * 1000;
+
+    const resetTimer = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        clearAuth();
+        toast.warn('Your session has expired due to inactivity. Please log in again.');
+      }, timeoutMs);
+    };
+
+    const events = ['mousemove', 'keydown', 'click', 'scroll'];
+    events.forEach(event => window.addEventListener(event, resetTimer));
+
+    resetTimer();
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      events.forEach(event => window.removeEventListener(event, resetTimer));
+    };
+  }, [token, user, sessionTimeoutMins, clearAuth]);
+
+  if (maintenanceMode && user?.role !== 'admin' && window.location.pathname !== '/admin') {
+    return <Maintenance />;
+  }
 
   return (
     <BrowserRouter>
@@ -94,6 +136,17 @@ function App() {
             <AdminAgencies />
           </AdminRoute>
         } />
+        <Route path="/admin/users/:id/profile" element={
+          <AdminRoute title="User Profile">
+            <AdminUserProfile />
+          </AdminRoute>
+        } />
+        <Route path="/admin/settings" element={
+          <AdminRoute title="Settings">
+            <AdminSettings />
+          </AdminRoute>
+        } />
+
 
         {/* ── Regular user protected routes ── */}
         <Route path="/dashboard" element={
@@ -121,6 +174,13 @@ function App() {
           <PrivateRoute>
             <AppLayout pageTitle="My Team">
               <Team />
+            </AppLayout>
+          </PrivateRoute>
+        } />
+        <Route path="/settings" element={
+          <PrivateRoute>
+            <AppLayout pageTitle="Settings">
+              <UserSettings />
             </AppLayout>
           </PrivateRoute>
         } />

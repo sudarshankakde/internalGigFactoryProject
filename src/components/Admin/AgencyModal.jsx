@@ -1,6 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Globe, Users, Briefcase, Mail, Phone, MapPin, ExternalLink } from 'lucide-react';
-import { CompletionBar, STATUS_CFG } from '../AdminShared';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
+import { api } from '../../utils/api';
+import { CompletionBar, STATUS_CFG, ActivityHistoryView } from '../AdminShared';
+
+
+// Import Profile Detailed View subcomponents
+import { ProfileHeader } from '../Profile/ProfileHeader';
+import { ProfileStats } from '../Profile/ProfileStats';
+import { ProfileAbout } from '../Profile/ProfileAbout';
+import { TeamStructure } from '../Profile/TeamStructure';
+import { CapabilityCloud } from '../Profile/CapabilityCloud';
+import { ServiceSpecs } from '../Profile/ServiceSpecs';
+import { DocumentsList } from '../Profile/DocumentsList';
+import '../../pages/Profile/Profile.css';
+
+const SERVICE_LABELS = {
+  BIM: 'BIM & 2D Drafting',
+  Audit: 'As-Built Audit',
+  Peer: 'Peer Review',
+  BOQ: 'BOQ Creation',
+  Viz: '3D Visualisation',
+};
+
+const getInitials = (name) => {
+  if (!name) return 'U';
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+};
+
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
@@ -17,6 +46,38 @@ function AgencyLogo({ name, logo, size = 42 }) {
 }
 
 export const AgencyModal = ({ agency, onClose }) => {
+  const [suspendReason, setSuspendReason] = useState('');
+  const [showSuspendInput, setShowSuspendInput] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const suspendMutation = useMutation({
+    mutationFn: () => api.post(`/admin/users/${agency?.id}/suspend`, { reason: suspendReason }),
+    onSuccess: (res) => {
+      toast.success(res.message || 'Account suspended.');
+      queryClient.invalidateQueries({ queryKey: ['admin-agencies'] });
+      if (agency) agency.account_status = 'suspended';
+      setShowSuspendInput(false);
+      setSuspendReason('');
+    },
+    onError: (err) => {
+      toast.error(err.message || 'Suspension failed.');
+    }
+  });
+
+  const reactivateMutation = useMutation({
+    mutationFn: () => api.post(`/admin/users/${agency?.id}/unsuspend`),
+    onSuccess: (res) => {
+      toast.success(res.message || 'Account reactivated.');
+      queryClient.invalidateQueries({ queryKey: ['admin-agencies'] });
+      if (agency) agency.account_status = 'approved';
+    },
+    onError: (err) => {
+      toast.error(err.message || 'Reactivation failed.');
+    }
+  });
+
   if (!agency) return null;
   const ap = agency.agency_profile || {};
 
@@ -55,12 +116,59 @@ export const AgencyModal = ({ agency, onClose }) => {
               </div>
             </div>
           </div>
-          <button onClick={onClose} style={S.closeBtn}><X size={16} /></button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button 
+              onClick={() => {
+                onClose();
+                navigate(`/admin/users/${agency.id}/profile`);
+              }}
+              style={{
+                background: 'rgba(112,214,77,0.1)', border: '1px solid rgba(112,214,77,0.3)',
+                color: '#70d64d', padding: '6px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700,
+                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px'
+              }}
+            >
+              Open Full View <ExternalLink size={12} />
+            </button>
+            <button onClick={onClose} style={S.closeBtn}><X size={16} /></button>
+          </div>
+        </div>
+
+        {/* Tab Strip */}
+        <div style={{ display: 'flex', borderBottom: '1px solid #23232a', background: '#0c0c0e', padding: '0 24px' }}>
+          <button 
+            onClick={() => setActiveTab('overview')} 
+            style={{
+              background: 'transparent', border: 'none', borderBottom: activeTab === 'overview' ? '2px solid #70d64d' : '2px solid transparent',
+              color: activeTab === 'overview' ? '#70d64d' : '#8a8a8a', padding: '12px 16px', fontSize: '0.85rem', fontWeight: activeTab === 'overview' ? 700 : 500, cursor: 'pointer', outline: 'none', transition: 'all 0.15s'
+            }}
+          >
+            Admin Overview
+          </button>
+          <button 
+            onClick={() => setActiveTab('profile')} 
+            style={{
+              background: 'transparent', border: 'none', borderBottom: activeTab === 'profile' ? '2px solid #70d64d' : '2px solid transparent',
+              color: activeTab === 'profile' ? '#70d64d' : '#8a8a8a', padding: '12px 16px', fontSize: '0.85rem', fontWeight: activeTab === 'profile' ? 700 : 500, cursor: 'pointer', outline: 'none', transition: 'all 0.15s'
+            }}
+          >
+            Detailed Profile View
+          </button>
+          <button 
+            onClick={() => setActiveTab('activity')} 
+            style={{
+              background: 'transparent', border: 'none', borderBottom: activeTab === 'activity' ? '2px solid #70d64d' : '2px solid transparent',
+              color: activeTab === 'activity' ? '#70d64d' : '#8a8a8a', padding: '12px 16px', fontSize: '0.85rem', fontWeight: activeTab === 'activity' ? 700 : 500, cursor: 'pointer', outline: 'none', transition: 'all 0.15s'
+            }}
+          >
+            Activity & History
+          </button>
         </div>
 
         {/* Content */}
         <div style={{ maxHeight: '68vh', overflowY: 'auto', padding: '24px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '20px' }}>
+          {activeTab === 'overview' && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '20px' }}>
             
             {/* Left Column */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -165,11 +273,71 @@ export const AgencyModal = ({ agency, onClose }) => {
                     ))}
                   </div>
                 )}
+              {/* Account Management Actions */}
+              <div style={{ ...S.sectionCard, border: '1px solid #ef444433', background: '#1c0c0e', marginTop: '16px' }}>
+                <p style={{ ...S.sectionTitle, color: '#ef4444', borderColor: '#ef444433' }}>Account Management</p>
+                {agency.account_status === 'suspended' ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: 0 }}>This account is currently suspended.</p>
+                    <button
+                      disabled={reactivateMutation.isPending}
+                      onClick={() => reactivateMutation.mutate()}
+                      style={{ background: '#70d64d', color: '#000', border: 'none', borderRadius: '6px', padding: '10px', fontSize: '0.8rem', fontWeight: 800, cursor: 'pointer', textAlign: 'center', width: '100%' }}
+                    >
+                      {reactivateMutation.isPending ? 'Reactivating...' : 'REACTIVATE ACCOUNT'}
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {!showSuspendInput ? (
+                      <button
+                        onClick={() => setShowSuspendInput(true)}
+                        style={{ background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', borderRadius: '6px', padding: '10px', fontSize: '0.8rem', fontWeight: 800, cursor: 'pointer', textAlign: 'center', width: '100%' }}
+                      >
+                        SUSPEND ACCOUNT
+                      </button>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <input
+                          type="text"
+                          placeholder="Reason for suspension..."
+                          value={suspendReason}
+                          onChange={e => setSuspendReason(e.target.value)}
+                          style={{ background: '#000', border: '1px solid #ef4444', borderRadius: '6px', padding: '8px 12px', color: '#fff', fontSize: '0.8rem', outline: 'none' }}
+                        />
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            type="button"
+                            onClick={() => setShowSuspendInput(false)}
+                            style={{ flex: 1, background: '#1c1c20', border: '1px solid #23232a', color: '#8a8a8a', borderRadius: '6px', padding: '8px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="button"
+                            disabled={suspendMutation.isPending}
+                            onClick={() => {
+                              if (!suspendReason.trim()) {
+                                toast.error('Please enter a suspension reason.');
+                                return;
+                              }
+                              suspendMutation.mutate();
+                            }}
+                            style={{ flex: 1, background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '8px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}
+                          >
+                            {suspendMutation.isPending ? 'Suspending...' : 'Confirm Suspend'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
+          </div>
 
-            {/* Right Column */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* Right Column */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {/* Statistics */}
               <div style={S.sectionCard}>
                 <p style={S.sectionTitle}>Stats & Quality Rating</p>
@@ -197,7 +365,7 @@ export const AgencyModal = ({ agency, onClose }) => {
                 <div style={S.row}><strong>Email:</strong> <span>{agency.email}</span></div>
                 <div style={S.row}><strong>Phone:</strong> <span>{agency.mobile || '—'}</span></div>
                 <div style={S.row}><strong>Location:</strong> <span>{ap.city && ap.country ? `${ap.city}, ${ap.country}` : '—'}</span></div>
-                <div style={S.row}><strong>Joined Date:</strong> <span>{fmtDate(agency.created_at)}</span></div>
+                <div style={S.row}><strong>Registered On:</strong> <span>{fmtDate(agency.created_at)}</span></div>
                 <div style={S.row}><strong>Last Login:</strong> <span>{fmtDate(agency.last_login)}</span></div>
               </div>
 
@@ -258,9 +426,64 @@ export const AgencyModal = ({ agency, onClose }) => {
             </div>
 
           </div>
+          )}
+
+          {activeTab === 'profile' && (
+            <div className="profile-workspace-view animate-fade-in" style={{ padding: '0', background: 'transparent' }}>
+              <ProfileHeader
+                isFreelancer={false}
+                name={ap.agency_name || agency.full_name}
+                avatar={ap.logo}
+                subtitle={ap.industry || 'Digital Services Agency'}
+                emailVal={agency.email}
+                phoneVal={agency.mobile}
+                locationVal={ap.city && ap.country ? `${ap.city}, ${ap.country}` : 'Not Specified'}
+                webVal={ap.website}
+                foundedYear={ap.founded_year}
+                initials={getInitials(ap.agency_name || agency.full_name)}
+                hideEditButton={true}
+              />
+
+              <ProfileStats
+                isFreelancer={false}
+                totalProjects={ap.total_projects}
+                commercialBasis={ap.commercial_basis}
+                employeeCount={ap.employee_count}
+              />
+
+              <div className="profile-details-split-grid" style={{ marginTop: '20px' }}>
+                <div className="profile-details-left-pane">
+                  <ProfileAbout
+                    isFreelancer={false}
+                    description={ap.description}
+                  />
+                  <TeamStructure employeeCount={ap.employee_count} />
+                </div>
+
+                <div className="profile-details-right-pane">
+                  <CapabilityCloud
+                    isFreelancer={false}
+                    skills={(ap.service_details?.selectedServices || []).map(code => ({ skill_name: SERVICE_LABELS[code] || code }))}
+                  />
+                  <ServiceSpecs serviceDetails={ap.service_details} />
+                  <DocumentsList
+                    isFreelancer={false}
+                    verifications={agency.verifications}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'activity' && (
+            <ActivityHistoryView id={agency.id} />
+          )}
+
         </div>
       </div>
     </>
   );
 };
+
 export default AgencyModal;
+

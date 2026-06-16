@@ -13,7 +13,8 @@ export const ProfileHeader = ({
   foundedYear,
   initials,
   availability,
-  handleEditClick
+  handleEditClick,
+  hideEditButton
 }) => {
   return (
     <header className="profile-identity-banner">
@@ -55,9 +56,11 @@ export const ProfileHeader = ({
         </div>
       </div>
 
-      <button className="edit-profile-action-btn" onClick={handleEditClick}>
-        <Edit2 size={14} /> Edit Profile
-      </button>
+      {!hideEditButton && handleEditClick && (
+        <button className="edit-profile-action-btn" onClick={handleEditClick}>
+          <Edit2 size={14} /> Edit Profile
+        </button>
+      )}
     </header>
   );
 };

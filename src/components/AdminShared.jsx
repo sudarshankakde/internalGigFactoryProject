@@ -1,5 +1,8 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '../utils/api';
+
 
 export const STATUS_CFG = {
   approved:  { bg: 'rgba(112,214,77,0.12)',  color: '#70d64d',  label: 'Approved'  },
@@ -54,3 +57,96 @@ export function Pagination({ page, totalPages, onPage }) {
     </div>
   );
 }
+
+export function ActivityHistoryView({ id }) {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['user-history', id],
+    queryFn: async () => {
+      const response = await api.get(`/admin/users/${id}/profile-history`);
+      return response;
+    },
+    enabled: !!id
+  });
+
+  if (isLoading) return <div style={{ color: '#8a8a8a', fontSize: '0.85rem', padding: '40px', textAlign: 'center' }}>Loading history logs...</div>;
+  if (error) return <div style={{ color: '#ef4444', fontSize: '0.85rem', padding: '40px', textAlign: 'center' }}>Error loading logs: {error.message || 'Unknown error'}</div>;
+
+  const { activityLogs = [], loginHistory = [], blockedHistory = [] } = data || {};
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* Suspension History */}
+      {blockedHistory.length > 0 && (
+        <div style={{ background: '#1c0c0e', border: '1px solid #ef444433', borderRadius: '8px', padding: '18px' }}>
+          <h4 style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: '#ef4444', margin: '0 0 12px', paddingBottom: '6px', borderBottom: '1px solid #ef444422' }}>
+            Suspension History Logs
+          </h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {blockedHistory.map(log => (
+              <div key={log.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#d1d5db', borderBottom: '1px solid #ef444411', paddingBottom: '6px' }}>
+                <div>
+                  <strong>Reason:</strong> {log.reason}
+                </div>
+                <span style={{ color: '#8a8a8a', fontSize: '0.72rem' }}>
+                  {new Date(log.created_at).toLocaleString('en-IN')}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+  {/* Action / Activity Logs */}
+      <div style={{ background: '#0c0c0e', border: '1px solid #23232a', borderRadius: '8px', padding: '18px' }}>
+        <h4 style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: '#70d64d', margin: '0 0 12px', paddingBottom: '6px', borderBottom: '1px solid #23232a' }}>
+          Platform Activity Logs
+        </h4>
+        {activityLogs.length === 0 ? (
+          <p style={{ color: '#8a8a8a', fontSize: '0.8rem', margin: 0, fontStyle: 'italic' }}>No activity records found.</p>
+        ) : (
+          <div style={{ maxHeight: '300px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {activityLogs.map(log => (
+              <div key={log.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', color: '#d1d5db', borderBottom: '1px solid #1a1a22', paddingBottom: '6px' }}>
+                <div>
+                  <span style={{ color: '#38bdf8', fontWeight: 700, marginRight: '8px', fontSize: '0.72rem', textTransform: 'uppercase' }}>
+                    [{log.module || 'System'}]
+                  </span>
+                  <span>{log.action}</span>
+                  {log.ip_address && <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: '2px' }}>IP: {log.ip_address}</div>}
+                </div>
+                <span style={{ color: '#8a8a8a', fontSize: '0.72rem' }}>
+                  {log.created_at ? new Date(log.created_at).toLocaleString('en-IN') : '—'}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      {/* Login History */}
+      <div style={{ background: '#0c0c0e', border: '1px solid #23232a', borderRadius: '8px', padding: '18px' }}>
+        <h4 style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: '#c084fc', margin: '0 0 12px', paddingBottom: '6px', borderBottom: '1px solid #23232a' }}>
+          Recent Login Attempts
+        </h4>
+        {loginHistory.length === 0 ? (
+          <p style={{ color: '#8a8a8a', fontSize: '0.8rem', margin: 0, fontStyle: 'italic' }}>No login records found.</p>
+        ) : (
+          <div style={{ maxHeight: '250px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {loginHistory.map(log => (
+              <div key={log.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', color: '#d1d5db', borderBottom: '1px solid #1a1a22', paddingBottom: '6px' }}>
+                <div>
+                  <span style={{ color: '#fff', fontWeight: 600 }}>{log.browser || 'Browser'}</span> on <span style={{ color: '#a78bfa' }}>{log.device || 'Device'}</span>
+                  <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: '2px' }}>IP: {log.ip_address || '—'}</div>
+                </div>
+                <span style={{ color: '#8a8a8a', fontSize: '0.72rem' }}>
+                  {log.login_at ? new Date(log.login_at).toLocaleString('en-IN') : '—'}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+    
+    </div>
+  );
+}
+

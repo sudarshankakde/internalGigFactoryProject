@@ -40,7 +40,7 @@ export const MemberCard = ({ member, onEdit, onDelete }) => {
         </div>
         <div className="detail-item">
           <Calendar size={14} />
-          <span className="detail-text">Joined: {formatDate(member.joined_at)}</span>
+          <span className="detail-text">Added: {formatDate(member.joined_at)}</span>
         </div>
         {member.resume_url && (
           <div className="detail-item">

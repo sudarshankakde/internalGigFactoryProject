@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users, Building2, FileSearch, CheckCircle2,
-  TrendingUp, ArrowRight, Clock, UserCheck,
+  TrendingUp, ArrowRight, Clock, UserCheck, Bell, X
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 import { api } from '../../utils/api';
 
 const fmtDate = (d) =>
@@ -97,6 +98,7 @@ function QuickLink({ icon: Icon, label, desc, to, color }) {
 
 export default function AdminOverview() {
   const navigate = useNavigate();
+  const [isSenderOpen, setIsSenderOpen] = useState(false);
 
   const { data: statsData } = useQuery({
     queryKey: ['admin-stats'],
@@ -108,6 +110,31 @@ export default function AdminOverview() {
     queryKey: ['admin-registration-requests-overview'],
     queryFn: () => api.get('/auth/registration-requests').then(r => r.requests || []),
   });
+
+  const { data: freelancersData } = useQuery({
+    queryKey: ['admin-freelancers-list'],
+    queryFn: () => api.get('/profiles/admin/freelancers?limit=100').then(r => r.freelancers || []),
+  });
+
+  const { data: agenciesData } = useQuery({
+    queryKey: ['admin-agencies-list'],
+    queryFn: () => api.get('/profiles/admin/agencies?limit=100').then(r => r.agencies || []),
+  });
+
+  const usersList = useMemo(() => {
+    const list = [];
+    if (freelancersData) {
+      freelancersData.forEach(f => {
+        list.push({ id: f.id, name: `${f.full_name} (Freelancer)`, email: f.email });
+      });
+    }
+    if (agenciesData) {
+      agenciesData.forEach(a => {
+        list.push({ id: a.id, name: `${a.agency_profile?.agency_name || a.full_name} (Agency)`, email: a.email });
+      });
+    }
+    return list;
+  }, [freelancersData, agenciesData]);
 
   const stats = statsData?.stats || {};
   const recentRequests = (reqData || []).slice(0, 5);
@@ -235,7 +262,234 @@ export default function AdminOverview() {
           <QuickLink icon={Users}       label="Freelancers"    desc="Manage freelancer accounts"    to="/admin/freelancers" color="#38bdf8" />
           <QuickLink icon={Building2}   label="Agencies"       desc="Manage agency accounts"        to="/admin/agencies"    color="#c084fc" />
           <QuickLink icon={TrendingUp}  label="Analytics"      desc="Platform performance metrics"  to="/admin/analytics"   color="#70d64d" />
+          
+          <h2 style={{ color: '#fff', fontSize: '1rem', fontWeight: 800, margin: '12px 0 4px' }}>Communications</h2>
+          <div
+            onClick={() => setIsSenderOpen(true)}
+            style={{
+              background: 'linear-gradient(135deg, #121215, #16220a)',
+              border: '1px solid #23232a',
+              borderRadius: '10px',
+              padding: '20px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '16px',
+              transition: 'border-color 0.15s, background 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#70d64d'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = '#23232a'; }}
+          >
+            <div style={{
+              width: '44px', height: '44px', borderRadius: '10px',
+              background: 'rgba(112, 214, 77, 0.08)',
+              border: '1px solid rgba(112, 214, 77, 0.25)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <Bell size={20} color="#70d64d" />
+            </div>
+            <div style={{ flex: 1 }}>
+              <p style={{ color: '#fff', fontWeight: 700, fontSize: '0.9rem', margin: 0 }}>Notification Hub</p>
+              <p style={{ color: '#6b7280', fontSize: '0.75rem', margin: '3px 0 0' }}>Send manual alerts & emails</p>
+            </div>
+            <ArrowRight size={16} color="#6b7280" />
+          </div>
         </div>
+      </div>
+
+      {isSenderOpen && (
+        <SendManualNotificationModal 
+          onClose={() => setIsSenderOpen(false)} 
+          usersList={usersList} 
+        />
+      )}
+    </div>
+  );
+}
+
+/* ─── Send Manual Notification Modal ─────────────────────────────────────── */
+function SendManualNotificationModal({ onClose, usersList }) {
+  const [targetUserId, setTargetUserId] = useState('ALL');
+  const [title, setTitle] = useState('');
+  const [message, setMessage] = useState('');
+  const [type, setType] = useState('manual');
+  const [sendEmail, setSendEmail] = useState(false);
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailHtml, setEmailHtml] = useState('');
+
+  const sendMutation = useMutation({
+    mutationFn: (body) => api.post('/notifications/manual', body),
+    onSuccess: () => {
+      toast.success('Notification & email sent successfully!');
+      onClose();
+    },
+    onError: (err) => {
+      toast.error(err.message || 'Failed to send notification.');
+    }
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!title.trim() || !message.trim()) {
+      toast.error('Title and message are required.');
+      return;
+    }
+    sendMutation.mutate({
+      userId: targetUserId,
+      title,
+      message,
+      type,
+      sendEmail,
+      emailSubject: emailSubject.trim() || undefined,
+      emailHtml: emailHtml.trim() || undefined,
+    });
+  };
+
+  return (
+    <div style={{
+      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+      background: 'rgba(0, 0, 0, 0.8)', backdropFilter: 'blur(8px)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 1000
+    }} onClick={onClose}>
+      <div style={{
+        background: '#121215', border: '1px solid #23232a', borderRadius: '16px',
+        width: '580px', maxWidth: '95vw', padding: '30px', color: '#fff',
+        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.8)', display: 'flex',
+        flexDirection: 'column', gap: '20px'
+      }} onClick={e => e.stopPropagation()}>
+        
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #23232a', paddingBottom: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Bell size={20} color="#70d64d" />
+            <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>Manual Notification Hub</h3>
+          </div>
+          <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: '#6b7280', cursor: 'pointer' }}>
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          
+          {/* Recipient */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <label style={{ color: '#6b7280', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Recipient</label>
+            <select 
+              value={targetUserId} 
+              onChange={e => setTargetUserId(e.target.value)}
+              style={{ background: '#1c1c20', border: '1px solid #2c2c35', borderRadius: '8px', padding: '10px', color: '#fff', fontSize: '0.85rem' }}
+            >
+              <option value="ALL">All Users (Broadcast)</option>
+              {usersList.map(u => (
+                <option key={u.id} value={u.id}>{u.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Row for Title & Type */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 150px', gap: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ color: '#6b7280', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Title</label>
+              <input 
+                type="text" 
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                placeholder="e.g. Schedule Update"
+                style={{ background: '#1c1c20', border: '1px solid #2c2c35', borderRadius: '8px', padding: '10px', color: '#fff', fontSize: '0.85rem' }}
+              />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ color: '#6b7280', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Type</label>
+              <select 
+                value={type} 
+                onChange={e => setType(e.target.value)}
+                style={{ background: '#1c1c20', border: '1px solid #2c2c35', borderRadius: '8px', padding: '10px', color: '#fff', fontSize: '0.85rem' }}
+              >
+                <option value="manual">Manual</option>
+                <option value="project">Project</option>
+                <option value="payment">Payment</option>
+                <option value="meeting">Meeting</option>
+                <option value="approved">Approved</option>
+                <option value="system">System</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Message */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <label style={{ color: '#6b7280', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Message Body</label>
+            <textarea 
+              rows={3}
+              value={message}
+              onChange={e => setMessage(e.target.value)}
+              placeholder="Enter the notification content..."
+              style={{ background: '#1c1c20', border: '1px solid #2c2c35', borderRadius: '8px', padding: '10px', color: '#fff', fontSize: '0.85rem', resize: 'vertical' }}
+            />
+          </div>
+
+          {/* Send Email Toggle */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0' }}>
+            <input 
+              type="checkbox" 
+              id="sendEmailCheckbox"
+              checked={sendEmail} 
+              onChange={e => setSendEmail(e.target.checked)}
+              style={{ accentColor: '#70d64d', width: '16px', height: '16px', cursor: 'pointer' }}
+            />
+            <label htmlFor="sendEmailCheckbox" style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              Also Send Email notification
+            </label>
+          </div>
+
+          {/* Expandable Email Fields */}
+          {sendEmail && (
+            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px dashed #2c2c35', borderRadius: '10px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ color: '#6b7280', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Custom Email Subject (Optional)</label>
+                <input 
+                  type="text" 
+                  value={emailSubject}
+                  onChange={e => setEmailSubject(e.target.value)}
+                  placeholder="Defaults to notification title"
+                  style={{ background: '#1c1c20', border: '1px solid #2c2c35', borderRadius: '8px', padding: '8px 10px', color: '#fff', fontSize: '0.8rem' }}
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ color: '#6b7280', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Custom Email HTML body (Optional)</label>
+                <textarea 
+                  rows={2}
+                  value={emailHtml}
+                  onChange={e => setEmailHtml(e.target.value)}
+                  placeholder="HTML tags allowed. Defaults to styled message."
+                  style={{ background: '#1c1c20', border: '1px solid #2c2c35', borderRadius: '8px', padding: '8px 10px', color: '#fff', fontSize: '0.8rem', resize: 'vertical' }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Footer Buttons */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #23232a', paddingTop: '16px', marginTop: '10px' }}>
+            <button 
+              type="button" 
+              onClick={onClose}
+              style={{ background: 'transparent', border: '1px solid #2c2c35', color: '#a1a1aa', borderRadius: '8px', padding: '10px 16px', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit"
+              disabled={sendMutation.isPending}
+              style={{ background: '#70d64d', color: '#000', border: 'none', borderRadius: '8px', padding: '10px 22px', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', opacity: sendMutation.isPending ? 0.6 : 1 }}
+            >
+              {sendMutation.isPending ? 'Sending...' : 'Send Notification'}
+            </button>
+          </div>
+
+        </form>
+
       </div>
     </div>
   );

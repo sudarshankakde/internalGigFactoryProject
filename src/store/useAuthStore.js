@@ -11,6 +11,37 @@ export const useAuthStore = create(
       isProfileLoading: false,
       profileError: null,
 
+      // Public settings & maintenance state
+      maintenanceMode: false,
+      maintenanceMessage: '',
+      sessionTimeoutMins: 60,
+      platformName: 'GigFactory',
+      supportEmail: 'support@gigfactory.com',
+
+      setMaintenance: (active, message) => {
+        set({ maintenanceMode: active, maintenanceMessage: message || '' });
+      },
+
+      fetchPublicSettings: async () => {
+        try {
+          const response = await fetch("http://localhost:5000/api/auth/public-settings");
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+              set({
+                platformName: data.platformName,
+                supportEmail: data.supportEmail,
+                sessionTimeoutMins: data.sessionTimeoutMins,
+                maintenanceMode: data.maintenanceMode,
+                maintenanceMessage: data.maintenanceMessage,
+              });
+            }
+          }
+        } catch (error) {
+          console.error("Failed to fetch public settings:", error);
+        }
+      },
+
       setAuth: (token, refreshToken, user) => {
         set({ token, refreshToken, user });
         // Defensive double-writing to keep raw localStorage in sync for any legacy files

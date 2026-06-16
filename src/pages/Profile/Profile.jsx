@@ -270,7 +270,7 @@ export const Profile = () => {
           {isFreelancer ? (
             <WorkHistory workHistory={profile?.work_history} />
           ) : (
-            <TeamStructure employeeCount={profile?.employee_count} />
+            <TeamStructure teamMembers={profile?.team_members || []} employeeCount={profile?.employee_count} />
           )}
         </div>
 

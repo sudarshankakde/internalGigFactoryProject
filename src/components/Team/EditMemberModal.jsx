@@ -1,6 +1,7 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
+import { DesignationSelect } from './DesignationSelect';
 
 export const EditMemberModal = ({ isOpen, onClose, editingMember, setEditingMember, onSubmit, isSaving, handleEditResumeChange }) => {
   if (!isOpen || !editingMember) return null;
@@ -47,12 +48,10 @@ export const EditMemberModal = ({ isOpen, onClose, editingMember, setEditingMemb
             </div>
             <div className="form-group">
               <label>Designation</label>
-              <input
-                type="text"
-                required
+              <DesignationSelect
                 value={editingMember.designation}
-                onChange={(e) => setEditingMember({ ...editingMember, designation: e.target.value })}
-                placeholder="e.g. Senior Backend Developer"
+                onChange={(val) => setEditingMember({ ...editingMember, designation: val })}
+                placeholder="Select or type designation…"
               />
             </div>
             <div className="form-group">

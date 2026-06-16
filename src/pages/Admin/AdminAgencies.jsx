@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, RefreshCw, Filter, SortAsc, LayoutGrid, LayoutList } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../utils/api';
@@ -7,7 +8,7 @@ import { Pagination } from '../../components/AdminShared';
 // Import subcomponents
 import { AgencyTable } from '../../components/Admin/AgencyTable';
 import { AgencyCard } from '../../components/Admin/AgencyCard';
-import { AgencyModal } from '../../components/Admin/AgencyModal';
+
 
 export default function AdminAgencies() {
   const [search, setSearch] = useState('');
@@ -15,7 +16,7 @@ export default function AdminAgencies() {
   const [sort,   setSort]   = useState(() => localStorage.getItem('agency_sort') || 'newest');
   const [page,   setPage]   = useState(1);
   const [viewMode, setViewMode] = useState(() => localStorage.getItem('admin_view_mode') || 'list');
-  const [selectedAgency, setSelectedAgency] = useState(null);
+  const navigate = useNavigate();
 
   const [dSearch, setDSearch] = useState('');
   useEffect(() => {
@@ -149,13 +150,13 @@ export default function AdminAgencies() {
         <AgencyTable
           agencies={agencies}
           isLoading={isLoading}
-          onSelectAgency={setSelectedAgency}
+          onSelectAgency={(agency) => navigate(`/admin/users/${agency.id}/profile`)}
         />
       ) : (
         <AgencyCard
           agencies={agencies}
           isLoading={isLoading}
-          onSelectAgency={setSelectedAgency}
+          onSelectAgency={(agency) => navigate(`/admin/users/${agency.id}/profile`)}
         />
       )}
 
@@ -166,11 +167,6 @@ export default function AdminAgencies() {
         </span>
         <Pagination page={page} totalPages={totalPages} onPage={setPage} />
       </div>
-
-      {/* Detail Modal */}
-      {selectedAgency && (
-        <AgencyModal agency={selectedAgency} onClose={() => setSelectedAgency(null)} />
-      )}
 
     </div>
   );

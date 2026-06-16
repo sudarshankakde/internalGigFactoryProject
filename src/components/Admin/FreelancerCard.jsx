@@ -138,7 +138,7 @@ export const FreelancerCard = ({ freelancers, isLoading, onSelectFreelancer }) =
               <CompletionBar value={fp?.profile_completion || 0} />
             </div>
 
-            {/* Contact and Join Date Footer */}
+              {/* Contact and Registered Date Footer */}
             <div style={{ borderTop: '1px solid #1a1a22', paddingTop: '12px', marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#8a8a8a', fontSize: '0.74rem', overflow: 'hidden' }}>
                 <Mail size={12} color="#6b7280" style={{ flexShrink: 0 }} />
@@ -149,7 +149,7 @@ export const FreelancerCard = ({ freelancers, isLoading, onSelectFreelancer }) =
                 <span>{f.mobile || '—'}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #1a1a22', paddingTop: '8px', marginTop: '4px', fontSize: '0.7rem', color: '#5b5b67' }}>
-                <span>Joined: {fmtDate(f.created_at)}</span>
+                <span>Registered: {fmtDate(f.created_at)}</span>
               </div>
             </div>
           </div>

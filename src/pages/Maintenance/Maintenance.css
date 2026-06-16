@@ -1,0 +1,168 @@
+/* Maintenance.css */
+.maintenance-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: radial-gradient(circle at center, #1a1a2e 0%, #0c0c14 100%);
+  color: #f3f4f6;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  padding: 20px;
+  text-align: center;
+}
+
+.maintenance-card {
+  max-width: 550px;
+  width: 100%;
+  padding: 45px 35px;
+  background: rgba(30, 30, 46, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Premium Animated Icon styling */
+.maintenance-icon-wrap {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.maintenance-icon-glow {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0) 70%);
+  animation: pulse-glow 3s infinite ease-in-out;
+}
+
+.maintenance-gears {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  color: #f59e0b;
+}
+
+.gear-main {
+  animation: spin-clockwise 8s infinite linear;
+}
+
+.maintenance-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 15px;
+  background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.maintenance-message {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #9ca3af;
+  margin-bottom: 35px;
+  max-width: 440px;
+}
+
+.maintenance-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 99px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fbbf24;
+  margin-bottom: 25px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #f59e0b;
+  box-shadow: 0 0 8px #f59e0b;
+  animation: blink 1.5s infinite ease-in-out;
+}
+
+.maintenance-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0c0c14;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+  transition: all 0.25s ease;
+}
+
+.maintenance-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
+.maintenance-btn:active {
+  transform: translateY(0);
+}
+
+.maintenance-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.maintenance-footer {
+  margin-top: 40px;
+  font-size: 0.82rem;
+  color: #4b5563;
+}
+
+.maintenance-footer a {
+  color: #6366f1;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.maintenance-footer a:hover {
+  color: #818cf8;
+  text-decoration: underline;
+}
+
+/* Animations */
+@keyframes spin-clockwise {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.spin-fast {
+  animation: spin-clockwise 1s infinite linear;
+}

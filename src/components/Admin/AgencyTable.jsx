@@ -23,7 +23,7 @@ export const AgencyTable = ({ agencies, isLoading, onSelectAgency }) => {
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ background: '#0c0c0e' }}>
-              {['Agency', 'Contact Person', 'Contact', 'Industry', 'Team', 'Projects', 'Profile', 'Status', 'Joined'].map(h => (
+              {['Agency', 'Contact Person', 'Contact', 'Industry', 'Team', 'Projects', 'Profile', 'Status', 'Registered'].map(h => (
                 <th key={h} style={{ color: '#6b7280', fontSize: '0.65rem', fontWeight: 700, padding: '14px 16px', borderBottom: '1px solid #23232a', letterSpacing: '0.6px', whiteSpace: 'nowrap' }}>
                   {h.toUpperCase()}
                 </th>
