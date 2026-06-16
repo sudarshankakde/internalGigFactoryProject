@@ -37,9 +37,17 @@ const fmtDate = (d) =>
 function AgencyLogo({ name, logo, size = 42 }) {
   const initials = name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
   return logo ? (
-    <img src={logo} alt={name} style={{ width: size, height: size, borderRadius: '8px', objectFit: 'cover', flexShrink: 0, border: '1px solid #23232a', background: '#1c1c20' }} />
+    <img 
+      src={logo} 
+      alt={name} 
+      className="rounded-lg object-cover shrink-0 border border-[#23232a] bg-[#1c1c20]"
+      style={{ width: size, height: size }} 
+    />
   ) : (
-    <div style={{ width: size, height: size, borderRadius: '8px', background: 'linear-gradient(135deg,#2e1065,#4c1d95)', border: '1px solid #3b2a6a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: `${size * 0.3}px`, fontWeight: 800, color: '#c084fc', flexShrink: 0 }}>
+    <div 
+      className="rounded-lg border border-[#3b2a6a] flex items-center justify-center font-extrabold text-[#c084fc] shrink-0 bg-gradient-to-br from-[#2e1065] to-[#4c1d95]"
+      style={{ width: size, height: size, fontSize: `${size * 0.3}px` }}
+    >
       {initials}
     </div>
   );
@@ -81,189 +89,144 @@ export const AgencyModal = ({ agency, onClose }) => {
   if (!agency) return null;
   const ap = agency.agency_profile || {};
 
-  const S = {
-    overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(5px)', zIndex: 600 },
-    modal: { position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '90vw', maxWidth: '800px', background: '#121215', border: '1px solid #23232a', borderRadius: '12px', overflow: 'hidden', zIndex: 601, boxShadow: '0 20px 60px rgba(0,0,0,0.8)', animation: 'modalIn 0.2s ease-out' },
-    header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px', borderBottom: '1px solid #23232a', background: '#0c0c0e' },
-    sectionCard: { background: '#0c0c0e', border: '1px solid #23232a', borderRadius: '8px', padding: '18px' },
-    sectionTitle: { fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: '#70d64d', margin: '0 0 14px', paddingBottom: '6px', borderBottom: '1px solid #23232a' },
-    row: { display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', borderBottom: '1px solid #1a1a22', padding: '7px 0', color: '#d1d5db' },
-    closeBtn: { background: 'transparent', border: '1px solid #23232a', color: '#8a8a8a', borderRadius: '6px', padding: '6px 8px', cursor: 'pointer', display: 'flex', alignItems: 'center' },
-    badge: { display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '3px 8px', borderRadius: '4px', fontSize: '0.68rem', fontWeight: 700 },
-  };
-
   const statusCfg = STATUS_CFG[agency.account_status] || STATUS_CFG.pending;
 
   return (
     <>
-      <div onClick={onClose} style={S.overlay} />
-      <div style={S.modal}>
+      <div onClick={onClose} className="fixed inset-0 bg-black/85 backdrop-blur-[5px] z-[600]" />
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-[800px] bg-[#121215] border border-[#23232a] rounded-xl overflow-hidden z-[601] shadow-[0_20px_60px_rgba(0,0,0,0.8)] animate-[modalIn_0.2s_ease-out]">
         {/* Header */}
-        <div style={S.header}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div className="flex items-center justify-between p-6 border-b border-[#23232a] bg-[#0c0c0e]">
+          <div className="flex items-center gap-4">
             <AgencyLogo name={ap?.agency_name || agency.full_name} logo={ap?.logo} size={50} />
             <div>
-              <h2 style={{ color: '#fff', fontSize: '1.25rem', fontWeight: 800, margin: '0 0 4px' }}>
+              <h2 className="text-white text-[1.25rem] font-extrabold mb-1">
                 {ap?.agency_name || agency.full_name}
               </h2>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <span style={{ ...S.badge, background: statusCfg.bg, color: statusCfg.color }}>
+              <div className="flex gap-2 items-center">
+                <span 
+                  className="inline-flex items-center gap-[5px] py-[3px] px-2 rounded text-[0.68rem] font-bold"
+                  style={{ background: statusCfg.bg, color: statusCfg.color }}
+                >
                   {agency.account_status?.toUpperCase()}
                 </span>
-                <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                <span className="text-[0.75rem] text-[#6b7280]">
                   {agency.is_verified ? '✓ VERIFIED AGENCY' : 'UNVERIFIED AGENCY'}
                 </span>
               </div>
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="flex items-center gap-3">
             <button 
               onClick={() => {
                 onClose();
                 navigate(`/admin/users/${agency.id}/profile`);
               }}
-              style={{
-                background: 'rgba(112,214,77,0.1)', border: '1px solid rgba(112,214,77,0.3)',
-                color: '#70d64d', padding: '6px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700,
-                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px'
-              }}
+              className="bg-[#70d64d]/10 border border-[#70d64d]/30 text-[#70d64d] px-3 py-1.5 rounded-md text-[0.75rem] font-bold cursor-pointer inline-flex items-center gap-1.5"
             >
               Open Full View <ExternalLink size={12} />
             </button>
-            <button onClick={onClose} style={S.closeBtn}><X size={16} /></button>
+            <button onClick={onClose} className="bg-transparent border border-[#23232a] text-[#8a8a8a] rounded-md py-[6px] px-[8px] cursor-pointer flex items-center"><X size={16} /></button>
           </div>
         </div>
 
         {/* Tab Strip */}
-        <div style={{ display: 'flex', borderBottom: '1px solid #23232a', background: '#0c0c0e', padding: '0 24px' }}>
+        <div className="flex border-b border-[#23232a] bg-[#0c0c0e] px-6">
           <button 
             onClick={() => setActiveTab('overview')} 
-            style={{
-              background: 'transparent', border: 'none', borderBottom: activeTab === 'overview' ? '2px solid #70d64d' : '2px solid transparent',
-              color: activeTab === 'overview' ? '#70d64d' : '#8a8a8a', padding: '12px 16px', fontSize: '0.85rem', fontWeight: activeTab === 'overview' ? 700 : 500, cursor: 'pointer', outline: 'none', transition: 'all 0.15s'
-            }}
+            className={`bg-transparent border-none py-3 px-4 text-[0.85rem] cursor-pointer outline-none transition-all duration-150 border-b-2 ${activeTab === 'overview' ? 'border-[#70d64d] text-[#70d64d] font-bold' : 'border-transparent text-[#8a8a8a] font-medium'}`}
           >
             Admin Overview
           </button>
           <button 
             onClick={() => setActiveTab('profile')} 
-            style={{
-              background: 'transparent', border: 'none', borderBottom: activeTab === 'profile' ? '2px solid #70d64d' : '2px solid transparent',
-              color: activeTab === 'profile' ? '#70d64d' : '#8a8a8a', padding: '12px 16px', fontSize: '0.85rem', fontWeight: activeTab === 'profile' ? 700 : 500, cursor: 'pointer', outline: 'none', transition: 'all 0.15s'
-            }}
+            className={`bg-transparent border-none py-3 px-4 text-[0.85rem] cursor-pointer outline-none transition-all duration-150 border-b-2 ${activeTab === 'profile' ? 'border-[#70d64d] text-[#70d64d] font-bold' : 'border-transparent text-[#8a8a8a] font-medium'}`}
           >
             Detailed Profile View
           </button>
           <button 
             onClick={() => setActiveTab('activity')} 
-            style={{
-              background: 'transparent', border: 'none', borderBottom: activeTab === 'activity' ? '2px solid #70d64d' : '2px solid transparent',
-              color: activeTab === 'activity' ? '#70d64d' : '#8a8a8a', padding: '12px 16px', fontSize: '0.85rem', fontWeight: activeTab === 'activity' ? 700 : 500, cursor: 'pointer', outline: 'none', transition: 'all 0.15s'
-            }}
+            className={`bg-transparent border-none py-3 px-4 text-[0.85rem] cursor-pointer outline-none transition-all duration-150 border-b-2 ${activeTab === 'activity' ? 'border-[#70d64d] text-[#70d64d] font-bold' : 'border-transparent text-[#8a8a8a] font-medium'}`}
           >
             Activity & History
           </button>
         </div>
 
         {/* Content */}
-        <div style={{ maxHeight: '68vh', overflowY: 'auto', padding: '24px' }}>
+        <div className="max-h-[68vh] overflow-y-auto p-6">
           {activeTab === 'overview' && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '20px' }}>
+            <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-5">
             
             {/* Left Column */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="flex flex-col gap-4">
               {/* Description */}
-              <div style={S.sectionCard}>
-                <p style={S.sectionTitle}>Agency Description</p>
-                <p style={{ color: '#8a8a8a', fontSize: '0.88rem', lineHeight: '1.5', margin: 0 }}>
+              <div className="bg-[#0c0c0e] border border-[#23232a] rounded-lg p-[18px]">
+                <p className="text-[0.72rem] font-extrabold uppercase tracking-[0.6px] text-[#70d64d] mb-3.5 pb-1.5 border-b border-[#23232a]">Agency Description</p>
+                <p className="text-[#8a8a8a] text-[0.88rem] leading-[1.5] m-0">
                   {ap.description || 'No description provided.'}
                 </p>
               </div>
 
               {/* Profile Overview */}
-              <div style={S.sectionCard}>
-                <p style={S.sectionTitle}>Business Overview</p>
-                <div style={S.row}><strong>Primary Industry:</strong> <span>{ap.industry || '—'}</span></div>
-                <div style={S.row}><strong>Founded Year:</strong> <span>{ap.founded_year || '—'}</span></div>
-                <div style={S.row}><strong>Employee Count:</strong> <span>{ap.employee_count ? `${ap.employee_count} Employees` : '—'}</span></div>
-                <div style={S.row}><strong>Office Location:</strong> <span>{ap.address || '—'}</span></div>
-                {ap.gst_number && <div style={S.row}><strong>GSTIN / Tax ID:</strong> <span style={{ textTransform: 'uppercase' }}>{ap.gst_number}</span></div>}
-                {ap.cin && <div style={S.row}><strong>Corporate Identification (CIN):</strong> <span style={{ textTransform: 'uppercase' }}>{ap.cin}</span></div>}
-                {ap.company_pan && <div style={S.row}><strong>Company PAN:</strong> <span style={{ textTransform: 'uppercase' }}>{ap.company_pan}</span></div>}
+              <div className="bg-[#0c0c0e] border border-[#23232a] rounded-lg p-[18px]">
+                <p className="text-[0.72rem] font-extrabold uppercase tracking-[0.6px] text-[#70d64d] mb-3.5 pb-1.5 border-b border-[#23232a]">Business Overview</p>
+                <div className="flex justify-between text-[0.85rem] border-b border-[#1a1a22] py-[7px] text-[#d1d5db]"><strong>Primary Industry:</strong> <span>{ap.industry || '—'}</span></div>
+                <div className="flex justify-between text-[0.85rem] border-b border-[#1a1a22] py-[7px] text-[#d1d5db]"><strong>Founded Year:</strong> <span>{ap.founded_year || '—'}</span></div>
+                <div className="flex justify-between text-[0.85rem] border-b border-[#1a1a22] py-[7px] text-[#d1d5db]"><strong>Employee Count:</strong> <span>{ap.employee_count ? `${ap.employee_count} Employees` : '—'}</span></div>
+                <div className="flex justify-between text-[0.85rem] border-b border-[#1a1a22] py-[7px] text-[#d1d5db]"><strong>Office Location:</strong> <span>{ap.address || '—'}</span></div>
+                {ap.gst_number && <div className="flex justify-between text-[0.85rem] border-b border-[#1a1a22] py-[7px] text-[#d1d5db]"><strong>GSTIN / Tax ID:</strong> <span className="uppercase">{ap.gst_number}</span></div>}
+                {ap.cin && <div className="flex justify-between text-[0.85rem] border-b border-[#1a1a22] py-[7px] text-[#d1d5db]"><strong>Corporate Identification (CIN):</strong> <span className="uppercase">{ap.cin}</span></div>}
+                {ap.company_pan && <div className="flex justify-between text-[0.85rem] border-b border-[#1a1a22] py-[7px] text-[#d1d5db]"><strong>Company PAN:</strong> <span className="uppercase">{ap.company_pan}</span></div>}
               </div>
 
               {/* Team Members List */}
-              <div style={S.sectionCard}>
-                <p style={S.sectionTitle}>Team Members ({ap.team_members?.length || 0})</p>
+              <div className="bg-[#0c0c0e] border border-[#23232a] rounded-lg p-[18px]">
+                <p className="text-[0.72rem] font-extrabold uppercase tracking-[0.6px] text-[#70d64d] mb-3.5 pb-1.5 border-b border-[#23232a]">Team Members ({ap.team_members?.length || 0})</p>
                 {(!ap.team_members || ap.team_members.length === 0) ? (
-                  <p style={{ color: '#6b7280', fontSize: '0.8rem', fontStyle: 'italic', margin: 0 }}>
+                  <p className="text-[#6b7280] text-[0.8rem] italic m-0">
                     No team members listed for this agency.
                   </p>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div className="flex flex-col gap-2.5">
                     {ap.team_members.map((member) => (
                       <div
                         key={member.id}
-                        style={{
-                          background: '#121215',
-                          border: '1px solid #23232a',
-                          borderRadius: '8px',
-                          padding: '12px 14px',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '8px'
-                        }}
+                        className="bg-[#121215] border border-[#23232a] rounded-lg p-[12px_14px] flex flex-col gap-2"
                       >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div className="flex justify-between items-start">
                           <div>
-                            <strong style={{ color: '#fff', fontSize: '0.88rem' }}>{member.full_name}</strong>
-                            <p style={{ color: '#c084fc', fontSize: '0.72rem', fontWeight: 600, margin: '2px 0 0' }}>
+                            <strong className="text-white text-[0.88rem] font-bold">{member.full_name}</strong>
+                            <p className="text-[#c084fc] text-[0.72rem] font-semibold mt-0.5 m-0">
                               {member.designation?.toUpperCase() || 'TEAM MEMBER'}
                             </p>
                           </div>
                           <span
-                            style={{
-                              background: member.status === 'active' ? 'rgba(112,214,77,0.1)' : 'rgba(245,158,11,0.1)',
-                              color: member.status === 'active' ? '#70d64d' : '#f59e0b',
-                              fontSize: '0.62rem',
-                              fontWeight: 700,
-                              padding: '2px 6px',
-                              borderRadius: '4px',
-                              textTransform: 'uppercase'
-                            }}
+                            className={`text-[0.62rem] font-bold px-1.5 py-0.5 rounded uppercase ${member.status === 'active' ? 'bg-[#70d64d]/10 text-[#70d64d]' : 'bg-[#f59e0b]/10 text-[#f59e0b]'}`}
                           >
                             {member.status || 'ACTIVE'}
                           </span>
                         </div>
                         
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', borderTop: '1px solid #1a1a22', paddingTop: '8px', marginTop: '2px' }}>
-                          <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#8a8a8a', fontSize: '0.75rem', overflow: 'hidden' }}>
-                            <Mail size={11} color="#6b7280" style={{ flexShrink: 0 }} />
-                            <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }} title={member.email}>
+                        <div className="grid grid-cols-2 gap-2 border-t border-[#1a1a22] pt-2 mt-0.5">
+                          <span className="flex items-center gap-1.25 text-[#8a8a8a] text-[0.75rem] overflow-hidden">
+                            <Mail size={11} color="#6b7280" className="shrink-0" />
+                            <span className="truncate" title={member.email}>
                               {member.email}
                             </span>
                           </span>
-                          <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#8a8a8a', fontSize: '0.75rem' }}>
-                            <Phone size={11} color="#6b7280" style={{ flexShrink: 0 }} />
+                          <span className="flex items-center gap-1.25 text-[#8a8a8a] text-[0.75rem]">
+                            <Phone size={11} color="#6b7280" className="shrink-0" />
                             <span>{member.mobile || '—'}</span>
                           </span>
                         </div>
 
                         {member.resume_url && (
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px dashed #1a1a22', paddingTop: '6px', marginTop: '2px' }}>
+                          <div className="flex justify-end border-t border-dashed border-[#1a1a22] pt-1.5 mt-0.5">
                             <a
                               href={member.resume_url}
                               target="_blank"
                               rel="noreferrer"
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                color: '#70d64d',
-                                fontSize: '0.72rem',
-                                textDecoration: 'none',
-                                fontWeight: 700
-                              }}
+                              className="inline-flex items-center gap-1 text-[#70d64d] text-[0.72rem] no-underline font-bold"
                             >
                               View CV / Resume <ExternalLink size={10} />
                             </a>
@@ -273,43 +236,44 @@ export const AgencyModal = ({ agency, onClose }) => {
                     ))}
                   </div>
                 )}
+              </div>
               {/* Account Management Actions */}
-              <div style={{ ...S.sectionCard, border: '1px solid #ef444433', background: '#1c0c0e', marginTop: '16px' }}>
-                <p style={{ ...S.sectionTitle, color: '#ef4444', borderColor: '#ef444433' }}>Account Management</p>
+              <div className="bg-[#1c0c0e] border border-[#ef4444]/20 rounded-lg p-[18px] mt-4">
+                <p className="text-[0.72rem] font-extrabold uppercase tracking-[0.6px] text-[#ef4444] mb-3.5 pb-1.5 border-b border-[#ef4444]/20">Account Management</p>
                 {agency.account_status === 'suspended' ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: 0 }}>This account is currently suspended.</p>
+                  <div className="flex flex-col gap-2.5">
+                    <p className="text-[#ef4444] text-[0.8rem] m-0">This account is currently suspended.</p>
                     <button
                       disabled={reactivateMutation.isPending}
                       onClick={() => reactivateMutation.mutate()}
-                      style={{ background: '#70d64d', color: '#000', border: 'none', borderRadius: '6px', padding: '10px', fontSize: '0.8rem', fontWeight: 800, cursor: 'pointer', textAlign: 'center', width: '100%' }}
+                      className="bg-[#70d64d] text-black border-none rounded-md p-2.5 text-[0.8rem] font-extrabold cursor-pointer text-center w-full"
                     >
                       {reactivateMutation.isPending ? 'Reactivating...' : 'REACTIVATE ACCOUNT'}
                     </button>
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div className="flex flex-col gap-2.5">
                     {!showSuspendInput ? (
                       <button
                         onClick={() => setShowSuspendInput(true)}
-                        style={{ background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', borderRadius: '6px', padding: '10px', fontSize: '0.8rem', fontWeight: 800, cursor: 'pointer', textAlign: 'center', width: '100%' }}
+                        className="bg-transparent border border-[#ef4444] text-[#ef4444] rounded-md p-2.5 text-[0.8rem] font-extrabold cursor-pointer text-center w-full"
                       >
                         SUSPEND ACCOUNT
                       </button>
                     ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div className="flex flex-col gap-2">
                         <input
                           type="text"
                           placeholder="Reason for suspension..."
                           value={suspendReason}
                           onChange={e => setSuspendReason(e.target.value)}
-                          style={{ background: '#000', border: '1px solid #ef4444', borderRadius: '6px', padding: '8px 12px', color: '#fff', fontSize: '0.8rem', outline: 'none' }}
+                          className="bg-black border border-[#ef4444] rounded-md py-2 px-3 text-white text-[0.8rem] outline-none"
                         />
-                        <div style={{ display: 'flex', gap: '8px' }}>
+                        <div className="flex gap-2">
                           <button
                             type="button"
                             onClick={() => setShowSuspendInput(false)}
-                            style={{ flex: 1, background: '#1c1c20', border: '1px solid #23232a', color: '#8a8a8a', borderRadius: '6px', padding: '8px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}
+                            className="flex-1 bg-[#1c1c20] border border-[#23232a] text-[#8a8a8a] rounded-md p-2 text-[0.75rem] font-bold cursor-pointer"
                           >
                             Cancel
                           </button>
@@ -323,7 +287,7 @@ export const AgencyModal = ({ agency, onClose }) => {
                               }
                               suspendMutation.mutate();
                             }}
-                            style={{ flex: 1, background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '8px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}
+                            className="flex-1 bg-[#ef4444] text-white border-none rounded-md p-2 text-[0.75rem] font-bold cursor-pointer"
                           >
                             {suspendMutation.isPending ? 'Suspending...' : 'Confirm Suspend'}
                           </button>
@@ -334,64 +298,50 @@ export const AgencyModal = ({ agency, onClose }) => {
                 )}
               </div>
             </div>
-          </div>
 
-          {/* Right Column */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* Right Column */}
+            <div className="flex flex-col gap-4">
               {/* Statistics */}
-              <div style={S.sectionCard}>
-                <p style={S.sectionTitle}>Stats & Quality Rating</p>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '14px' }}>
-                  <div style={{ background: '#121215', border: '1px solid #23232a', padding: '8px', borderRadius: '6px', textAlign: 'center' }}>
-                    <p style={{ fontSize: '0.65rem', color: '#6b7280', textTransform: 'uppercase', fontWeight: 700, margin: 0 }}>TEAM SIZE</p>
-                    <p style={{ fontSize: '1.1rem', color: '#c084fc', fontWeight: 800, margin: '4px 0 0' }}>{ap?._count?.team_members ?? ap?.employee_count ?? 0}</p>
+              <div className="bg-[#0c0c0e] border border-[#23232a] rounded-lg p-[18px]">
+                <p className="text-[0.72rem] font-extrabold uppercase tracking-[0.6px] text-[#70d64d] mb-3.5 pb-1.5 border-b border-[#23232a]">Stats & Quality Rating</p>
+                <div className="grid grid-cols-2 gap-2.5 mb-3.5">
+                  <div className="bg-[#121215] border border-[#23232a] p-2 rounded-md text-center">
+                    <p className="text-[0.65rem] text-[#6b7280] uppercase font-bold m-0">TEAM SIZE</p>
+                    <p className="text-[1.1rem] text-[#c084fc] font-extrabold mt-1 mb-0 mx-0">{ap?._count?.team_members ?? ap?.employee_count ?? 0}</p>
                   </div>
-                  <div style={{ background: '#121215', border: '1px solid #23232a', padding: '8px', borderRadius: '6px', textAlign: 'center' }}>
-                    <p style={{ fontSize: '0.65rem', color: '#6b7280', textTransform: 'uppercase', fontWeight: 700, margin: 0 }}>PROJECTS</p>
-                    <p style={{ fontSize: '1.1rem', color: '#70d64d', fontWeight: 800, margin: '4px 0 0' }}>{ap.total_projects ?? 0}</p>
+                  <div className="bg-[#121215] border border-[#23232a] p-2 rounded-md text-center">
+                    <p className="text-[0.65rem] text-[#6b7280] uppercase font-bold m-0">PROJECTS</p>
+                    <p className="text-[1.1rem] text-[#70d64d] font-extrabold mt-1 mb-0 mx-0">{ap.total_projects ?? 0}</p>
                   </div>
                 </div>
-                <div style={S.row}><strong>Rating:</strong> <span>{ap.rating ? `★ ${ap.rating}` : '—'}</span></div>
-                <div style={S.row}><strong>Completed Projects:</strong> <span>{ap.total_completed_projects ?? '—'}</span></div>
-                <div style={{ marginTop: '12px' }}>
+                <div className="flex justify-between text-[0.85rem] border-b border-[#1a1a22] py-[7px] text-[#d1d5db]"><strong>Rating:</strong> <span>{ap.rating ? `★ ${ap.rating}` : '—'}</span></div>
+                <div className="flex justify-between text-[0.85rem] border-b border-[#1a1a22] py-[7px] text-[#d1d5db]"><strong>Completed Projects:</strong> <span>{ap.total_completed_projects ?? '—'}</span></div>
+                <div className="mt-3">
                   <CompletionBar value={ap.profile_completion || 0} />
                 </div>
               </div>
 
               {/* Point of Contact & Info */}
-              <div style={S.sectionCard}>
-                <p style={S.sectionTitle}>Point of Contact</p>
-                <div style={S.row}><strong>Authorized Signee:</strong> <span>{agency.full_name}</span></div>
-                <div style={S.row}><strong>Email:</strong> <span>{agency.email}</span></div>
-                <div style={S.row}><strong>Phone:</strong> <span>{agency.mobile || '—'}</span></div>
-                <div style={S.row}><strong>Location:</strong> <span>{ap.city && ap.country ? `${ap.city}, ${ap.country}` : '—'}</span></div>
-                <div style={S.row}><strong>Registered On:</strong> <span>{fmtDate(agency.created_at)}</span></div>
-                <div style={S.row}><strong>Last Login:</strong> <span>{fmtDate(agency.last_login)}</span></div>
+              <div className="bg-[#0c0c0e] border border-[#23232a] rounded-lg p-[18px]">
+                <p className="text-[0.72rem] font-extrabold uppercase tracking-[0.6px] text-[#70d64d] mb-3.5 pb-1.5 border-b border-[#23232a]">Point of Contact</p>
+                <div className="flex justify-between text-[0.85rem] border-b border-[#1a1a22] py-[7px] text-[#d1d5db]"><strong>Authorized Signee:</strong> <span>{agency.full_name}</span></div>
+                <div className="flex justify-between text-[0.85rem] border-b border-[#1a1a22] py-[7px] text-[#d1d5db]"><strong>Email:</strong> <span>{agency.email}</span></div>
+                <div className="flex justify-between text-[0.85rem] border-b border-[#1a1a22] py-[7px] text-[#d1d5db]"><strong>Phone:</strong> <span>{agency.mobile || '—'}</span></div>
+                <div className="flex justify-between text-[0.85rem] border-b border-[#1a1a22] py-[7px] text-[#d1d5db]"><strong>Location:</strong> <span>{ap.city && ap.country ? `${ap.city}, ${ap.country}` : '—'}</span></div>
+                <div className="flex justify-between text-[0.85rem] border-b border-[#1a1a22] py-[7px] text-[#d1d5db]"><strong>Registered On:</strong> <span>{fmtDate(agency.created_at)}</span></div>
+                <div className="flex justify-between text-[0.85rem] border-b border-[#1a1a22] py-[7px] text-[#d1d5db]"><strong>Last Login:</strong> <span>{fmtDate(agency.last_login)}</span></div>
               </div>
 
               {/* Links */}
-              <div style={S.sectionCard}>
-                <p style={S.sectionTitle}>Corporate Links</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div className="bg-[#0c0c0e] border border-[#23232a] rounded-lg p-[18px]">
+                <p className="text-[0.72rem] font-extrabold uppercase tracking-[0.6px] text-[#70d64d] mb-3.5 pb-1.5 border-b border-[#23232a]">Corporate Links</p>
+                <div className="flex flex-col gap-2">
                   {ap.website && (
                     <a
                       href={ap.website}
                       target="_blank"
                       rel="noreferrer"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px',
-                        background: '#70d64d',
-                        color: '#000',
-                        textDecoration: 'none',
-                        fontSize: '0.8rem',
-                        fontWeight: 800,
-                        padding: '8px',
-                        borderRadius: '6px',
-                        textAlign: 'center'
-                      }}
+                      className="flex items-center justify-center gap-1.5 bg-[#70d64d] text-black no-underline text-[0.8rem] font-extrabold p-2 rounded-md text-center"
                     >
                       <Globe size={14} /> Visit Corporate Website <ExternalLink size={11} color="#000" />
                     </a>
@@ -401,35 +351,20 @@ export const AgencyModal = ({ agency, onClose }) => {
                       href={ap.linkedin_url}
                       target="_blank"
                       rel="noreferrer"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px',
-                        border: '1px solid #23232a',
-                        color: '#fff',
-                        textDecoration: 'none',
-                        fontSize: '0.8rem',
-                        fontWeight: 700,
-                        padding: '8px',
-                        borderRadius: '6px',
-                        textAlign: 'center',
-                        background: '#0c0c0e'
-                      }}
+                      className="flex items-center justify-center gap-1.5 border border-[#23232a] text-white no-underline text-[0.8rem] font-bold p-2 rounded-md text-center bg-[#0c0c0e]"
                     >
                       LinkedIn Profile <ExternalLink size={11} />
                     </a>
                   )}
                 </div>
               </div>
-
             </div>
 
           </div>
           )}
 
           {activeTab === 'profile' && (
-            <div className="profile-workspace-view animate-fade-in" style={{ padding: '0', background: 'transparent' }}>
+            <div className="profile-workspace-view animate-fade-in p-0 bg-transparent">
               <ProfileHeader
                 isFreelancer={false}
                 name={ap.agency_name || agency.full_name}
@@ -451,7 +386,7 @@ export const AgencyModal = ({ agency, onClose }) => {
                 employeeCount={ap.employee_count}
               />
 
-              <div className="profile-details-split-grid" style={{ marginTop: '20px' }}>
+              <div className="profile-details-split-grid mt-5">
                 <div className="profile-details-left-pane">
                   <ProfileAbout
                     isFreelancer={false}
@@ -486,4 +421,3 @@ export const AgencyModal = ({ agency, onClose }) => {
 };
 
 export default AgencyModal;
-

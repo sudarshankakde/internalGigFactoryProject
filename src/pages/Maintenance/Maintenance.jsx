@@ -48,7 +48,7 @@ export default function Maintenance() {
 
         <div className="maintenance-footer">
           <p>
-            Need urgent help? Reach out to <a href={`mailto:${supportEmail}`}><Mail size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} />{supportEmail}</a>
+            Need urgent help? Reach out to <a href={`mailto:${supportEmail}`}><Mail size={12} className="inline align-middle mr-1" />{supportEmail}</a>
           </p>
         </div>
       </div>

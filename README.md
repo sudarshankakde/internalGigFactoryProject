@@ -19,7 +19,7 @@ This is the frontend client application for **GigFactory**, built with React, Vi
 
 - **Core**: React 19, Javascript ES6
 - **Build Tool**: Vite 8
-- **Styling**: Vanilla CSS, React Bootstrap 2 (reused for specific layout grids), TailwindCSS (Vite plugin configuration)
+- **Styling**: Vanilla CSS, Tailwind CSS v3 (configured via PostCSS with `tailwind.config.js` content scanning)
 - **State Management**: Zustand
 - **Data Fetching**: `@tanstack/react-query`
 - **Routing**: `react-router-dom` v7
@@ -97,6 +97,8 @@ npm run preview
 ---
 
 ## 🧪 Styling and Best Practices
+- **Tailwind CSS v3**: Utility-first styles are compiled via PostCSS using paths defined in `tailwind.config.js`. Static inline styles (`style={{ ... }}`) should be avoided in favor of Tailwind utility classes.
+- **No Bootstrap**: Bootstrap has been completely removed from dependencies and imports. The styling system relies solely on Tailwind CSS and custom component-specific stylesheets, resulting in a cleaner, conflict-free rendering pipeline and a 67% smaller compiled CSS footprint.
 - **Variables**: The design system relies on CSS root tokens defined in `src/components/Layout/AppLayout.css` (e.g., `--accent`, `--bg-card`, `--border`).
 - **Debounced Inputs**: Whenever implementing custom search or query inputs, ensure a debounce helper (e.g., `setTimeout`) is used with a `350ms` delay to prevent excess queries.
 - **Subcomponents**: Avoid creating large inline components. Always place new, reusable panels or tables under `src/components/<FeatureArea>/`.

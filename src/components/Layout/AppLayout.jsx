@@ -79,11 +79,11 @@ function NotifDropdown({ notifications, onMarkAllRead, onMarkRead, onDismiss, on
   return (
     <div className="notif-dropdown">
       <div className="notif-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className="flex items-center gap-2">
           <Bell size={18} color="#70d64d" />
           <span>Notifications</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div className="flex items-center gap-3">
           {notifications.some(n => !n.is_read) && (
             <button className="notif-mark-all-btn" onClick={onMarkAllRead}>
               Mark all as read
@@ -97,7 +97,7 @@ function NotifDropdown({ notifications, onMarkAllRead, onMarkRead, onDismiss, on
 
       <div className="notif-list">
         {notifications.length === 0 ? (
-          <div style={{ padding: '40px 20px', textAlign: 'center', color: '#6b7280', fontSize: '0.88rem' }}>
+          <div className="py-10 px-5 text-center text-[#6b7280] text-[0.88rem]">
             No notifications yet.
           </div>
         ) : (
@@ -121,8 +121,7 @@ function NotifDropdown({ notifications, onMarkAllRead, onMarkRead, onDismiss, on
             return (
               <div 
                 key={n.id} 
-                className={`notif-item ${!n.is_read ? 'unread' : ''}`}
-                style={{ cursor: 'pointer' }}
+                className={`notif-item cursor-pointer ${!n.is_read ? 'unread' : ''}`}
                 onClick={() => {
                   if (!n.is_read) {
                     onMarkRead(n.id);
@@ -190,9 +189,9 @@ function ProfileDropdown({ user, onLogout, onClose }) {
           <User size={14} /> My Profile
         </button>
       )}
-      {/* <button className="profile-dd-item" onClick={() => { navigate(isAdmin ? '/admin/settings' : '/settings'); onClose(); }}>
+      <button className="profile-dd-item" onClick={() => { navigate(isAdmin ? '/admin/settings' : '/settings'); onClose(); }}>
         <Settings size={14} /> Settings
-      </button> */}
+      </button>
       <div className="profile-dd-divider" />
       <button className="profile-dd-item danger" onClick={onLogout}>
         <LogOut size={14} /> Logout
@@ -218,9 +217,20 @@ export default function AppLayout({ children, pageTitle }) {
   const navItems    = NAV_CONFIG[role] || NAV_CONFIG.freelancer;
 
   const [collapsed,     setCollapsed]     = useState(false);
+  const [isMobile,      setIsMobile]      = useState(false);
   const [mobileOpen,    setMobileOpen]    = useState(false);
   const [showNotif,     setShowNotif]     = useState(false);
   const [showProfile,   setShowProfile]   = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 1024px)');
+    const listener = () => setIsMobile(media.matches);
+    listener();
+    media.addEventListener('change', listener);
+    return () => media.removeEventListener('change', listener);
+  }, []);
+
+  const effectiveCollapsed = isMobile ? false : collapsed;
 
   const queryClient = useQueryClient();
 
@@ -287,12 +297,12 @@ export default function AppLayout({ children, pageTitle }) {
     <NavLink
       to={item.to}
       className={({ isActive }) =>
-        `sidebar-nav-item ${isActive ? 'active' : ''} ${collapsed ? 'collapsed' : ''}`
+        `sidebar-nav-item ${isActive ? 'active' : ''} ${effectiveCollapsed ? 'collapsed' : ''}`
       }
-      title={collapsed ? item.label : undefined}
+      title={effectiveCollapsed ? item.label : undefined}
     >
       <item.icon size={18} className="nav-icon" />
-      {!collapsed && <span className="nav-label">{item.label}</span>}
+      {!effectiveCollapsed && <span className="nav-label">{item.label}</span>}
     </NavLink>
   );
 
@@ -300,9 +310,9 @@ export default function AppLayout({ children, pageTitle }) {
   const SidebarContent = () => (
     <>
       {/* brand */}
-      <div className={`sidebar-brand ${collapsed ? 'brand-collapsed' : ''}`}>
+      <div className={`sidebar-brand ${effectiveCollapsed ? 'brand-collapsed' : ''}`}>
         <img src={gigfactoryLogo} alt="GigFactory" className="sidebar-logo" />
-        {!collapsed && (
+        {!effectiveCollapsed && !isMobile && (
           <button
             className="sidebar-collapse-btn"
             onClick={() => setCollapsed(true)}
@@ -314,7 +324,7 @@ export default function AppLayout({ children, pageTitle }) {
       </div>
 
       {/* role badge */}
-      {!collapsed && (
+      {!effectiveCollapsed && (
         <div className="sidebar-role-badge">
           <Shield size={12} color="#70d64d" />
           <span>{role === 'admin' ? 'Super Admin' : role.charAt(0).toUpperCase() + role.slice(1)}</span>
@@ -323,13 +333,13 @@ export default function AppLayout({ children, pageTitle }) {
 
       {/* nav */}
       <nav className="sidebar-nav">
-        {!collapsed && <p className="nav-section-label">NAVIGATION</p>}
+        {!effectiveCollapsed && <p className="nav-section-label">NAVIGATION</p>}
         {navItems.map(item => <NavItem key={item.to} item={item} />)}
       </nav>
 
       {/* bottom: expand button + logout */}
       <div className="sidebar-bottom">
-        {collapsed && (
+        {effectiveCollapsed && (
           <button
             className="sidebar-nav-item collapsed expand-btn"
             onClick={() => setCollapsed(false)}
@@ -343,8 +353,8 @@ export default function AppLayout({ children, pageTitle }) {
   );
 
   return (
-    <LayoutContext.Provider value={{ collapsed, setCollapsed }}>
-      <div className={`app-shell ${collapsed ? 'sidebar-collapsed' : ''}`}>
+    <LayoutContext.Provider value={{ collapsed: effectiveCollapsed, setCollapsed }}>
+      <div className={`app-shell ${effectiveCollapsed ? 'sidebar-collapsed' : ''}`}>
 
         {/* ── Mobile overlay ── */}
         {mobileOpen && (
@@ -352,7 +362,7 @@ export default function AppLayout({ children, pageTitle }) {
         )}
 
         {/* ── Sidebar ── */}
-        <aside className={`app-sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
+        <aside className={`app-sidebar ${effectiveCollapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
           <SidebarContent />
         </aside>
 
@@ -397,15 +407,6 @@ export default function AppLayout({ children, pageTitle }) {
                 )}
               </div>
 
-              {/* Settings */}
-              <button
-                className="topbar-icon-btn"
-                onClick={() => navigate(role === 'admin' ? '/admin/settings' : '/settings')}
-                aria-label="Settings"
-              >
-                <Settings size={18} />
-              </button>
-
               {/* Divider */}
               <div className="topbar-divider" />
 
@@ -426,7 +427,7 @@ export default function AppLayout({ children, pageTitle }) {
                     </span>
                   </div>
                   {avatarUrl ? (
-                    <img src={avatarUrl} alt={userName} className="topbar-profile-avatar-circle" style={{ objectFit: 'cover' }} />
+                    <img src={avatarUrl} alt={userName} className="topbar-profile-avatar-circle object-cover" />
                   ) : (
                     <div className="topbar-profile-avatar-circle">
                       {userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 1)}

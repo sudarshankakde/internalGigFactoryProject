@@ -77,7 +77,7 @@ const ResetPassword = () => {
         {!token ? (
           <div className="token-error-message">
             <p>Invalid or missing password reset token. Please request a new link.</p>
-            <button type="button" onClick={() => navigate('/forgot-password')} className="reset-submit-btn" style={{ marginTop: '16px' }}>
+            <button type="button" onClick={() => navigate('/forgot-password')} className="reset-submit-btn mt-4">
               Go to Forgot Password
             </button>
           </div>

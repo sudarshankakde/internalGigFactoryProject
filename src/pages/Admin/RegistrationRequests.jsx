@@ -125,75 +125,84 @@ export default function RegistrationRequests() {
     rejected: allRequests.filter(r => r.status === 'rejected').length,
   }), [allRequests]);
 
-  const S = {
-    filterBtn: { background: '#0c0c0e', border: '1px solid #23232a', color: '#6b7280', borderRadius: '6px', padding: '7px 14px', fontSize: '0.8rem', cursor: 'pointer', transition: 'all 0.1s' },
-    filterBtnActive: { background: '#70d64d', color: '#000', borderColor: '#70d64d', fontWeight: 700 },
-    select: { background: '#0c0c0e', border: '1px solid #23232a', color: '#fff', borderRadius: '6px', padding: '7px 12px', fontSize: '0.8rem', outline: 'none', cursor: 'pointer' },
-  };
+  const filterBtnClass = "bg-[#0c0c0e] border border-[#23232a] text-gray-500 rounded-[6px] px-[14px] py-[7px] text-[0.8rem] cursor-pointer transition-all duration-100";
+  const filterBtnActiveClass = "bg-[#70d64d] text-black border-[#70d64d] font-bold";
+  const selectClass = "bg-[#0c0c0e] border border-[#23232a] text-white rounded-[6px] px-[12px] py-[7px] text-[0.8rem] outline-none cursor-pointer";
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div className="flex flex-col gap-[24px]">
 
       {/* Stat cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-[16px]">
         {[
           { label: 'Total Requests', value: stats.total,    Icon: FileText,  accent: false },
           { label: 'Pending Review', value: stats.pending,  Icon: Clock,     accent: true  },
           { label: 'Approved',       value: stats.approved, Icon: Users,     accent: false },
           { label: 'Rejected',       value: stats.rejected, Icon: Building2, accent: false },
         ].map(({ label, value, Icon, accent }) => (
-          <div key={label} style={{ background: accent ? 'linear-gradient(135deg,#121215,#162203)' : '#121215', border: `1px solid ${accent ? '#374f05' : '#23232a'}`, borderRadius: '8px', padding: '18px 20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: '#6b7280', fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' }}>{label}</span>
+          <div 
+            key={label} 
+            className={`border rounded-[8px] px-[20px] py-[18px] ${
+              accent 
+                ? 'bg-gradient-to-br from-[#121215] to-[#162203] border-[#374f05]' 
+                : 'bg-[#121215] border-[#23232a]'
+            }`}
+          >
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500 text-[0.68rem] font-bold tracking-[0.5px] uppercase">{label}</span>
               <Icon size={16} color={accent ? '#70d64d' : '#6b7280'} />
             </div>
-            <div style={{ fontSize: '2rem', fontWeight: 800, color: '#fff', marginTop: '6px' }}>
-              {isLoading ? <span className="skeleton-pulse" style={{ display: 'inline-block', width: '40px', height: '28px', borderRadius: '4px', verticalAlign: 'middle' }} /> : value}
+            <div className="text-[2rem] font-extrabold text-white mt-[6px]">
+              {isLoading ? <span className="skeleton-pulse inline-block w-[40px] h-[28px] rounded-[4px] align-middle" /> : value}
             </div>
           </div>
         ))}
       </div>
 
       {/* Table card */}
-      <div style={{ background: '#121215', border: '1px solid #23232a', borderRadius: '10px', padding: '24px' }}>
+      <div className="bg-[#121215] border border-[#23232a] rounded-[10px] p-[24px]">
         {/* Controls */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+        <div className="flex justify-between items-start mb-[20px] flex-wrap gap-[12px]">
           {/* Left: search */}
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flex: 1, minWidth: '220px' }}>
-            <Search size={14} style={{ position: 'absolute', left: '12px', color: '#6b7280', pointerEvents: 'none' }} />
+          <div className="relative flex items-center flex-1 min-w-[220px]">
+            <Search size={14} className="absolute left-[12px] text-gray-500 pointer-events-none" />
             <input
               type="text"
               placeholder="Search by name, email, or mobile…"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              style={{ width: '100%', background: '#0c0c0e', border: '1px solid #23232a', borderRadius: '6px', color: '#fff', fontSize: '0.85rem', padding: '8px 12px 8px 36px', outline: 'none' }}
+              className="w-full bg-[#0c0c0e] border border-[#23232a] rounded-[6px] text-white text-[0.85rem] pl-[36px] pr-[12px] py-[8px] outline-none"
             />
           </div>
 
           {/* Right: filters */}
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div className="flex gap-[8px] flex-wrap items-center">
             {/* Status filter pills */}
-            <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+            <div className="flex gap-[5px] items-center">
               <Filter size={12} color="#6b7280" />
               {['all', 'pending', 'approved', 'rejected'].map(s => (
-                <button key={s} onClick={() => setStatusFilter(s)} style={{ ...S.filterBtn, ...(statusFilter === s ? S.filterBtnActive : {}) }}>
+                <button 
+                  key={s} 
+                  onClick={() => setStatusFilter(s)} 
+                  className={`${filterBtnClass} ${statusFilter === s ? filterBtnActiveClass : ''}`}
+                >
                   {s.charAt(0).toUpperCase() + s.slice(1)}
                 </button>
               ))}
             </div>
             {/* Role filter */}
-            <select value={roleFilter} onChange={e => setRoleFilter(e.target.value)} style={S.select}>
+            <select value={roleFilter} onChange={e => setRoleFilter(e.target.value)} className={selectClass}>
               <option value="all">All Roles</option>
               <option value="freelancer">Freelancer</option>
               <option value="agency">Agency</option>
             </select>
             {/* Sort */}
-            <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={S.select}>
+            <select value={sortBy} onChange={e => setSortBy(e.target.value)} className={selectClass}>
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
               <option value="name">Name A-Z</option>
             </select>
-            <button onClick={() => refetch()} style={{ ...S.filterBtn, display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <button onClick={() => refetch()} className={`${filterBtnClass} flex items-center gap-[5px]`}>
               <RefreshCw size={13} /> Refresh
             </button>
           </div>
@@ -210,8 +219,8 @@ export default function RegistrationRequests() {
         />
 
         {/* Footer: count + pagination */}
-        <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-          <span style={{ color: '#6b7280', fontSize: '0.8rem' }}>
+        <div className="mt-[20px] flex justify-between items-center flex-wrap gap-[12px]">
+          <span className="text-gray-500 text-[0.8rem]">
             Showing {Math.min((page - 1) * PAGE_SIZE + 1, sorted.length)}–{Math.min(page * PAGE_SIZE, sorted.length)} of {sorted.length} results
           </span>
           <Pagination page={page} totalPages={totalPages} onPage={setPage} />

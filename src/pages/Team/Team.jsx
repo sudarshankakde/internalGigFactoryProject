@@ -36,20 +36,20 @@ const TeamSkeleton = () => (
     {[1, 2, 3, 4].map((i) => (
       <div key={i} className="member-card">
         <div className="member-card-header">
-          <div className="member-avatar skeleton-pulse" style={{ border: 'none', background: '#1c1c22' }} />
-          <div className="member-identity" style={{ width: '100%', gap: '8px' }}>
-            <div className="skeleton-pulse" style={{ width: '60%', height: '16px', borderRadius: '4px' }} />
-            <div className="skeleton-pulse" style={{ width: '40%', height: '12px', borderRadius: '4px' }} />
+          <div className="member-avatar skeleton-pulse border-none bg-[#1c1c22]" />
+          <div className="member-identity w-full gap-2">
+            <div className="skeleton-pulse w-[60%] h-4 rounded" />
+            <div className="skeleton-pulse w-[40%] h-3 rounded" />
           </div>
         </div>
-        <div className="member-details-list" style={{ gap: '12px' }}>
-          <div className="skeleton-pulse" style={{ width: '85%', height: '12px', borderRadius: '4px' }} />
-          <div className="skeleton-pulse" style={{ width: '70%', height: '12px', borderRadius: '4px' }} />
-          <div className="skeleton-pulse" style={{ width: '50%', height: '12px', borderRadius: '4px' }} />
+        <div className="member-details-list gap-3">
+          <div className="skeleton-pulse w-[85%] h-3 rounded" />
+          <div className="skeleton-pulse w-[70%] h-3 rounded" />
+          <div className="skeleton-pulse w-[50%] h-3 rounded" />
         </div>
         <div className="member-card-actions">
-          <div className="skeleton-pulse" style={{ width: '60px', height: '28px', borderRadius: '4px' }} />
-          <div className="skeleton-pulse" style={{ width: '70px', height: '28px', borderRadius: '4px' }} />
+          <div className="skeleton-pulse w-[60px] h-[28px] rounded" />
+          <div className="skeleton-pulse w-[70px] h-[28px] rounded" />
         </div>
       </div>
     ))}
@@ -290,7 +290,7 @@ export const Team = () => {
               : "Get started by adding your first developer, manager, or creator to the agency team."}
           </p>
           {!searchQuery && (
-            <button className="add-member-btn" style={{ marginTop: '12px' }} onClick={() => setIsAddModalOpen(true)}>
+            <button className="add-member-btn mt-3" onClick={() => setIsAddModalOpen(true)}>
               <Plus size={18} />
               <span>Add Team Member</span>
             </button>

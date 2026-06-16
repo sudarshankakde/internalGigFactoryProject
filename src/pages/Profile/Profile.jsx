@@ -213,8 +213,8 @@ export const Profile = () => {
 
   if (error) {
     return (
-      <div className="profile-workspace-view" style={{ textAlign: 'center', padding: '40px' }}>
-        <p style={{ color: '#ef4444', fontWeight: 600 }}>Failed to load profile details: {error}</p>
+      <div className="profile-workspace-view text-center p-10">
+        <p className="text-[#ef4444] font-semibold">Failed to load profile details: {error}</p>
       </div>
     );
   }

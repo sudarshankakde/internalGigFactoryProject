@@ -16,7 +16,7 @@ export const DeleteMemberModal = ({ isOpen, onClose, deletingMember, onSubmit, i
         </div>
         <form className="team-modal-form" onSubmit={onSubmit}>
           <div className="team-modal-body">
-            <p style={{ color: '#cbd5e1', fontSize: '0.9rem', lineHeight: '1.5', margin: 0 }}>
+            <p className="text-[#cbd5e1] text-[0.9rem] leading-[1.5] m-0">
               Are you sure you want to remove <strong>{deletingMember.full_name}</strong> from your agency team? This action will sever their association with your agency.
             </p>
           </div>
@@ -24,7 +24,7 @@ export const DeleteMemberModal = ({ isOpen, onClose, deletingMember, onSubmit, i
             <button type="button" className="btn-cancel" onClick={onClose}>
               Cancel
             </button>
-            <button type="submit" className="btn-save" style={{ backgroundColor: '#ff4d4d', color: '#fff' }} disabled={isSaving}>
+            <button type="submit" className="btn-save bg-[#ff4d4d] text-white" disabled={isSaving}>
               {isSaving ? 'Removing...' : 'Remove Member'}
             </button>
           </div>

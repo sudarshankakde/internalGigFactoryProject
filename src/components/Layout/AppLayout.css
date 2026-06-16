@@ -664,4 +664,12 @@
   .app-content { padding: 16px; }
   .topbar-name  { display: none; }
   .app-topbar   { padding: 0 14px; }
+  .notif-dropdown {
+    position: fixed;
+    top: var(--topbar-height);
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-width: none;
+  }
 }

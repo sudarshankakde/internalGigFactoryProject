@@ -13,24 +13,25 @@ const ROLE_STYLES = {
 function RoleChip({ role }) {
   const r = ROLE_STYLES[role] || ROLE_STYLES.freelancer;
   return (
-    <span style={{ background: r.bg, color: r.color, fontSize: '0.68rem', fontWeight: 700, padding: '3px 8px', borderRadius: '4px' }}>
+    <span 
+      style={{ background: r.bg, color: r.color }} 
+      className="text-[0.68rem] font-bold px-[8px] py-[3px] rounded-[4px]"
+    >
       {role?.toUpperCase()}
     </span>
   );
 }
 
 export const RegistrationRequestsTable = ({ pageItems, isLoading, onSelectReq, onApprove, onReject, reviewQueryFetching }) => {
-  const S = {
-    btn: { display: 'inline-flex', alignItems: 'center', gap: '5px', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', border: 'none', transition: 'opacity 0.15s' },
-  };
+  const btnBaseClass = "inline-flex items-center gap-[5px] rounded-[5px] text-[0.72rem] font-bold cursor-pointer border-none transition-opacity duration-150";
 
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse text-left">
         <thead>
           <tr>
             {['Full Name', 'Email', 'Mobile', 'Role', 'Status', 'Submitted', 'Actions'].map(h => (
-              <th key={h} style={{ color: '#6b7280', fontSize: '0.68rem', fontWeight: 700, padding: '12px 14px', borderBottom: '1px solid #23232a', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>
+              <th key={h} className="text-gray-500 text-[0.68rem] font-bold px-[14px] py-[12px] border-b border-[#23232a] tracking-[0.5px] whitespace-nowrap">
                 {h.toUpperCase()}
               </th>
             ))}
@@ -41,46 +42,61 @@ export const RegistrationRequestsTable = ({ pageItems, isLoading, onSelectReq, o
             [...Array(5)].map((_, i) => (
               <tr key={i}>
                 {[120, 160, 90, 80, 70, 100, 140].map((w, j) => (
-                  <td key={j} style={{ padding: '14px', borderBottom: '1px solid #1a1a22' }}>
-                    <div className="skeleton-pulse" style={{ width: `${w}px`, height: '14px', borderRadius: '4px' }} />
+                  <td key={j} className="p-[14px] border-b border-[#1a1a22]">
+                    <div className="skeleton-pulse h-[14px] rounded-[4px]" style={{ width: `${w}px` }} />
                   </td>
                 ))}
               </tr>
             ))
           ) : pageItems.length === 0 ? (
             <tr>
-              <td colSpan={7} style={{ textAlign: 'center', padding: '48px', color: '#6b7280', fontSize: '0.88rem' }}>
+              <td colSpan={7} className="text-center p-[48px] text-gray-500 text-[0.88rem]">
                 No requests match your filters.
               </td>
             </tr>
           ) : pageItems.map(req => (
-            <tr key={req.id} style={{ transition: 'background 0.1s' }}
-              onMouseEnter={e => e.currentTarget.style.background = '#181818'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            <tr 
+              key={req.id} 
+              className="transition-colors duration-100 hover:bg-[#181818]"
             >
-              <td style={{ padding: '14px', borderBottom: '1px solid #1a1a22', verticalAlign: 'middle' }}>
-                <strong style={{ color: '#fff', fontSize: '0.88rem' }}>{req.full_name}</strong>
+              <td className="p-[14px] border-b border-[#1a1a22] align-middle">
+                <strong className="text-white text-[0.88rem]">{req.full_name}</strong>
               </td>
-              <td style={{ padding: '14px', borderBottom: '1px solid #1a1a22', color: '#8a8a8a', fontSize: '0.83rem', verticalAlign: 'middle' }}>{req.email}</td>
-              <td style={{ padding: '14px', borderBottom: '1px solid #1a1a22', color: '#8a8a8a', fontSize: '0.83rem', verticalAlign: 'middle' }}>{req.mobile}</td>
-              <td style={{ padding: '14px', borderBottom: '1px solid #1a1a22', verticalAlign: 'middle' }}><RoleChip role={req.role} /></td>
-              <td style={{ padding: '14px', borderBottom: '1px solid #1a1a22', verticalAlign: 'middle' }}><StatusBadge status={req.status} /></td>
-              <td style={{ padding: '14px', borderBottom: '1px solid #1a1a22', color: '#6b6b6b', fontSize: '0.8rem', verticalAlign: 'middle' }}>{fmtDate(req.created_at)}</td>
-              <td style={{ padding: '14px', borderBottom: '1px solid #1a1a22', verticalAlign: 'middle' }}>
-                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                  <button onClick={() => onSelectReq(req)} style={{ ...S.btn, background: 'transparent', border: '1px solid #23232a', color: '#8a8a8a', padding: '5px 8px' }} title="View details">
+              <td className="p-[14px] border-b border-[#1a1a22] text-[#8a8a8a] text-[0.83rem] align-middle">{req.email}</td>
+              <td className="p-[14px] border-b border-[#1a1a22] text-[#8a8a8a] text-[0.83rem] align-middle">{req.mobile}</td>
+              <td className="p-[14px] border-b border-[#1a1a22] align-middle"><RoleChip role={req.role} /></td>
+              <td className="p-[14px] border-b border-[#1a1a22] align-middle"><StatusBadge status={req.status} /></td>
+              <td className="p-[14px] border-b border-[#1a1a22] text-[#6b6b6b] text-[0.8rem] align-middle">{fmtDate(req.created_at)}</td>
+              <td className="p-[14px] border-b border-[#1a1a22] align-middle">
+                <div className="flex gap-[6px] items-center">
+                  <button 
+                    onClick={() => onSelectReq(req)} 
+                    className={`${btnBaseClass} bg-transparent border border-[#23232a] text-[#8a8a8a] px-[8px] py-[5px]`} 
+                    title="View details"
+                  >
                     <Eye size={13} />
                   </button>
                   {req.status === 'pending' && (<>
-                    <button onClick={() => onApprove(req.id)} disabled={reviewQueryFetching} style={{ ...S.btn, background: 'rgba(112,214,77,0.1)', color: '#70d64d', border: '1px solid rgba(112,214,77,0.3)', padding: '5px 9px' }}>
+                    <button 
+                      onClick={() => onApprove(req.id)} 
+                      disabled={reviewQueryFetching} 
+                      className={`${btnBaseClass} bg-[rgba(112,214,77,0.1)] text-[#70d64d] border border-[rgba(112,214,77,0.3)] px-[9px] py-[5px]`}
+                    >
                       <Check size={12} /> Approve
                     </button>
-                    <button onClick={() => onReject(req)} disabled={reviewQueryFetching} style={{ ...S.btn, background: 'rgba(239,68,68,0.08)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.25)', padding: '5px 9px' }}>
+                    <button 
+                      onClick={() => onReject(req)} 
+                      disabled={reviewQueryFetching} 
+                      className={`${btnBaseClass} bg-[rgba(239,68,68,0.08)] text-[#ef4444] border border-[rgba(239,68,68,0.25)] px-[9px] py-[5px]`}
+                    >
                       <X size={12} /> Reject
                     </button>
                   </>)}
                   {req.status !== 'pending' && (
-                    <button onClick={() => onSelectReq(req)} style={{ ...S.btn, background: 'transparent', border: '1px solid #70d64d', color: '#70d64d', padding: '4px 9px', fontSize: '0.72rem' }}>
+                    <button 
+                      onClick={() => onSelectReq(req)} 
+                      className={`${btnBaseClass} bg-transparent border border-[#70d64d] text-[#70d64d] px-[9px] py-[4px] text-[0.72rem]`}
+                    >
                       Change Decision
                     </button>
                   )}
@@ -93,4 +109,5 @@ export const RegistrationRequestsTable = ({ pageItems, isLoading, onSelectReq, o
     </div>
   );
 };
+
 export default RegistrationRequestsTable;

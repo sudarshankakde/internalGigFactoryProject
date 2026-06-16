@@ -9,7 +9,6 @@ import { Pagination } from '../../components/AdminShared';
 import { FreelancerTable } from '../../components/Admin/FreelancerTable';
 import { FreelancerCard } from '../../components/Admin/FreelancerCard';
 
-
 export default function AdminFreelancers() {
   const [search, setSearch]   = useState('');
   const [status, setStatus]   = useState(() => localStorage.getItem('freelancer_status_filter') || '');
@@ -54,52 +53,60 @@ export default function AdminFreelancers() {
   const total       = data?.total        || 0;
   const totalPages  = data?.totalPages   || 1;
 
-  const S = {
-    filterBtn: { background: '#0c0c0e', border: '1px solid #23232a', color: '#6b7280', borderRadius: '6px', padding: '7px 14px', fontSize: '0.8rem', cursor: 'pointer' },
-    filterBtnActive: { background: '#70d64d', color: '#000', borderColor: '#70d64d', fontWeight: 700 },
-    select: { background: '#0c0c0e', border: '1px solid #23232a', color: '#fff', borderRadius: '6px', padding: '7px 12px', fontSize: '0.8rem', outline: 'none', cursor: 'pointer' },
-  };
+  const filterBtnClass = "bg-[#0c0c0e] border border-[#23232a] text-gray-500 rounded-[6px] px-[14px] py-[7px] text-[0.8rem] cursor-pointer transition-colors duration-100";
+  const filterBtnActiveClass = "bg-[#70d64d] text-black border-[#70d64d] font-bold";
+  const selectClass = "bg-[#0c0c0e] border border-[#23232a] text-white rounded-[6px] px-[12px] py-[7px] text-[0.8rem] outline-none cursor-pointer";
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="flex flex-col gap-[20px]">
 
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+      <div className="flex justify-between items-center flex-wrap gap-[12px]">
         <div>
-          <h2 style={{ color: '#fff', fontWeight: 800, fontSize: '1.4rem', margin: 0 }}>Freelancers</h2>
-          <p style={{ color: '#6b7280', fontSize: '0.82rem', margin: '4px 0 0' }}>
+          <h2 className="text-white font-extrabold text-[1.4rem] m-0">Freelancers</h2>
+          <p className="text-gray-500 text-[0.82rem] m-0 mt-[4px]">
             {isLoading ? 'Loading…' : `${total} freelancers registered on the platform`}
           </p>
         </div>
-        <button onClick={() => refetch()} disabled={isFetching} style={{ ...S.filterBtn, display: 'flex', alignItems: 'center', gap: '6px', opacity: isFetching ? 0.5 : 1 }}>
+        <button 
+          onClick={() => refetch()} 
+          disabled={isFetching} 
+          className={`${filterBtnClass} flex items-center gap-[6px] ${isFetching ? 'opacity-50' : 'opacity-100'}`}
+        >
           <RefreshCw size={13} className={isFetching ? 'spin' : ''} /> Refresh
         </button>
       </div>
 
       {/* Controls */}
-      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+      <div className="flex gap-[10px] flex-wrap items-center">
         {/* Search */}
-        <div style={{ position: 'relative', flex: 1, minWidth: '220px' }}>
-          <Search size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#6b7280', pointerEvents: 'none' }} />
+        <div className="relative flex-1 min-w-[220px]">
+          <Search size={14} className="absolute left-[12px] top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
           <input
             type="text"
             placeholder="Search by name, email, or mobile…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ width: '100%', background: '#0c0c0e', border: '1px solid #23232a', borderRadius: '6px', color: '#fff', fontSize: '0.85rem', padding: '9px 12px 9px 36px', outline: 'none', boxSizing: 'border-box' }}
+            className="w-full bg-[#0c0c0e] border border-[#23232a] rounded-[6px] text-white text-[0.85rem] pl-[36px] pr-[12px] py-[9px] outline-none box-border"
           />
         </div>
         {/* Status filter */}
-        <div style={{ display: 'flex', gap: '5px', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div className="flex gap-[5px] items-center flex-wrap">
           <Filter size={12} color="#6b7280" />
           {[['', 'All'], ['approved', 'Approved'], ['inactive', 'Inactive'], ['suspended', 'Suspended']].map(([v, l]) => (
-            <button key={v} onClick={() => setStatus(v)} style={{ ...S.filterBtn, ...(status === v ? S.filterBtnActive : {}) }}>{l}</button>
+            <button 
+              key={v} 
+              onClick={() => setStatus(v)} 
+              className={`${filterBtnClass} ${status === v ? filterBtnActiveClass : ''}`}
+            >
+              {l}
+            </button>
           ))}
         </div>
         {/* Sort */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div className="flex items-center gap-[6px]">
           <SortAsc size={13} color="#6b7280" />
-          <select value={sort} onChange={e => setSort(e.target.value)} style={S.select}>
+          <select value={sort} onChange={e => setSort(e.target.value)} className={selectClass}>
             <option value="newest">Newest First</option>
             <option value="oldest">Oldest First</option>
             <option value="name_asc">Name A→Z</option>
@@ -107,37 +114,21 @@ export default function AdminFreelancers() {
           </select>
         </div>
         {/* Layout Toggle */}
-        <div style={{ display: 'flex', border: '1px solid #23232a', borderRadius: '6px', overflow: 'hidden' }}>
+        <div className="flex border border-[#23232a] rounded-[6px] overflow-hidden">
           <button
             onClick={() => setViewMode('list')}
-            style={{
-              background: viewMode === 'list' ? '#70d64d' : '#0c0c0e',
-              border: 'none',
-              color: viewMode === 'list' ? '#000' : '#8a8a8a',
-              padding: '7px 10px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'all 0.2s',
-            }}
+            className={`border-none px-[10px] py-[7px] cursor-pointer flex items-center justify-center transition-colors duration-200 ${
+              viewMode === 'list' ? 'bg-[#70d64d] text-black' : 'bg-[#0c0c0e] text-[#8a8a8a]'
+            }`}
             title="List View"
           >
             <LayoutList size={16} />
           </button>
           <button
             onClick={() => setViewMode('card')}
-            style={{
-              background: viewMode === 'card' ? '#70d64d' : '#0c0c0e',
-              border: 'none',
-              color: viewMode === 'card' ? '#000' : '#8a8a8a',
-              padding: '7px 10px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'all 0.2s',
-            }}
+            className={`border-none px-[10px] py-[7px] cursor-pointer flex items-center justify-center transition-colors duration-200 ${
+              viewMode === 'card' ? 'bg-[#70d64d] text-black' : 'bg-[#0c0c0e] text-[#8a8a8a]'
+            }`}
             title="Card View"
           >
             <LayoutGrid size={16} />
@@ -161,8 +152,8 @@ export default function AdminFreelancers() {
       )}
 
       {/* Common Pagination Footer */}
-      <div style={{ background: '#121215', border: '1px solid #23232a', borderRadius: '10px', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-        <span style={{ color: '#6b7280', fontSize: '0.8rem' }}>
+      <div className="bg-[#121215] border border-[#23232a] rounded-[10px] px-[24px] py-[16px] flex justify-between items-center flex-wrap gap-[12px]">
+        <span className="text-gray-500 text-[0.8rem]">
           {isLoading ? '…' : `Page ${page} of ${totalPages} · ${total} total`}
         </span>
         <Pagination page={page} totalPages={totalPages} onPage={setPage} />
@@ -171,6 +162,3 @@ export default function AdminFreelancers() {
     </div>
   );
 }
-
-
-   

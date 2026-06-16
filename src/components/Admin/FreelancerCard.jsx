@@ -8,9 +8,17 @@ const fmtDate = (d) =>
 function Avatar({ name, photo, size = 40 }) {
   const initials = name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?';
   return photo ? (
-    <img src={photo} alt={name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '1px solid #23232a' }} />
+    <img 
+      src={photo} 
+      alt={name} 
+      style={{ width: size, height: size }} 
+      className="rounded-full object-cover shrink-0 border border-[#23232a]" 
+    />
   ) : (
-    <div style={{ width: size, height: size, borderRadius: '50%', background: 'linear-gradient(135deg,#1e293b,#2563eb22)', border: '1px solid #23232a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: `${size * 0.35}px`, fontWeight: 800, color: '#38bdf8', flexShrink: 0 }}>
+    <div 
+      style={{ width: size, height: size, fontSize: `${size * 0.35}px` }} 
+      className="rounded-full bg-gradient-to-br from-[#1e293b] to-[#2563eb22] border border-[#23232a] flex items-center justify-center font-extrabold text-[#38bdf8] shrink-0"
+    >
       {initials}
     </div>
   );
@@ -19,24 +27,24 @@ function Avatar({ name, photo, size = 40 }) {
 export const FreelancerCard = ({ freelancers, isLoading, onSelectFreelancer }) => {
   if (isLoading) {
     return (
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '16px' }}>
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-[16px]">
         {[...Array(6)].map((_, i) => (
-          <div key={i} style={{ background: '#121215', border: '1px solid #23232a', borderRadius: '10px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div className="skeleton-pulse" style={{ width: '48px', height: '48px', borderRadius: '50%' }} />
-              <div style={{ flex: 1 }}>
-                <div className="skeleton-pulse" style={{ width: '60%', height: '14px', borderRadius: '4px', marginBottom: '6px' }} />
-                <div className="skeleton-pulse" style={{ width: '40%', height: '10px', borderRadius: '4px' }} />
+          <div key={i} className="bg-[#121215] border border-[#23232a] rounded-[10px] p-[20px] flex flex-col gap-[14px]">
+            <div className="flex items-center gap-[12px]">
+              <div className="skeleton-pulse w-[48px] h-[48px] rounded-full" />
+              <div className="flex-1">
+                <div className="skeleton-pulse w-[60%] h-[14px] rounded-[4px] mb-[6px]" />
+                <div className="skeleton-pulse w-[40%] h-[10px] rounded-[4px]" />
               </div>
             </div>
-            <div className="skeleton-pulse" style={{ width: '80%', height: '12px', borderRadius: '4px' }} />
-            <div style={{ display: 'flex', gap: '6px' }}>
-              <div className="skeleton-pulse" style={{ width: '50px', height: '18px', borderRadius: '4px' }} />
-              <div className="skeleton-pulse" style={{ width: '60px', height: '18px', borderRadius: '4px' }} />
-              <div className="skeleton-pulse" style={{ width: '45px', height: '18px', borderRadius: '4px' }} />
+            <div className="skeleton-pulse w-[80%] h-[12px] rounded-[4px]" />
+            <div className="flex gap-[6px]">
+              <div className="skeleton-pulse w-[50px] h-[18px] rounded-[4px]" />
+              <div className="skeleton-pulse w-[60px] h-[18px] rounded-[4px]" />
+              <div className="skeleton-pulse w-[45px] h-[18px] rounded-[4px]" />
             </div>
-            <div style={{ borderTop: '1px solid #1c1c20', paddingTop: '12px' }}>
-              <div className="skeleton-pulse" style={{ width: '100%', height: '18px', borderRadius: '4px' }} />
+            <div className="border-t border-[#1c1c20] pt-[12px]">
+              <div className="skeleton-pulse w-[100%] h-[18px] rounded-[4px]" />
             </div>
           </div>
         ))}
@@ -46,14 +54,14 @@ export const FreelancerCard = ({ freelancers, isLoading, onSelectFreelancer }) =
 
   if (freelancers.length === 0) {
     return (
-      <div style={{ background: '#121215', border: '1px solid #23232a', borderRadius: '10px', padding: '48px', textAlign: 'center', color: '#6b7280' }}>
+      <div className="bg-[#121215] border border-[#23232a] rounded-[10px] p-[48px] text-center text-gray-500">
         No freelancers found.
       </div>
     );
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '16px' }}>
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-[16px]">
       {freelancers.map(f => {
         const fp = f.freelancer_profile;
         const skills = fp?.freelancer_skills?.slice(0, 3).map(s => s.skill_name) || [];
@@ -61,40 +69,21 @@ export const FreelancerCard = ({ freelancers, isLoading, onSelectFreelancer }) =
           <div
             key={f.id}
             onClick={() => onSelectFreelancer(f)}
-            style={{
-              background: '#121215',
-              border: '1px solid #23232a',
-              borderRadius: '10px',
-              padding: '20px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '14px',
-              position: 'relative',
-              transition: 'transform 0.2s, border-color 0.2s',
-              cursor: 'pointer'
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.border = '1px solid #70d64d';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.transform = 'none';
-              e.currentTarget.style.border = '1px solid #23232a';
-            }}
+            className="bg-[#121215] border border-[#23232a] rounded-[10px] p-[20px] flex flex-col gap-[14px] relative cursor-pointer transition-all duration-200 hover:-translate-y-[2px] hover:border-[#70d64d]"
           >
             {/* Status Badge top right */}
-            <div style={{ position: 'absolute', top: '20px', right: '20px' }}>
+            <div className="absolute top-[20px] right-[20px]">
               <StatusBadge status={f.account_status} />
             </div>
 
             {/* Profile header */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="flex items-center gap-[12px]">
               <Avatar name={f.full_name} photo={f.profile_photo} size={46} />
-              <div style={{ overflow: 'hidden', paddingRight: '60px' }}>
-                <h4 style={{ color: '#fff', fontSize: '0.92rem', fontWeight: 700, margin: 0, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+              <div className="overflow-hidden pr-[60px]">
+                <h4 className="text-white text-[0.92rem] font-bold m-0 text-ellipsis overflow-hidden whitespace-nowrap">
                   {f.full_name}
                 </h4>
-                <p style={{ color: '#6b7280', fontSize: '0.72rem', margin: '2px 0 0' }}>
+                <p className="text-gray-500 text-[0.72rem] m-0 mt-[2px]">
                   {f.is_verified ? '✓ Verified Member' : 'Unverified Member'}
                 </p>
               </div>
@@ -102,53 +91,53 @@ export const FreelancerCard = ({ freelancers, isLoading, onSelectFreelancer }) =
 
             {/* Designation */}
             <div>
-              <p style={{ color: '#d1d5db', fontSize: '0.82rem', margin: 0, fontWeight: 600, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+              <p className="text-[#d1d5db] text-[0.82rem] m-0 font-semibold text-ellipsis overflow-hidden whitespace-nowrap">
                 {fp?.title || 'No Title'}
               </p>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#8a8a8a', fontSize: '0.75rem' }}>
+              <div className="flex justify-between items-center mt-[6px]">
+                <span className="flex items-center gap-[4px] text-[#8a8a8a] text-[0.75rem]">
                   <MapPin size={11} color="#6b7280" />
                   {fp?.city && fp?.country ? `${fp.city}, ${fp.country}` : 'Remote'}
                 </span>
-                <span style={{ color: '#70d64d', fontWeight: 700, fontSize: '0.82rem' }}>
+                <span className="text-[#70d64d] font-bold text-[0.82rem]">
                   {fp?.hourly_rate ? `₹${fp.hourly_rate}/hr` : '—'}
                 </span>
               </div>
             </div>
 
             {/* Skills chips */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', minHeight: '22px' }}>
+            <div className="flex flex-wrap gap-[4px] min-h-[22px]">
               {skills.map(s => (
-                <span key={s} style={{ background: '#1e293b', color: '#38bdf8', fontSize: '0.62rem', fontWeight: 600, padding: '2px 6px', borderRadius: '4px' }}>
+                <span key={s} className="bg-[#1e293b] text-[#38bdf8] text-[0.62rem] font-semibold px-[6px] py-[2px] rounded-[4px]">
                   {s}
                 </span>
               ))}
               {(fp?.freelancer_skills?.length || 0) > 3 && (
-                <span style={{ color: '#6b7280', fontSize: '0.62rem', padding: '2px 4px', alignSelf: 'center' }}>
+                <span className="text-gray-500 text-[0.62rem] px-[4px] py-[2px] self-center">
                   +{fp.freelancer_skills.length - 3} more
                 </span>
               )}
               {skills.length === 0 && (
-                <span style={{ color: '#4b4b57', fontSize: '0.7rem', fontStyle: 'italic' }}>No skills listed</span>
+                <span className="text-[#4b4b57] text-[0.7rem] italic">No skills listed</span>
               )}
             </div>
 
             {/* Profile Completion */}
-            <div style={{ background: '#0c0c0e', padding: '10px', borderRadius: '6px', border: '1px solid #1a1a22' }}>
+            <div className="bg-[#0c0c0e] p-[10px] rounded-[6px] border border-[#1a1a22]">
               <CompletionBar value={fp?.profile_completion || 0} />
             </div>
 
-              {/* Contact and Registered Date Footer */}
-            <div style={{ borderTop: '1px solid #1a1a22', paddingTop: '12px', marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#8a8a8a', fontSize: '0.74rem', overflow: 'hidden' }}>
-                <Mail size={12} color="#6b7280" style={{ flexShrink: 0 }} />
-                <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{f.email}</span>
+            {/* Contact and Registered Date Footer */}
+            <div className="border-t border-[#1a1a22] pt-[12px] mt-auto flex flex-col gap-[6px]">
+              <div className="flex items-center gap-[6px] text-[#8a8a8a] text-[0.74rem] overflow-hidden">
+                <Mail size={12} color="#6b7280" className="shrink-0" />
+                <span className="text-ellipsis overflow-hidden whitespace-nowrap">{f.email}</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#8a8a8a', fontSize: '0.74rem' }}>
-                <Phone size={12} color="#6b7280" style={{ flexShrink: 0 }} />
+              <div className="flex items-center gap-[6px] text-[#8a8a8a] text-[0.74rem]">
+                <Phone size={12} color="#6b7280" className="shrink-0" />
                 <span>{f.mobile || '—'}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #1a1a22', paddingTop: '8px', marginTop: '4px', fontSize: '0.7rem', color: '#5b5b67' }}>
+              <div className="flex justify-between items-center border-t border-[#1a1a22] pt-[8px] mt-[4px] text-[0.7rem] text-[#5b5b67]">
                 <span>Registered: {fmtDate(f.created_at)}</span>
               </div>
             </div>
@@ -158,3 +147,5 @@ export const FreelancerCard = ({ freelancers, isLoading, onSelectFreelancer }) =
     </div>
   );
 };
+
+export default FreelancerCard;

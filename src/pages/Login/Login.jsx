@@ -239,7 +239,7 @@ const Login = () => {
             <div className="input-group">
               <div className="label-row">
                 <label htmlFor="password">Password</label> 
-                <span onClick={() => navigate('/forgot-password')} className="forgot-link" style={{ cursor: 'pointer' }}>Forgot Password?</span> 
+                <span onClick={() => navigate('/forgot-password')} className="forgot-link cursor-pointer">Forgot Password?</span> 
               </div>
               <div className="input-wrapper">
                 <span className="input-icon">
@@ -275,7 +275,7 @@ const Login = () => {
               <div className="label-row">
                 <label htmlFor="email">Email Address</label>
                 {isOtpSent && (
-                  <button type="button" onClick={handleBackToEmail} className="forgot-link" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <button type="button" onClick={handleBackToEmail} className="forgot-link flex items-center gap-1">
                     <ArrowLeft size={12} /> Change Email
                   </button>
                 )}
@@ -357,12 +357,11 @@ const Login = () => {
         )}
 
         {/* Dynamic Auth Method Toggle Button */}
-        <div style={{ marginTop: '20px' }}>
+        <div className="mt-5">
           <button 
             type="button" 
             onClick={handleToggleAuthMethod} 
-            className="resend-otp-link-btn" 
-            style={{ fontSize: '0.9rem', textDecoration: 'underline' }}
+            className="resend-otp-link-btn text-[0.9rem] underline"
           >
             {authMethod === 'password' ? 'Login with OTP instead' : 'Login with password instead'}
           </button>

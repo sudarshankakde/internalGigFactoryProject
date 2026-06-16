@@ -109,47 +109,47 @@ const AuthStatusModal = ({ isOpen, onClose, statusData, email, onRegisterTrigger
       <div
         ref={overlayRef}
         onClick={handleOverlayClick}
-        style={styles.overlay}
+        className="fixed inset-0 bg-black/80 backdrop-blur-[4px] z-[9998] animate-[gf-overlay-in_0.2s_ease-out]"
       />
 
       {/* modal card */}
-      <div style={styles.modalWrap}>
-        <div style={styles.card}>
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-5 pointer-events-none">
+        <div className="w-full max-w-[420px] bg-[var(--card-bg)] rounded-[10px] shadow-[0_12px_36px_rgba(0,0,0,0.7)] border border-[var(--input-border)] overflow-hidden relative pointer-events-auto animate-[gf-modal-in_0.25s_cubic-bezier(0.22,1,0.36,1)]">
 
           {/* lime accent top bar */}
-          <div style={styles.accentBar} />
+          <div className="h-[3px] bg-[var(--accent-lime)] w-full" />
 
           {/* close */}
-          <button type="button" onClick={onClose} style={styles.closeBtn} aria-label="Close">
+          <button type="button" onClick={onClose} className="absolute top-3.5 right-3.5 bg-transparent border border-[var(--input-border)] rounded-md text-[var(--text-muted)] cursor-pointer py-1.25 px-1.75 flex items-center justify-center transition-all duration-150 leading-none" aria-label="Close">
             <X size={16} />
           </button>
 
           {/* body */}
-          <div style={styles.body}>
+          <div className="p-7 flex flex-col items-center text-center">
 
             {/* icon */}
-            <div style={styles.iconRing}>
+            <div className="w-[60px] h-[60px] rounded-full bg-[#70d64d]/10 border-[1.5px] border-[#70d64d]/30 flex items-center justify-center text-[var(--accent-lime)] mb-4">
               <Icon size={28} strokeWidth={1.75} />
             </div>
 
             {/* title + lime underline */}
-            <h2 style={styles.title}>{title}</h2>
-            <div style={styles.titleUnderline} />
+            <h2 className="text-[var(--text-main)] text-[1.25rem] font-extrabold tracking-[0.3px] mb-2">{title}</h2>
+            <div className="w-10 h-[2px] bg-[var(--accent-lime)] rounded-[2px] mb-4" />
 
             {/* ────── USER NOT FOUND ────── */}
             {status === 'user_not_found' && (
               <>
-                <p style={styles.description}>
+                <p className="text-[var(--text-muted)] text-[0.85rem] leading-[1.6] mb-4">
                   No account is registered under{' '}
-                  <span style={styles.emailHighlight}>{email}</span>.
+                  <span className="text-[var(--accent-lime)] font-semibold break-all">{email}</span>.
                   {' '}Join GigFactory to unlock premium gig opportunities!
                 </p>
 
-                <div style={styles.btnRow}>
-                  <button type="button" style={styles.primaryBtn} onClick={handleRegisterRedirect}>
+                <div className="flex gap-2.5 w-full">
+                  <button type="button" className="flex-1 bg-[var(--accent-lime)] text-black border-none rounded-md py-[11px] px-4 text-[0.88rem] font-extrabold cursor-pointer flex items-center gap-1.75 transition-opacity duration-150" onClick={handleRegisterRedirect}>
                     <UserPlus size={15} /> Register Now &amp; Join
                   </button>
-                  <button type="button" style={styles.ghostBtn} onClick={onClose}>
+                  <button type="button" className="flex-1 bg-transparent text-[var(--text-muted)] border border-[var(--input-border)] rounded-md py-[11px] px-4 text-[0.88rem] font-semibold cursor-pointer flex items-center justify-center gap-1.75 transition-all duration-150" onClick={onClose}>
                     Cancel
                   </button>
                 </div>
@@ -159,20 +159,20 @@ const AuthStatusModal = ({ isOpen, onClose, statusData, email, onRegisterTrigger
             {/* ────── PENDING APPROVAL ────── */}
             {status === 'pending_approval' && (
               <>
-                <span style={styles.statusBadge}>WILL APPROVE SOON</span>
+                <span className="inline-block px-3 py-1 rounded-[20px] text-[0.65rem] font-bold tracking-[1.2px] bg-[#70d64d]/10 text-[var(--accent-lime)] border border-[#70d64d]/25 mb-3.5 uppercase">WILL APPROVE SOON</span>
 
-                <p style={styles.description}>
+                <p className="text-[var(--text-muted)] text-[0.85rem] leading-[1.6] mb-4">
                   Your registration is currently being reviewed by our team. We&apos;re auditing your
                   work samples and credentials. Once approved, you&apos;ll receive a setup link via
                   email to activate your account.
                 </p>
 
-                <div style={styles.infoCard}>
+                <div className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-md p-[10px_12px] mb-5 flex flex-col gap-2">
                   <InfoRow Icon={CheckCircle} text="Application submitted successfully" />
                   <InfoRow Icon={Clock}       text="Average review time: 1–3 business days" />
                 </div>
 
-                <button type="button" style={{ ...styles.primaryBtn, width: '100%', justifyContent: 'center' }} onClick={onClose}>
+                <button type="button" className="flex-1 bg-[var(--accent-lime)] text-black border-none rounded-md py-[11px] px-4 text-[0.88rem] font-extrabold cursor-pointer flex items-center gap-1.75 transition-opacity duration-150 w-full justify-center" onClick={onClose}>
                   Got It
                 </button>
               </>
@@ -181,23 +181,23 @@ const AuthStatusModal = ({ isOpen, onClose, statusData, email, onRegisterTrigger
             {/* ────── REJECTED – COOLDOWN ────── */}
             {status === 'rejected_cooldown' && (
               <>
-                <p style={styles.description}>
+                <p className="text-[var(--text-muted)] text-[0.85rem] leading-[1.6] mb-4">
                   Unfortunately, your registration request was not approved by our administrators.
                   A cooldown period is currently active.
                 </p>
 
                 {rejectionReason && <ReasonBox label="REASON FOR REJECTION" text={rejectionReason} />}
 
-                <div style={styles.cooldownBox}>
-                  <span style={styles.cooldownLabel}>COOLDOWN IN EFFECT</span>
-                  <p style={styles.cooldownTimer}>{cooldown}</p>
-                  <p style={styles.cooldownSub}>
+                <div className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-md p-[14px_12px] text-center mb-4.5">
+                  <span className="block text-[0.6rem] font-bold tracking-[1.5px] text-[var(--text-muted)] uppercase mb-2">COOLDOWN IN EFFECT</span>
+                  <p className="text-[var(--text-main)] text-[1.4rem] font-extrabold tabular-nums mb-1.5 tracking-[0.5px]">{cooldown}</p>
+                  <p className="text-[var(--text-muted)] text-[0.75rem] m-0">
                     You can reapply after:{' '}
-                    <strong style={{ color: 'var(--text-main)' }}>{formatDate(canReapplyAt)}</strong>
+                    <strong className="text-[var(--text-main)] font-semibold">{formatDate(canReapplyAt)}</strong>
                   </p>
                 </div>
 
-                <button type="button" style={{ ...styles.ghostBtn, width: '100%', justifyContent: 'center' }} onClick={onClose}>
+                <button type="button" className="flex-1 bg-transparent text-[var(--text-muted)] border border-[var(--input-border)] rounded-md py-[11px] px-4 text-[0.88rem] font-semibold cursor-pointer flex items-center justify-center gap-1.75 transition-all duration-150 w-full" onClick={onClose}>
                   Close
                 </button>
               </>
@@ -206,22 +206,22 @@ const AuthStatusModal = ({ isOpen, onClose, statusData, email, onRegisterTrigger
             {/* ────── REJECTED – CAN REAPPLY ────── */}
             {status === 'rejected_can_reapply' && (
               <>
-                <p style={styles.description}>
+                <p className="text-[var(--text-muted)] text-[0.85rem] leading-[1.6] mb-4">
                   Your previous application was rejected, but your cooldown has expired!
                   Review, edit, and resubmit your application below.
                 </p>
 
                 {rejectionReason && <ReasonBox label="PREVIOUS REJECTION REASON" text={rejectionReason} />}
 
-                <p style={{ ...styles.description, fontSize: '0.75rem', marginBottom: '20px' }}>
+                <p className="text-[var(--text-muted)] text-[0.75rem] mb-5">
                   Your previous details have been saved for your convenience.
                 </p>
 
-                <div style={styles.btnRow}>
-                  <button type="button" style={styles.primaryBtn} onClick={handleReapplyRedirect}>
+                <div className="flex gap-2.5 w-full">
+                  <button type="button" className="flex-1 bg-[var(--accent-lime)] text-black border-none rounded-md py-[11px] px-4 text-[0.88rem] font-extrabold cursor-pointer flex items-center gap-1.75 transition-opacity duration-150" onClick={handleReapplyRedirect}>
                     <RefreshCw size={15} /> Edit &amp; Reapply
                   </button>
-                  <button type="button" style={styles.ghostBtn} onClick={onClose}>
+                  <button type="button" className="flex-1 bg-transparent text-[var(--text-muted)] border border-[var(--input-border)] rounded-md py-[11px] px-4 text-[0.88rem] font-semibold cursor-pointer flex items-center justify-center gap-1.75 transition-all duration-150" onClick={onClose}>
                     Cancel
                   </button>
                 </div>
@@ -230,27 +230,29 @@ const AuthStatusModal = ({ isOpen, onClose, statusData, email, onRegisterTrigger
 
             {/* Timeline History */}
             {statusData.history && statusData.history.length > 0 && (
-              <div style={styles.historySection}>
-                <h3 style={styles.historyTitle}>APPLICATION HISTORY</h3>
-                <div style={styles.timeline}>
+              <div className="w-full text-left mt-6 border-t border-[var(--input-border)] pt-5">
+                <h3 className="text-[0.75rem] font-extrabold text-[var(--text-muted)] tracking-[1px] mb-3.5">APPLICATION HISTORY</h3>
+                <div className="flex flex-col gap-4 pl-1">
                   {statusData.history.map((log, index) => {
                     const isLast = index === statusData.history.length - 1;
                     return (
-                      <div key={log.id || index} style={styles.timelineItem}>
-                        <div style={styles.timelineBadgeCol}>
-                          <div style={{
-                            ...styles.timelineBadge,
-                            backgroundColor: getActionColor(log.action),
-                          }} />
-                          {!isLast && <div style={styles.timelineLine} />}
+                      <div key={log.id || index} className="flex gap-3">
+                        <div className="flex flex-col items-center relative">
+                          <div 
+                            className="w-2.5 h-2.5 rounded-full shrink-0 mt-1" 
+                            style={{ backgroundColor: getActionColor(log.action) }} 
+                          />
+                          {!isLast && <div className="w-[2px] bg-[var(--input-border)] absolute top-3.5 bottom-[-16px]" />}
                         </div>
-                        <div style={styles.timelineContent}>
-                          <div style={styles.timelineHeader}>
-                            <span style={styles.timelineAction}>{log.action}</span>
-                            <span style={styles.timelineDate}>{formatDate(log.created_at)}</span>
+                        <div className="flex-1 flex flex-col gap-0.5">
+                          <div className="flex justify-between items-baseline gap-2.5">
+                            <span className="text-[0.82rem] font-bold text-[var(--text-main)]">{log.action}</span>
+                            <span className="text-[0.72rem] text-[var(--text-muted)]">{formatDate(log.created_at)}</span>
                           </div>
                           {log.rejection_reason && (
-                            <p style={styles.timelineReason}>Reason: {log.rejection_reason}</p>
+                            <p className="text-[0.78rem] text-[#f87171] mt-1 mb-0 mx-0 bg-[#ef4444]/5 border border-[#ef4444]/10 rounded py-1.5 px-2.5 leading-[1.4]">
+                              Reason: {log.rejection_reason}
+                            </p>
                           )}
                         </div>
                       </div>
@@ -281,316 +283,21 @@ const AuthStatusModal = ({ isOpen, onClose, statusData, email, onRegisterTrigger
 /* ─── sub-components ─────────────────────────────────────────────────── */
 function InfoRow({ Icon, text }) {
   return (
-    <div style={styles.infoRow}>
-      <Icon size={13} style={{ color: 'var(--accent-lime)', flexShrink: 0 }} />
-      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{text}</span>
+    <div className="flex items-center gap-2 text-left">
+      <Icon size={13} className="text-[var(--accent-lime)] shrink-0" />
+      <span className="text-[0.8rem] text-[var(--text-muted)]">{text}</span>
     </div>
   );
 }
 
 function ReasonBox({ label, text }) {
   return (
-    <div style={styles.reasonBox}>
-      <span style={styles.reasonLabel}>{label}</span>
-      <p style={styles.reasonText}>{text}</p>
+    <div className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-md p-[10px_12px] text-left mb-3">
+      <span className="block text-[0.6rem] font-bold tracking-[1.5px] text-[var(--text-muted)] uppercase mb-1.5">{label}</span>
+      <p className="text-[var(--text-main)] text-[0.82rem] leading-[1.5] m-0">{text}</p>
     </div>
   );
 }
 
-/* ─── inline styles using platform CSS vars ──────────────────────────── */
-const styles = {
-  overlay: {
-    position: 'fixed',
-    inset: 0,
-    background: 'rgba(0,0,0,0.8)',
-    backdropFilter: 'blur(4px)',
-    WebkitBackdropFilter: 'blur(4px)',
-    zIndex: 9998,
-    animation: 'gf-overlay-in 0.2s ease-out',
-  },
-  modalWrap: {
-    position: 'fixed',
-    inset: 0,
-    zIndex: 9999,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '20px',
-    pointerEvents: 'none',
-  },
-  card: {
-    width: '100%',
-    maxWidth: '420px',
-    backgroundColor: 'var(--card-bg)',
-    borderRadius: '10px',
-    boxShadow: '0 12px 36px rgba(0,0,0,0.7)',
-    border: '1px solid var(--input-border)',
-    overflow: 'hidden',
-    position: 'relative',
-    pointerEvents: 'auto',
-    animation: 'gf-modal-in 0.25s cubic-bezier(0.22,1,0.36,1)',
-  },
-  accentBar: {
-    height: '3px',
-    background: 'var(--accent-lime)',
-    width: '100%',
-  },
-  closeBtn: {
-    position: 'absolute',
-    top: '14px',
-    right: '14px',
-    background: 'transparent',
-    border: '1px solid var(--input-border)',
-    borderRadius: '6px',
-    color: 'var(--text-muted)',
-    cursor: 'pointer',
-    padding: '5px 7px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'color 0.15s, border-color 0.15s',
-    lineHeight: 1,
-  },
-  body: {
-    padding: '28px 28px 28px 28px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    textAlign: 'center',
-  },
-  iconRing: {
-    width: '60px',
-    height: '60px',
-    borderRadius: '50%',
-    background: 'rgba(112,214,77,0.1)',
-    border: '1.5px solid rgba(112,214,77,0.3)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'var(--accent-lime)',
-    marginBottom: '16px',
-  },
-  title: {
-    color: 'var(--text-main)',
-    fontSize: '1.25rem',
-    fontWeight: 800,
-    letterSpacing: '0.3px',
-    marginBottom: '8px',
-  },
-  titleUnderline: {
-    width: '40px',
-    height: '2px',
-    background: 'var(--accent-lime)',
-    borderRadius: '2px',
-    marginBottom: '16px',
-  },
-  statusBadge: {
-    display: 'inline-block',
-    padding: '4px 12px',
-    borderRadius: '20px',
-    fontSize: '0.65rem',
-    fontWeight: 700,
-    letterSpacing: '1.2px',
-    background: 'rgba(112,214,77,0.1)',
-    color: 'var(--accent-lime)',
-    border: '1px solid rgba(112,214,77,0.25)',
-    marginBottom: '14px',
-    textTransform: 'uppercase',
-  },
-  description: {
-    color: 'var(--text-muted)',
-    fontSize: '0.85rem',
-    lineHeight: 1.6,
-    marginBottom: '16px',
-  },
-  emailHighlight: {
-    color: 'var(--accent-lime)',
-    fontWeight: 600,
-    wordBreak: 'break-all',
-  },
-  infoCard: {
-    width: '100%',
-    background: 'var(--input-bg)',
-    border: '1px solid var(--input-border)',
-    borderRadius: '6px',
-    padding: '10px 12px',
-    marginBottom: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-  },
-  infoRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    textAlign: 'left',
-  },
-  reasonBox: {
-    width: '100%',
-    background: 'var(--input-bg)',
-    border: '1px solid var(--input-border)',
-    borderRadius: '6px',
-    padding: '10px 12px',
-    textAlign: 'left',
-    marginBottom: '12px',
-  },
-  reasonLabel: {
-    display: 'block',
-    fontSize: '0.6rem',
-    fontWeight: 700,
-    letterSpacing: '1.5px',
-    color: 'var(--text-muted)',
-    textTransform: 'uppercase',
-    marginBottom: '6px',
-  },
-  reasonText: {
-    color: 'var(--text-main)',
-    fontSize: '0.82rem',
-    lineHeight: 1.5,
-    margin: 0,
-  },
-  cooldownBox: {
-    width: '100%',
-    background: 'var(--input-bg)',
-    border: '1px solid var(--input-border)',
-    borderRadius: '6px',
-    padding: '14px 12px',
-    textAlign: 'center',
-    marginBottom: '18px',
-  },
-  cooldownLabel: {
-    display: 'block',
-    fontSize: '0.6rem',
-    fontWeight: 700,
-    letterSpacing: '1.5px',
-    color: 'var(--text-muted)',
-    textTransform: 'uppercase',
-    marginBottom: '8px',
-  },
-  cooldownTimer: {
-    color: 'var(--text-main)',
-    fontSize: '1.4rem',
-    fontWeight: 800,
-    fontVariantNumeric: 'tabular-nums',
-    marginBottom: '6px',
-    letterSpacing: '0.5px',
-  },
-  cooldownSub: {
-    color: 'var(--text-muted)',
-    fontSize: '0.75rem',
-    margin: 0,
-  },
-  btnRow: {
-    display: 'flex',
-    gap: '10px',
-    width: '100%',
-  },
-  primaryBtn: {
-    flex: 1,
-    background: 'var(--accent-lime)',
-    color: '#000000',
-    border: 'none',
-    borderRadius: '6px',
-    padding: '11px 16px',
-    fontSize: '0.88rem',
-    fontWeight: 800,
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '7px',
-    transition: 'opacity 0.15s',
-  },
-  ghostBtn: {
-    flex: 1,
-    background: 'transparent',
-    color: 'var(--text-muted)',
-    border: '1px solid var(--input-border)',
-    borderRadius: '6px',
-    padding: '11px 16px',
-    fontSize: '0.88rem',
-    fontWeight: 600,
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '7px',
-    transition: 'color 0.15s, border-color 0.15s',
-  },
-  historySection: {
-    width: '100%',
-    textAlign: 'left',
-    marginTop: '24px',
-    borderTop: '1px solid var(--input-border)',
-    paddingTop: '20px',
-  },
-  historyTitle: {
-    fontSize: '0.75rem',
-    fontWeight: 800,
-    color: 'var(--text-muted)',
-    letterSpacing: '1px',
-    marginBottom: '14px',
-  },
-  timeline: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '16px',
-    paddingLeft: '4px',
-  },
-  timelineItem: {
-    display: 'flex',
-    gap: '12px',
-  },
-  timelineBadgeCol: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    position: 'relative',
-  },
-  timelineBadge: {
-    width: '10px',
-    height: '10px',
-    borderRadius: '50%',
-    flexShrink: 0,
-    marginTop: '4px',
-  },
-  timelineLine: {
-    width: '2px',
-    backgroundColor: 'var(--input-border)',
-    position: 'absolute',
-    top: '14px',
-    bottom: '-16px',
-  },
-  timelineContent: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '2px',
-  },
-  timelineHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-    gap: '10px',
-  },
-  timelineAction: {
-    fontSize: '0.82rem',
-    fontWeight: 700,
-    color: 'var(--text-main)',
-  },
-  timelineDate: {
-    fontSize: '0.72rem',
-    color: 'var(--text-muted)',
-  },
-  timelineReason: {
-    fontSize: '0.78rem',
-    color: '#f87171',
-    margin: '4px 0 0 0',
-    background: 'rgba(239, 68, 68, 0.05)',
-    border: '1px solid rgba(239, 68, 68, 0.1)',
-    borderRadius: '4px',
-    padding: '6px 10px',
-    lineHeight: 1.4,
-  },
-};
 
 export default AuthStatusModal;

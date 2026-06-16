@@ -68,10 +68,10 @@ export const AdminUserProfile = () => {
 
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh', color: '#8a8a8a', background: '#0c0c0e' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div className="animate-spin" style={{ width: '40px', height: '40px', border: '3px solid #70d64d11', borderTopColor: '#70d64d', borderRadius: '50%', margin: '0 auto 16px' }} />
-          <p style={{ fontSize: '0.9rem', fontWeight: 600 }}>Loading User Profile...</p>
+      <div className="flex justify-center items-center min-h-[80vh] text-[#8a8a8a] bg-[#0c0c0e]">
+        <div className="text-center">
+          <div className="animate-spin w-10 h-10 border-3 border-[#70d64d]/10 border-t-[#70d64d] rounded-full mx-auto mb-4" />
+          <p className="text-[0.9rem] font-semibold">Loading User Profile...</p>
         </div>
       </div>
     );
@@ -79,13 +79,13 @@ export const AdminUserProfile = () => {
 
   if (error || !data || !data.user) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center', color: '#ef4444', background: '#0c0c0e', minHeight: '80vh' }}>
-        <ShieldAlert size={48} style={{ margin: '0 auto 16px' }} />
-        <h3 style={{ fontSize: '1.25rem', fontWeight: 800, margin: '0 0 8px' }}>Failed to Load Profile</h3>
-        <p style={{ fontSize: '0.9rem', color: '#8a8a8a', marginBottom: '20px' }}>{error?.message || 'User not found or database query failed.'}</p>
+      <div className="p-10 text-center text-[#ef4444] bg-[#0c0c0e] min-h-[80vh]">
+        <ShieldAlert size={48} className="mx-auto mb-4" />
+        <h3 className="text-[1.25rem] font-extrabold mb-2 m-0">Failed to Load Profile</h3>
+        <p className="text-[0.9rem] text-[#8a8a8a] mb-5">{error?.message || 'User not found or database query failed.'}</p>
         <button 
           onClick={() => navigate(-1)} 
-          style={{ background: '#1c1c20', border: '1px solid #23232a', color: '#fff', padding: '10px 20px', borderRadius: '6px', cursor: 'pointer', fontWeight: 700 }}
+          className="bg-[#1c1c20] border border-[#23232a] text-white px-5 py-2.5 rounded-md cursor-pointer font-bold"
         >
           Go Back
         </button>
@@ -125,45 +125,40 @@ export const AdminUserProfile = () => {
       : '#f59e0b';
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px 16px', background: 'transparent' }}>
+    <div className="max-w-[1200px] mx-auto px-4 py-6 bg-transparent">
       
       {/* Top Navigation */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', borderBottom: '1px solid #23232a', paddingBottom: '16px' }}>
+      <div className="flex items-center justify-between mb-6 border-b border-[#23232a] pb-4">
         <button 
           onClick={() => navigate(-1)} 
-          style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'transparent', border: 'none', color: '#8a8a8a', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700 }}
+          className="flex items-center gap-2 bg-transparent border-none text-[#8a8a8a] cursor-pointer text-[0.9rem] font-bold"
         >
           <ArrowLeft size={16} /> Back to Listings
         </button>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: '#6b7280' }}>
+        <div className="flex items-center gap-2">
+          <span className="text-[0.75rem] font-extrabold uppercase text-[#6b7280]">
             ADMIN VIEW
           </span>
-          <span style={{ display: 'inline-flex', padding: '4px 10px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 800, background: statusBg, color: statusColor }}>
+          <span 
+            className="inline-flex px-2.5 py-1 rounded text-[0.7rem] font-extrabold"
+            style={{ background: statusBg, color: statusColor }}
+          >
             {user.account_status?.toUpperCase()}
           </span>
         </div>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', borderBottom: '1px solid #23232a', marginBottom: '24px' }}>
+      <div className="flex border-b border-[#23232a] mb-6">
         <button 
           onClick={() => setActiveTab('profile')} 
-          style={{ 
-            display: 'flex', alignItems: 'center', gap: '8px', background: 'transparent', border: 'none', 
-            borderBottom: activeTab === 'profile' ? '2px solid #70d64d' : '2px solid transparent',
-            color: activeTab === 'profile' ? '#70d64d' : '#8a8a8a', padding: '12px 20px', fontSize: '0.9rem', fontWeight: 700, cursor: 'pointer' 
-          }}
+          className={`flex items-center gap-2 bg-transparent border-none border-b-2 py-3 px-5 text-[0.9rem] font-bold cursor-pointer transition-all ${activeTab === 'profile' ? 'border-[#70d64d] text-[#70d64d]' : 'border-transparent text-[#8a8a8a]'}`}
         >
           <User size={16} /> Profile Information
         </button>
         <button 
           onClick={() => setActiveTab('activity')} 
-          style={{ 
-            display: 'flex', alignItems: 'center', gap: '8px', background: 'transparent', border: 'none', 
-            borderBottom: activeTab === 'activity' ? '2px solid #70d64d' : '2px solid transparent',
-            color: activeTab === 'activity' ? '#70d64d' : '#8a8a8a', padding: '12px 20px', fontSize: '0.9rem', fontWeight: 700, cursor: 'pointer' 
-          }}
+          className={`flex items-center gap-2 bg-transparent border-none border-b-2 py-3 px-5 text-[0.9rem] font-bold cursor-pointer transition-all ${activeTab === 'activity' ? 'border-[#70d64d] text-[#70d64d]' : 'border-transparent text-[#8a8a8a]'}`}
         >
           <Clock size={16} /> Activity History & Logs
         </button>
@@ -171,7 +166,7 @@ export const AdminUserProfile = () => {
 
       {/* Profile Details Tab */}
       {activeTab === 'profile' && (
-        <div className="profile-workspace-view animate-fade-in" style={{ padding: '0', background: 'transparent' }}>
+        <div className="profile-workspace-view animate-fade-in p-0 bg-transparent">
           <ProfileHeader
             isFreelancer={isFreelancer}
             name={name}
@@ -182,7 +177,7 @@ export const AdminUserProfile = () => {
             locationVal={locationVal}
             webVal={webVal}
             foundedYear={isFreelancer ? undefined : ap.founded_year}
-            initials={initials}
+            initials={getInitials(name)}
             availability={isFreelancer ? fp.availability : undefined}
             hideEditButton={true}
           />
@@ -195,7 +190,7 @@ export const AdminUserProfile = () => {
             employeeCount={isFreelancer ? undefined : ap.employee_count}
           />
 
-          <div className="profile-details-split-grid" style={{ marginTop: '20px' }}>
+          <div className="profile-details-split-grid mt-5">
             <div className="profile-details-left-pane">
               <ProfileAbout
                 isFreelancer={isFreelancer}
@@ -210,44 +205,44 @@ export const AdminUserProfile = () => {
               )}
 
               {/* Account Suspension Panel */}
-              <div style={{ background: '#1c0c0e', border: '1px solid #ef444433', borderRadius: '8px', padding: '18px', marginTop: '20px' }}>
-                <h4 style={{ fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: '#ef4444', margin: '0 0 14px', paddingBottom: '6px', borderBottom: '1px solid #ef444422' }}>
+              <div className="bg-[#1c0c0e] border border-[#ef4444]/20 rounded-lg p-[18px] mt-5">
+                <h4 className="text-[0.72rem] font-extrabold uppercase tracking-[0.6px] text-[#ef4444] mb-3.5 pb-1.5 border-b border-[#ef4444]/10 m-0">
                   Account Management (Admin Controls)
                 </h4>
                 {user.account_status === 'suspended' ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: 0 }}>This account is currently suspended.</p>
+                  <div className="flex flex-col gap-2.5">
+                    <p className="text-[#ef4444] text-[0.8rem] m-0">This account is currently suspended.</p>
                     <button
                       disabled={reactivateMutation.isPending}
                       onClick={() => reactivateMutation.mutate()}
-                      style={{ background: '#70d64d', color: '#000', border: 'none', borderRadius: '6px', padding: '10px', fontSize: '0.8rem', fontWeight: 800, cursor: 'pointer', textAlign: 'center', width: '100%' }}
+                      className="bg-[#70d64d] text-black border-none rounded-md p-2.5 text-[0.8rem] font-extrabold cursor-pointer text-center w-full"
                     >
                       {reactivateMutation.isPending ? 'Reactivating...' : 'REACTIVATE ACCOUNT'}
                     </button>
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div className="flex flex-col gap-2.5">
                     {!showSuspendInput ? (
                       <button
                         onClick={() => setShowSuspendInput(true)}
-                        style={{ background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', borderRadius: '6px', padding: '10px', fontSize: '0.8rem', fontWeight: 800, cursor: 'pointer', textAlign: 'center', width: '100%' }}
+                        className="bg-transparent border border-[#ef4444] text-[#ef4444] rounded-md p-2.5 text-[0.8rem] font-extrabold cursor-pointer text-center w-full"
                       >
                         SUSPEND ACCOUNT
                       </button>
                     ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div className="flex flex-col gap-2">
                         <input
                           type="text"
                           placeholder="Reason for suspension..."
                           value={suspendReason}
                           onChange={e => setSuspendReason(e.target.value)}
-                          style={{ background: '#000', border: '1px solid #ef4444', borderRadius: '6px', padding: '8px 12px', color: '#fff', fontSize: '0.8rem', outline: 'none' }}
+                          className="bg-black border border-[#ef4444] rounded-md py-2 px-3 text-white text-[0.8rem] outline-none"
                         />
-                        <div style={{ display: 'flex', gap: '8px' }}>
+                        <div className="flex gap-2">
                           <button
                             type="button"
                             onClick={() => setShowSuspendInput(false)}
-                            style={{ flex: 1, background: '#1c1c20', border: '1px solid #23232a', color: '#8a8a8a', borderRadius: '6px', padding: '8px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}
+                            className="flex-1 bg-[#1c1c20] border border-[#23232a] text-[#8a8a8a] rounded-md p-2 text-[0.75rem] font-bold cursor-pointer"
                           >
                             Cancel
                           </button>
@@ -261,7 +256,7 @@ export const AdminUserProfile = () => {
                               }
                               suspendMutation.mutate();
                             }}
-                            style={{ flex: 1, background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '8px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}
+                            className="flex-1 bg-[#ef4444] text-white border-none rounded-md p-2 text-[0.75rem] font-bold cursor-pointer"
                           >
                             {suspendMutation.isPending ? 'Suspending...' : 'Confirm Suspend'}
                           </button>

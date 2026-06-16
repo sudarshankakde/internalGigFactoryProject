@@ -15,43 +15,30 @@ function StatCard({ label, value, Icon, accent, sub, onClick }) {
   return (
     <div
       onClick={onClick}
-      style={{
-        background: accent
-          ? 'linear-gradient(135deg,#121215,#16220a)'
-          : '#121215',
-        border: `1px solid ${accent ? '#374f05' : '#23232a'}`,
-        borderRadius: '12px',
-        padding: '24px',
-        cursor: onClick ? 'pointer' : 'default',
-        transition: 'transform 0.15s, box-shadow 0.15s',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-      }}
-      onMouseEnter={e => { if (onClick) e.currentTarget.style.transform = 'translateY(-2px)'; }}
-      onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
+      className={`rounded-[12px] p-[24px] flex flex-col gap-[12px] transition-all duration-150 ${
+        accent
+          ? 'bg-gradient-to-br from-[#121215] to-[#16220a] border border-[#374f05]'
+          : 'bg-[#121215] border border-[#23232a]'
+      } ${onClick ? 'cursor-pointer hover:-translate-y-[2px] hover:shadow-lg' : 'cursor-default'}`}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className="flex justify-between items-start">
         <div>
-          <p style={{ color: '#6b7280', fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', margin: 0 }}>
+          <p className="text-gray-500 text-[0.68rem] font-bold tracking-[0.8px] uppercase m-0">
             {label}
           </p>
-          <p style={{ color: '#fff', fontSize: '2.4rem', fontWeight: 800, margin: '6px 0 0', lineHeight: 1 }}>
-            {value ?? <span className="skeleton-pulse" style={{ display: 'inline-block', width: '50px', height: '36px', borderRadius: '6px' }} />}
+          <p className="text-white text-[2.4rem] font-extrabold m-0 mt-[6px] leading-none">
+            {value ?? <span className="skeleton-pulse inline-block w-[50px] h-[36px] rounded-[6px]" />}
           </p>
         </div>
-        <div style={{
-          width: '44px', height: '44px', borderRadius: '10px',
-          background: accent ? 'rgba(112,214,77,0.12)' : 'rgba(255,255,255,0.04)',
-          border: `1px solid ${accent ? 'rgba(112,214,77,0.25)' : '#23232a'}`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
+        <div className={`w-[44px] h-[44px] rounded-[10px] flex items-center justify-center border ${
+          accent ? 'bg-[rgba(112,214,77,0.12)] border-[rgba(112,214,77,0.25)]' : 'bg-[rgba(255,255,255,0.04)] border-[#23232a]'
+        }`}>
           <Icon size={20} color={accent ? '#70d64d' : '#6b7280'} />
         </div>
       </div>
-      {sub && <p style={{ color: '#6b7280', fontSize: '0.75rem', margin: 0 }}>{sub}</p>}
+      {sub && <p className="text-gray-500 text-[0.75rem] m-0">{sub}</p>}
       {onClick && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#70d64d', fontSize: '0.75rem', fontWeight: 600 }}>
+        <div className="flex items-center gap-[4px] text-[#70d64d] text-[0.75rem] font-semibold">
           View all <ArrowRight size={12} />
         </div>
       )}
@@ -64,32 +51,19 @@ function QuickLink({ icon: Icon, label, desc, to, color }) {
   return (
     <div
       onClick={() => navigate(to)}
-      style={{
-        background: '#121215',
-        border: '1px solid #23232a',
-        borderRadius: '10px',
-        padding: '20px',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '16px',
-        transition: 'border-color 0.15s, background 0.15s',
-      }}
+      className="bg-[#121215] border border-[#23232a] rounded-[10px] p-[20px] cursor-pointer flex items-center gap-[16px] transition-all duration-150"
       onMouseEnter={e => { e.currentTarget.style.borderColor = color; }}
       onMouseLeave={e => { e.currentTarget.style.borderColor = '#23232a'; }}
     >
-      <div style={{
-        width: '44px', height: '44px', borderRadius: '10px',
-        background: `${color}18`,
-        border: `1px solid ${color}40`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        flexShrink: 0,
-      }}>
+      <div 
+        style={{ background: `${color}18`, borderColor: `${color}40` }} 
+        className="w-[44px] h-[44px] rounded-[10px] border flex items-center justify-center shrink-0"
+      >
         <Icon size={20} color={color} />
       </div>
-      <div style={{ flex: 1 }}>
-        <p style={{ color: '#fff', fontWeight: 700, fontSize: '0.9rem', margin: 0 }}>{label}</p>
-        <p style={{ color: '#6b7280', fontSize: '0.75rem', margin: '3px 0 0' }}>{desc}</p>
+      <div className="flex-1">
+        <p className="text-white font-bold text-[0.9rem] m-0">{label}</p>
+        <p className="text-gray-500 text-[0.75rem] m-0 mt-[3px]">{desc}</p>
       </div>
       <ArrowRight size={16} color="#6b7280" />
     </div>
@@ -140,10 +114,10 @@ export default function AdminOverview() {
   const recentRequests = (reqData || []).slice(0, 5);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+    <div className="flex flex-col gap-[28px]">
 
       {/* Stats Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-[16px]">
         <StatCard
           label="Active Freelancers"
           value={stats.totalFreelancers}
@@ -175,30 +149,30 @@ export default function AdminOverview() {
       </div>
 
       {/* Main grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '20px' }}>
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-5">
 
         {/* Recent registration requests */}
-        <div style={{ background: '#121215', border: '1px solid #23232a', borderRadius: '12px', padding: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h2 style={{ color: '#fff', fontSize: '1rem', fontWeight: 800, margin: 0 }}>
+        <div className="bg-[#121215] border border-[#23232a] rounded-[12px] p-[24px]">
+          <div className="flex justify-between items-center mb-[20px]">
+            <h2 className="text-white text-[1rem] font-extrabold m-0">
               Recent Registration Requests
             </h2>
             <button
               onClick={() => navigate('/admin/requests')}
-              style={{ background: 'transparent', border: '1px solid #23232a', color: '#70d64d', borderRadius: '6px', padding: '6px 12px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
+              className="bg-transparent border border-[#23232a] text-[#70d64d] rounded-[6px] px-[12px] py-[6px] text-[0.75rem] font-bold cursor-pointer flex items-center gap-[5px]"
             >
               View All <ArrowRight size={12} />
             </button>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div className="flex flex-col gap-[12px]">
             {recentRequests.length === 0 ? (
               [...Array(4)].map((_, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0', borderBottom: '1px solid #1a1a22' }}>
-                  <div className="skeleton-pulse" style={{ width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0 }} />
-                  <div style={{ flex: 1 }}>
-                    <div className="skeleton-pulse" style={{ width: '40%', height: '14px', borderRadius: '4px', marginBottom: '6px' }} />
-                    <div className="skeleton-pulse" style={{ width: '60%', height: '12px', borderRadius: '4px' }} />
+                <div key={i} className="flex items-center gap-[12px] py-[10px] border-b border-[#1a1a22]">
+                  <div className="skeleton-pulse w-[36px] h-[36px] rounded-full shrink-0" />
+                  <div className="flex-1">
+                    <div className="skeleton-pulse w-[40%] h-[14px] rounded-[4px] mb-[6px]" />
+                    <div className="skeleton-pulse w-[60%] h-[12px] rounded-[4px]" />
                   </div>
                 </div>
               ))
@@ -209,45 +183,38 @@ export default function AdminOverview() {
                 <div
                   key={req.id}
                   onClick={() => navigate(`/admin/requests?id=${req.id}`)}
-                  onMouseEnter={e => e.currentTarget.style.background = '#181820'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '10px 8px',
-                    borderBottom: '1px solid #1a1a22',
-                    cursor: 'pointer',
-                    borderRadius: '6px',
-                    transition: 'background 0.2s',
-                  }}
+                  className="flex items-center gap-[12px] px-[8px] py-[10px] border-b border-[#1a1a22] cursor-pointer rounded-[6px] transition-colors duration-200 hover:bg-[#181820]"
                 >
-                  <div style={{
-                    width: '36px', height: '36px', borderRadius: '50%',
-                    background: `${roleColor}18`, border: `1px solid ${roleColor}40`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontWeight: 800, color: roleColor, fontSize: '0.75rem', flexShrink: 0,
-                  }}>
+                  <div 
+                    style={{ background: `${roleColor}18`, borderColor: `${roleColor}40`, color: roleColor }} 
+                    className="w-[36px] h-[36px] rounded-full border flex items-center justify-center font-extrabold text-[0.75rem] shrink-0"
+                  >
                     {req.full_name?.charAt(0).toUpperCase() || '?'}
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ color: '#fff', fontWeight: 600, fontSize: '0.85rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-[8px]">
+                      <span className="text-white font-semibold text-[0.85rem] whitespace-nowrap overflow-hidden text-ellipsis">
                         {req.full_name}
                       </span>
-                      <span style={{ background: `${roleColor}18`, color: roleColor, fontSize: '0.62rem', fontWeight: 700, padding: '2px 6px', borderRadius: '4px', flexShrink: 0 }}>
+                      <span 
+                        style={{ background: `${roleColor}18`, color: roleColor }} 
+                        className="text-[0.62rem] font-bold px-[6px] py-[2px] rounded-[4px] shrink-0"
+                      >
                         {req.role?.toUpperCase()}
                       </span>
                     </div>
-                    <p style={{ color: '#6b7280', fontSize: '0.75rem', margin: '2px 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <p className="text-gray-500 text-[0.75rem] m-0 mt-[2px] whitespace-nowrap overflow-hidden text-ellipsis">
                       {req.email}
                     </p>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', flexShrink: 0 }}>
-                    <span style={{ background: `${statusColor}18`, color: statusColor, fontSize: '0.62rem', fontWeight: 700, padding: '2px 7px', borderRadius: '4px' }}>
+                  <div className="flex flex-col items-end gap-[4px] shrink-0">
+                    <span 
+                      style={{ background: `${statusColor}18`, color: statusColor }} 
+                      className="text-[0.62rem] font-bold px-[7px] py-[2px] rounded-[4px]"
+                    >
                       {req.status?.toUpperCase()}
                     </span>
-                    <span style={{ color: '#4b4b57', fontSize: '0.68rem' }}>{fmtDate(req.created_at)}</span>
+                    <span className="text-[#4b4b57] text-[0.68rem]">{fmtDate(req.created_at)}</span>
                   </div>
                 </div>
               );
@@ -256,42 +223,24 @@ export default function AdminOverview() {
         </div>
 
         {/* Quick links */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <h2 style={{ color: '#fff', fontSize: '1rem', fontWeight: 800, margin: '0 0 4px' }}>Quick Access</h2>
+        <div className="flex flex-col gap-[12px]">
+          <h2 className="text-white text-[1rem] font-extrabold m-0 mb-[4px]">Quick Access</h2>
           <QuickLink icon={FileSearch}  label="Reg. Requests" desc="Review & approve applications" to="/admin/requests"    color="#f59e0b" />
           <QuickLink icon={Users}       label="Freelancers"    desc="Manage freelancer accounts"    to="/admin/freelancers" color="#38bdf8" />
           <QuickLink icon={Building2}   label="Agencies"       desc="Manage agency accounts"        to="/admin/agencies"    color="#c084fc" />
           <QuickLink icon={TrendingUp}  label="Analytics"      desc="Platform performance metrics"  to="/admin/analytics"   color="#70d64d" />
           
-          <h2 style={{ color: '#fff', fontSize: '1rem', fontWeight: 800, margin: '12px 0 4px' }}>Communications</h2>
+          <h2 className="text-white text-[1rem] font-extrabold mt-[12px] mb-[4px] mx-0">Communications</h2>
           <div
             onClick={() => setIsSenderOpen(true)}
-            style={{
-              background: 'linear-gradient(135deg, #121215, #16220a)',
-              border: '1px solid #23232a',
-              borderRadius: '10px',
-              padding: '20px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '16px',
-              transition: 'border-color 0.15s, background 0.15s',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = '#70d64d'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = '#23232a'; }}
+            className="bg-gradient-to-br from-[#121215] to-[#16220a] border border-[#23232a] rounded-[10px] p-[20px] cursor-pointer flex items-center gap-[16px] transition-colors duration-150 hover:border-[#70d64d]"
           >
-            <div style={{
-              width: '44px', height: '44px', borderRadius: '10px',
-              background: 'rgba(112, 214, 77, 0.08)',
-              border: '1px solid rgba(112, 214, 77, 0.25)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
-            }}>
+            <div className="w-[44px] h-[44px] rounded-[10px] bg-[rgba(112,214,77,0.08)] border border-[rgba(112,214,77,0.25)] flex items-center justify-center shrink-0">
               <Bell size={20} color="#70d64d" />
             </div>
-            <div style={{ flex: 1 }}>
-              <p style={{ color: '#fff', fontWeight: 700, fontSize: '0.9rem', margin: 0 }}>Notification Hub</p>
-              <p style={{ color: '#6b7280', fontSize: '0.75rem', margin: '3px 0 0' }}>Send manual alerts & emails</p>
+            <div className="flex-1">
+              <p className="text-white font-bold text-[0.9rem] m-0">Notification Hub</p>
+              <p className="text-gray-500 text-[0.75rem] m-0 mt-[3px]">Send manual alerts & emails</p>
             </div>
             <ArrowRight size={16} color="#6b7280" />
           </div>
@@ -347,40 +296,30 @@ function SendManualNotificationModal({ onClose, usersList }) {
   };
 
   return (
-    <div style={{
-      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      background: 'rgba(0, 0, 0, 0.8)', backdropFilter: 'blur(8px)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      zIndex: 1000
-    }} onClick={onClose}>
-      <div style={{
-        background: '#121215', border: '1px solid #23232a', borderRadius: '16px',
-        width: '580px', maxWidth: '95vw', padding: '30px', color: '#fff',
-        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.8)', display: 'flex',
-        flexDirection: 'column', gap: '20px'
-      }} onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-[8px] flex items-center justify-center z-[1000]" onClick={onClose}>
+      <div className="bg-[#121215] border border-[#23232a] rounded-[16px] w-[580px] max-w-[95vw] p-[30px] text-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] flex flex-col gap-[20px]" onClick={e => e.stopPropagation()}>
         
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #23232a', paddingBottom: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="flex justify-between items-center border-b border-[#23232a] pb-[16px]">
+          <div className="flex items-center gap-[10px]">
             <Bell size={20} color="#70d64d" />
-            <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>Manual Notification Hub</h3>
+            <h3 className="m-0 text-[1.2rem] font-extrabold">Manual Notification Hub</h3>
           </div>
-          <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: '#6b7280', cursor: 'pointer' }}>
+          <button onClick={onClose} className="bg-transparent border-none text-gray-500 cursor-pointer">
             <X size={20} />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-[16px]">
           
           {/* Recipient */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={{ color: '#6b7280', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Recipient</label>
+          <div className="flex flex-col gap-[6px]">
+            <label className="text-gray-500 text-[0.7rem] font-bold uppercase tracking-[0.5px]">Recipient</label>
             <select 
               value={targetUserId} 
               onChange={e => setTargetUserId(e.target.value)}
-              style={{ background: '#1c1c20', border: '1px solid #2c2c35', borderRadius: '8px', padding: '10px', color: '#fff', fontSize: '0.85rem' }}
+              className="bg-[#1c1c20] border border-[#2c2c35] rounded-[8px] p-[10px] text-white text-[0.85rem] focus:outline-none"
             >
               <option value="ALL">All Users (Broadcast)</option>
               {usersList.map(u => (
@@ -390,23 +329,23 @@ function SendManualNotificationModal({ onClose, usersList }) {
           </div>
 
           {/* Row for Title & Type */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 150px', gap: '12px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ color: '#6b7280', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Title</label>
+          <div className="grid grid-cols-[1fr_150px] gap-[12px]">
+            <div className="flex flex-col gap-[6px]">
+              <label className="text-gray-500 text-[0.7rem] font-bold uppercase tracking-[0.5px]">Title</label>
               <input 
                 type="text" 
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 placeholder="e.g. Schedule Update"
-                style={{ background: '#1c1c20', border: '1px solid #2c2c35', borderRadius: '8px', padding: '10px', color: '#fff', fontSize: '0.85rem' }}
+                className="bg-[#1c1c20] border border-[#2c2c35] rounded-[8px] p-[10px] text-white text-[0.85rem] focus:outline-none"
               />
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ color: '#6b7280', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Type</label>
+            <div className="flex flex-col gap-[6px]">
+              <label className="text-gray-500 text-[0.7rem] font-bold uppercase tracking-[0.5px]">Type</label>
               <select 
                 value={type} 
                 onChange={e => setType(e.target.value)}
-                style={{ background: '#1c1c20', border: '1px solid #2c2c35', borderRadius: '8px', padding: '10px', color: '#fff', fontSize: '0.85rem' }}
+                className="bg-[#1c1c20] border border-[#2c2c35] rounded-[8px] p-[10px] text-white text-[0.85rem] focus:outline-none"
               >
                 <option value="manual">Manual</option>
                 <option value="project">Project</option>
@@ -419,70 +358,70 @@ function SendManualNotificationModal({ onClose, usersList }) {
           </div>
 
           {/* Message */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={{ color: '#6b7280', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Message Body</label>
+          <div className="flex flex-col gap-[6px]">
+            <label className="text-gray-500 text-[0.7rem] font-bold uppercase tracking-[0.5px]">Message Body</label>
             <textarea 
               rows={3}
               value={message}
               onChange={e => setMessage(e.target.value)}
               placeholder="Enter the notification content..."
-              style={{ background: '#1c1c20', border: '1px solid #2c2c35', borderRadius: '8px', padding: '10px', color: '#fff', fontSize: '0.85rem', resize: 'vertical' }}
+              className="bg-[#1c1c20] border border-[#2c2c35] rounded-[8px] p-[10px] text-white text-[0.85rem] resize-y focus:outline-none"
             />
           </div>
 
           {/* Send Email Toggle */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0' }}>
+          <div className="flex items-center gap-[8px] py-[4px]">
             <input 
               type="checkbox" 
               id="sendEmailCheckbox"
               checked={sendEmail} 
               onChange={e => setSendEmail(e.target.checked)}
-              style={{ accentColor: '#70d64d', width: '16px', height: '16px', cursor: 'pointer' }}
+              className="accent-[#70d64d] w-[16px] h-[16px] cursor-pointer"
             />
-            <label htmlFor="sendEmailCheckbox" style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <label htmlFor="sendEmailCheckbox" className="text-white text-[0.85rem] font-semibold cursor-pointer flex items-center gap-[6px]">
               Also Send Email notification
             </label>
           </div>
 
           {/* Expandable Email Fields */}
           {sendEmail && (
-            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px dashed #2c2c35', borderRadius: '10px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ color: '#6b7280', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Custom Email Subject (Optional)</label>
+            <div className="bg-white/[0.02] border border-dashed border-[#2c2c35] rounded-[10px] p-[16px] flex flex-col gap-[12px]">
+              <div className="flex flex-col gap-[6px]">
+                <label className="text-gray-500 text-[0.65rem] font-bold uppercase tracking-[0.5px]">Custom Email Subject (Optional)</label>
                 <input 
                   type="text" 
                   value={emailSubject}
                   onChange={e => setEmailSubject(e.target.value)}
                   placeholder="Defaults to notification title"
-                  style={{ background: '#1c1c20', border: '1px solid #2c2c35', borderRadius: '8px', padding: '8px 10px', color: '#fff', fontSize: '0.8rem' }}
+                  className="bg-[#1c1c20] border border-[#2c2c35] rounded-[8px] px-[10px] py-[8px] text-white text-[0.8rem] focus:outline-none"
                 />
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ color: '#6b7280', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Custom Email HTML body (Optional)</label>
+              <div className="flex flex-col gap-[6px]">
+                <label className="text-gray-500 text-[0.65rem] font-bold uppercase tracking-[0.5px]">Custom Email HTML body (Optional)</label>
                 <textarea 
                   rows={2}
                   value={emailHtml}
                   onChange={e => setEmailHtml(e.target.value)}
                   placeholder="HTML tags allowed. Defaults to styled message."
-                  style={{ background: '#1c1c20', border: '1px solid #2c2c35', borderRadius: '8px', padding: '8px 10px', color: '#fff', fontSize: '0.8rem', resize: 'vertical' }}
+                  className="bg-[#1c1c20] border border-[#2c2c35] rounded-[8px] px-[10px] py-[8px] text-white text-[0.8rem] resize-y focus:outline-none"
                 />
               </div>
             </div>
           )}
 
           {/* Footer Buttons */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #23232a', paddingTop: '16px', marginTop: '10px' }}>
+          <div className="flex justify-end gap-[10px] border-t border-[#23232a] pt-[16px] mt-[10px]">
             <button 
               type="button" 
               onClick={onClose}
-              style={{ background: 'transparent', border: '1px solid #2c2c35', color: '#a1a1aa', borderRadius: '8px', padding: '10px 16px', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}
+              className="bg-transparent border border-[#2c2c35] text-[#a1a1aa] rounded-[8px] px-[16px] py-[10px] text-[0.85rem] font-semibold cursor-pointer"
             >
               Cancel
             </button>
             <button 
               type="submit"
               disabled={sendMutation.isPending}
-              style={{ background: '#70d64d', color: '#000', border: 'none', borderRadius: '8px', padding: '10px 22px', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', opacity: sendMutation.isPending ? 0.6 : 1 }}
+              className={`bg-[#70d64d] text-black border-none rounded-[8px] px-[22px] py-[10px] text-[0.85rem] font-bold cursor-pointer transition-opacity ${sendMutation.isPending ? 'opacity-60' : 'opacity-100'}`}
             >
               {sendMutation.isPending ? 'Sending...' : 'Send Notification'}
             </button>

@@ -50,8 +50,7 @@ export const MemberCard = ({ member, onEdit, onDelete }) => {
               download={`${userName.replace(/\s+/g, '_')}_Resume`}
               target="_blank"
               rel="noreferrer"
-              className="detail-text"
-              style={{ color: '#b5ff14', textDecoration: 'underline', fontWeight: '600' }}
+              className="detail-text text-[#b5ff14] underline font-semibold"
             >
               View CV / Resume
             </a>

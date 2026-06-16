@@ -433,12 +433,12 @@ export default function AdminSettings() {
                   </div>
                 )}
               </div>
-              <p className="settings-hint" style={{ marginTop: '8px' }}>
+              <p className="settings-hint mt-2">
                 A test email will be sent to your admin email address using the configuration above.
               </p>
             </Section>
 
-            <div className="settings-row-actions" style={{ borderTop: '1px solid #1e1e26', paddingTop: '20px', marginTop: '8px' }}>
+            <div className="settings-row-actions border-t border-[#1e1e26] pt-5 mt-2">
               <SaveBtn onClick={handleSaveSmtp} />
             </div>
           </div>
@@ -601,11 +601,11 @@ export default function AdminSettings() {
             <Section title="Maintenance Mode"
               description="When enabled, all non-admin users see a maintenance page instead of the platform.">
               <FormRow label="Maintenance Mode" id="sys-maint">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div className="flex items-center gap-3">
                   <Toggle id="sys-maint" checked={system.sys_maintenance_mode}
                     onChange={v => setSystem(s => ({ ...s, sys_maintenance_mode: v }))} />
                   {system.sys_maintenance_mode && (
-                    <span style={{ color: '#f59e0b', fontSize: '0.78rem', fontWeight: 700 }}>
+                    <span className="text-[#f59e0b] text-[0.78rem] font-bold">
                       ⚠ Platform is in maintenance mode
                     </span>
                   )}

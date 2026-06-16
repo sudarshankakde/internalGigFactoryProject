@@ -26,7 +26,10 @@ const ROLE_STYLES = {
 function StatusBadge({ status }) {
   const s = STATUS_STYLES[status] || STATUS_STYLES.pending;
   return (
-    <span style={{ background: s.bg, color: s.color, fontSize: '0.68rem', fontWeight: 700, padding: '3px 8px', borderRadius: '4px' }}>
+    <span 
+      style={{ background: s.bg, color: s.color }} 
+      className="text-[0.68rem] font-bold px-[8px] py-[3px] rounded-[4px]"
+    >
       {status.toUpperCase()}
     </span>
   );
@@ -35,7 +38,10 @@ function StatusBadge({ status }) {
 function RoleChip({ role }) {
   const r = ROLE_STYLES[role] || ROLE_STYLES.freelancer;
   return (
-    <span style={{ background: r.bg, color: r.color, fontSize: '0.68rem', fontWeight: 700, padding: '3px 8px', borderRadius: '4px' }}>
+    <span 
+      style={{ background: r.bg, color: r.color }} 
+      className="text-[0.68rem] font-bold px-[8px] py-[3px] rounded-[4px]"
+    >
       {role?.toUpperCase()}
     </span>
   );
@@ -43,12 +49,16 @@ function RoleChip({ role }) {
 
 function StatCard({ label, value, Icon, accent }) {
   return (
-    <div style={{ ...styles.statCard, ...(accent ? styles.statCardAccent : {}) }}>
-      <div style={styles.statHead}>
-        <span style={styles.statLabel}>{label}</span>
+    <div className={`border rounded-[8px] px-[20px] py-[18px] ${
+      accent 
+        ? 'bg-gradient-to-br from-[#121215] to-[#162203] border-[#374f05]' 
+        : 'bg-[#121215] border-[#23232a]'
+    }`}>
+      <div className="flex justify-between items-center">
+        <span className="text-gray-500 text-[0.68rem] font-bold tracking-[0.5px] uppercase">{label}</span>
         <Icon size={16} color={accent ? '#70d64d' : '#6b7280'} />
       </div>
-      <div style={styles.statValue}>{value}</div>
+      <div className="text-[2rem] font-extrabold text-white mt-[6px]">{value}</div>
     </div>
   );
 }
@@ -110,21 +120,21 @@ function DetailModal({ request, historyData, isLoadingHistory, onClose, onApprov
 
   return (
     <>
-      <div onClick={onClose} style={styles.modalOverlay} />
-      <div style={styles.profileModal}>
-        <div style={styles.modalHeader}>
-          <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h2 style={{ color: '#fff', fontSize: '1.25rem', fontWeight: 800, margin: 0 }}>
+      <div onClick={onClose} className="fixed inset-0 bg-black/75 backdrop-blur-[4px] z-[600]" />
+      <div style={{ animation: 'modalIn 0.2s ease-out' }} className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-[780px] bg-[#181818] border border-[#2c2c2c] rounded-[10px] overflow-hidden z-[601] shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
+        <div className="flex items-center gap-[12px] px-[24px] py-[20px] border-b border-[#2c2c2c]">
+          <div className="flex flex-col flex-1">
+            <div className="flex items-center justify-between">
+              <h2 className="text-white text-[1.25rem] font-extrabold m-0">
                 Registration Profile: {request.full_name}
               </h2>
-              <button onClick={onClose} style={styles.drawerClose}><X size={16} /></button>
+              <button onClick={onClose} className="bg-transparent border border-[#2c2c2c] text-[#8a8a8a] rounded-[6px] px-[8px] py-[6px] cursor-pointer flex items-center shrink-0"><X size={16} /></button>
             </div>
-            <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+            <div className="flex gap-[8px] mt-[8px]">
               <RoleChip role={request.role} />
               <StatusBadge status={request.status} />
               {request.status === 'rejected' && request.can_reapply_at && (
-                <span style={{ fontSize: '0.72rem', background: '#3b2314', color: '#f59e0b', padding: '3px 8px', borderRadius: '4px', fontWeight: 600 }}>
+                <span className="text-[0.72rem] bg-[#3b2314] text-[#f59e0b] px-[8px] py-[3px] rounded-[4px] font-semibold">
                   Cooldown until: {fmtDate(request.can_reapply_at)}
                 </span>
               )}
@@ -132,64 +142,64 @@ function DetailModal({ request, historyData, isLoadingHistory, onClose, onApprov
           </div>
         </div>
 
-        <div style={{ maxHeight: '70vh', overflowY: 'auto', padding: '24px' }}>
+        <div className="max-h-[70vh] overflow-y-auto p-[24px]">
           {/* Main profile view */}
           {!isEditingDecision ? (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Left Column: Info cards */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="flex flex-col gap-[16px]">
                 {/* 1. Contact & Designation Card */}
-                <div style={styles.profileSectionCard}>
-                  <h3 style={styles.profileSectionTitle}>Personal & Contact Details</h3>
-                  <div style={styles.profileRow}><strong>Email:</strong> <span>{request.email}</span></div>
-                  <div style={styles.profileRow}><strong>Mobile:</strong> <span>{request.mobile}</span></div>
-                  <div style={styles.profileRow}><strong>Designation:</strong> <span>{app.designation || app.title || 'N/A'}</span></div>
-                  <div style={styles.profileRow}><strong>Location:</strong> <span>{app.location || app.headquarters || 'N/A'}</span></div>
+                <div className="bg-[#1c1c20] border border-[#2c2c2c] rounded-[8px] p-[16px] flex flex-col gap-[8px]">
+                  <h3 className="text-[0.82rem] font-extrabold uppercase tracking-[0.5px] text-[#70d64d] m-0 mb-[8px] pb-[6px] border-b border-[#2c2c2c]">Personal & Contact Details</h3>
+                  <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Email:</strong> <span>{request.email}</span></div>
+                  <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Mobile:</strong> <span>{request.mobile}</span></div>
+                  <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Designation:</strong> <span>{app.designation || app.title || 'N/A'}</span></div>
+                  <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Location:</strong> <span>{app.location || app.headquarters || 'N/A'}</span></div>
                   {app.linkedinUrl && (
-                    <div style={styles.profileRow}>
+                    <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]">
                       <strong>LinkedIn:</strong> 
-                      <a href={app.linkedinUrl} target="_blank" rel="noreferrer" style={styles.profileLink}>View Profile</a>
+                      <a href={app.linkedinUrl} target="_blank" rel="noreferrer" className="text-[#70d64d] no-underline font-semibold hover:underline">View Profile</a>
                     </div>
                   )}
                   {app.website && (
-                    <div style={styles.profileRow}>
+                    <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]">
                       <strong>Website:</strong> 
-                      <a href={app.website} target="_blank" rel="noreferrer" style={styles.profileLink}>{app.website}</a>
+                      <a href={app.website} target="_blank" rel="noreferrer" className="text-[#70d64d] no-underline font-semibold hover:underline">{app.website}</a>
                     </div>
                   )}
                 </div>
 
                 {/* 2. Legal Details Card */}
-                <div style={styles.profileSectionCard}>
-                  <h3 style={styles.profileSectionTitle}>Legal & Identification</h3>
+                <div className="bg-[#1c1c20] border border-[#2c2c2c] rounded-[8px] p-[16px] flex flex-col gap-[8px]">
+                  <h3 className="text-[0.82rem] font-extrabold uppercase tracking-[0.5px] text-[#70d64d] m-0 mb-[8px] pb-[6px] border-b border-[#2c2c2c]">Legal & Identification</h3>
                   {request.role === 'freelancer' ? (
                     <>
-                      <div style={styles.profileRow}><strong>Legal Name (PAN):</strong> <span>{app.legalNamePan || 'N/A'}</span></div>
-                      <div style={styles.profileRow}><strong>Personal PAN:</strong> <span style={{ textTransform: 'uppercase' }}>{app.personalPan || 'N/A'}</span></div>
+                      <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Legal Name (PAN):</strong> <span>{app.legalNamePan || 'N/A'}</span></div>
+                      <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Personal PAN:</strong> <span className="uppercase">{app.personalPan || 'N/A'}</span></div>
                     </>
                   ) : (
                     <>
-                      <div style={styles.profileRow}><strong>Registered Name:</strong> <span>{app.registeredName || 'N/A'}</span></div>
-                      <div style={styles.profileRow}><strong>Authorized Person:</strong> <span>{app.authPersonName || 'N/A'}</span></div>
-                      <div style={styles.profileRow}><strong>Company PAN:</strong> <span style={{ textTransform: 'uppercase' }}>{app.companyPan || 'N/A'}</span></div>
-                      <div style={styles.profileRow}><strong>GSTIN:</strong> <span style={{ textTransform: 'uppercase' }}>{app.gstNumber || 'N/A'}</span></div>
-                      <div style={styles.profileRow}><strong>CIN:</strong> <span style={{ textTransform: 'uppercase' }}>{app.cin || 'N/A'}</span></div>
+                      <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Registered Name:</strong> <span>{app.registeredName || 'N/A'}</span></div>
+                      <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Authorized Person:</strong> <span>{app.authPersonName || 'N/A'}</span></div>
+                      <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Company PAN:</strong> <span className="uppercase">{app.companyPan || 'N/A'}</span></div>
+                      <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>GSTIN:</strong> <span className="uppercase">{app.gstNumber || 'N/A'}</span></div>
+                      <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>CIN:</strong> <span className="uppercase">{app.cin || 'N/A'}</span></div>
                     </>
                   )}
                 </div>
 
                 {/* 3. Availability & Sign-off Card */}
-                <div style={styles.profileSectionCard}>
-                  <h3 style={styles.profileSectionTitle}>Availability & Sign-off</h3>
-                  <div style={styles.profileRow}><strong>Availability:</strong> <span>{app.availability || 'Project basis'}</span></div>
-                  <div style={styles.profileRow}><strong>Notice Period:</strong> <span>{app.noticePeriod || 'Immediate'}</span></div>
+                <div className="bg-[#1c1c20] border border-[#2c2c2c] rounded-[8px] p-[16px] flex flex-col gap-[8px]">
+                  <h3 className="text-[0.82rem] font-extrabold uppercase tracking-[0.5px] text-[#70d64d] m-0 mb-[8px] pb-[6px] border-b border-[#2c2c2c]">Availability & Sign-off</h3>
+                  <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Availability:</strong> <span>{app.availability || 'Project basis'}</span></div>
+                  <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Notice Period:</strong> <span>{app.noticePeriod || 'Immediate'}</span></div>
                   {request.role === 'agency' && (
-                    <div style={styles.profileRow}><strong>Team Size:</strong> <span>{app.teamSize || 'N/A'} employees</span></div>
+                    <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Team Size:</strong> <span>{app.teamSize || 'N/A'} employees</span></div>
                   )}
-                  <div style={styles.profileRow}><strong>Signee Name:</strong> <span>{app.signatureName || 'N/A'}</span></div>
-                  <div style={styles.profileRow}>
+                  <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Signee Name:</strong> <span>{app.signatureName || 'N/A'}</span></div>
+                  <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]">
                     <strong>Declaration:</strong> 
-                    <span style={{ color: app.declarationAccepted ? '#70d64d' : '#ef4444', fontWeight: 600 }}>
+                    <span className="font-semibold" style={{ color: app.declarationAccepted ? '#70d64d' : '#ef4444' }}>
                       {app.declarationAccepted ? 'Accepted' : 'Declined'}
                     </span>
                   </div>
@@ -197,64 +207,64 @@ function DetailModal({ request, historyData, isLoadingHistory, onClose, onApprov
               </div>
 
               {/* Right Column: Skills, Details and Decision logs */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="flex flex-col gap-[16px]">
                 {/* 4. Selected Services & Skills */}
-                <div style={styles.profileSectionCard}>
-                  <h3 style={styles.profileSectionTitle}>Services & Capability Stack</h3>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+                <div className="bg-[#1c1c20] border border-[#2c2c2c] rounded-[8px] p-[16px] flex flex-col gap-[8px]">
+                  <h3 className="text-[0.82rem] font-extrabold uppercase tracking-[0.5px] text-[#70d64d] m-0 mb-[8px] pb-[6px] border-b border-[#2c2c2c]">Services & Capability Stack</h3>
+                  <div className="flex flex-wrap gap-[8px] mb-[12px]">
                     {(app.selectedServices || []).map(srv => (
-                      <span key={srv} style={styles.tag}>{srv}</span>
+                      <span key={srv} className="bg-[#1e293b] text-[#38bdf8] text-[0.72rem] font-semibold px-[8px] py-[3px] rounded-[4px]">{srv}</span>
                     ))}
                   </div>
 
                   {app.bimDetails && (
-                    <div style={{ marginTop: '12px', background: '#1c1c20', padding: '10px', borderRadius: '6px' }}>
-                      <p style={{ margin: '0 0 6px', fontSize: '0.75rem', fontWeight: 700, color: '#6b7280' }}>BIM DETAILS</p>
-                      <div style={styles.profileRow}><strong>Software Stack:</strong> <span>{Array.isArray(app.bimDetails.softwareStack) ? app.bimDetails.softwareStack.join(', ') : 'N/A'}</span></div>
-                      <div style={styles.profileRow}><strong>Experience:</strong> <span>{app.bimDetails.experience || 'N/A'} yrs</span></div>
+                    <div className="mt-[12px] bg-[#1c1c20] p-[10px] rounded-[6px]">
+                      <p className="m-0 mb-[6px] text-[0.75rem] font-bold text-gray-500">BIM DETAILS</p>
+                      <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Software Stack:</strong> <span>{Array.isArray(app.bimDetails.softwareStack) ? app.bimDetails.softwareStack.join(', ') : 'N/A'}</span></div>
+                      <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Experience:</strong> <span>{app.bimDetails.experience || 'N/A'} yrs</span></div>
                     </div>
                   )}
                   {app.portfolioUrl && (
-                    <div style={{ marginTop: '12px' }}>
+                    <div className="mt-[12px]">
                       <strong>Portfolio link: </strong>
-                      <a href={app.portfolioUrl} target="_blank" rel="noreferrer" style={styles.profileLink}>Open Link</a>
+                      <a href={app.portfolioUrl} target="_blank" rel="noreferrer" className="text-[#70d64d] no-underline font-semibold hover:underline">Open Link</a>
                     </div>
                   )}
                 </div>
 
                 {/* 5. Commercials Card */}
-                <div style={styles.profileSectionCard}>
-                  <h3 style={styles.profileSectionTitle}>Commercial Rates</h3>
-                  <div style={styles.profileRow}><strong>Base Rate:</strong> <span>INR {app.baseRate || 'N/A'}</span></div>
-                  <div style={styles.profileRow}><strong>Billing Basis:</strong> <span>{app.billingBasis || 'Hourly'}</span></div>
-                  <div style={styles.profileRow}><strong>Commercial Basis:</strong> <span>{app.commercialBasis || 'N/A'}</span></div>
+                <div className="bg-[#1c1c20] border border-[#2c2c2c] rounded-[8px] p-[16px] flex flex-col gap-[8px]">
+                  <h3 className="text-[0.82rem] font-extrabold uppercase tracking-[0.5px] text-[#70d64d] m-0 mb-[8px] pb-[6px] border-b border-[#2c2c2c]">Commercial Rates</h3>
+                  <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Base Rate:</strong> <span>INR {app.baseRate || 'N/A'}</span></div>
+                  <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Billing Basis:</strong> <span>{app.billingBasis || 'Hourly'}</span></div>
+                  <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Commercial Basis:</strong> <span>{app.commercialBasis || 'N/A'}</span></div>
                 </div>
 
                 {/* 5.1 Registration History & Attempts */}
-                <div style={styles.profileSectionCard}>
-                  <h3 style={styles.profileSectionTitle}>Attempts & History Tracker</h3>
+                <div className="bg-[#1c1c20] border border-[#2c2c2c] rounded-[8px] p-[16px] flex flex-col gap-[8px]">
+                  <h3 className="text-[0.82rem] font-extrabold uppercase tracking-[0.5px] text-[#70d64d] m-0 mb-[8px] pb-[6px] border-b border-[#2c2c2c]">Attempts & History Tracker</h3>
                   {isLoadingHistory ? (
-                    <div style={{ color: '#888', fontSize: '0.8rem', padding: '10px 0' }}>Loading history...</div>
+                    <div className="text-[#888] text-[0.8rem] py-[10px]">Loading history...</div>
                   ) : historyData ? (
                     <>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-                        <div style={{ background: '#121215', border: '1px solid #2c2c2c', padding: '8px', borderRadius: '6px', textAlign: 'center' }}>
-                          <span style={{ fontSize: '0.65rem', color: '#6b7280', textTransform: 'uppercase', fontWeight: 700 }}>Total Attempts</span>
-                          <div style={{ fontSize: '1.2rem', color: '#fff', fontWeight: 800, marginTop: '2px' }}>
+                      <div className="grid grid-cols-2 gap-[12px] mb-[12px]">
+                        <div className="bg-[#121215] border border-[#2c2c2c] p-[8px] rounded-[6px] text-center">
+                          <span className="text-[0.65rem] text-gray-500 uppercase font-bold">Total Attempts</span>
+                          <div className="text-[1.2rem] text-white font-extrabold mt-[2px]">
                             {historyData.tracker?.total_attempts || 0}
                           </div>
                         </div>
-                        <div style={{ background: '#121215', border: '1px solid #2c2c2c', padding: '8px', borderRadius: '6px', textAlign: 'center' }}>
-                          <span style={{ fontSize: '0.65rem', color: '#6b7280', textTransform: 'uppercase', fontWeight: 700 }}>Rejections</span>
-                          <div style={{ fontSize: '1.2rem', color: '#ef4444', fontWeight: 800, marginTop: '2px' }}>
+                        <div className="bg-[#121215] border border-[#2c2c2c] p-[8px] rounded-[6px] text-center">
+                          <span className="text-[0.65rem] text-gray-500 uppercase font-bold">Rejections</span>
+                          <div className="text-[1.2rem] text-[#ef4444] font-extrabold mt-[2px]">
                             {historyData.tracker?.rejection_count || 0}
                           </div>
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '180px', overflowY: 'auto', paddingRight: '4px' }}>
+                      <div className="flex flex-col gap-[10px] max-h-[180px] overflow-y-auto pr-[4px]">
                         {(!historyData.history || historyData.history.length === 0) ? (
-                          <div style={{ color: '#6b7280', fontSize: '0.75rem', textAlign: 'center', padding: '10px 0' }}>No history records logged yet.</div>
+                          <div className="text-gray-500 text-[0.75rem] text-center py-[10px]">No history records logged yet.</div>
                         ) : (
                           historyData.history.map((log) => {
                             let actionColor = '#70d64d'; // Approved
@@ -263,14 +273,14 @@ function DetailModal({ request, historyData, isLoadingHistory, onClose, onApprov
                             else if (log.action === 'DECISION_CHANGED') actionColor = '#f59e0b';
 
                             return (
-                              <div key={log.id} style={{ borderLeft: `2px solid ${actionColor}`, paddingLeft: '10px', fontSize: '0.75rem' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <div key={log.id} style={{ borderLeft: `2px solid ${actionColor}` }} className="pl-[10px] text-[0.75rem]">
+                                <div className="flex justify-between items-center">
                                   <strong style={{ color: actionColor }}>{log.action}</strong>
-                                  <span style={{ color: '#6b7280', fontSize: '0.65rem' }}>
+                                  <span className="text-gray-500 text-[0.65rem]">
                                     {new Date(log.created_at).toLocaleDateString()}
                                   </span>
                                 </div>
-                                <div style={{ color: '#d1d5db', marginTop: '2px', fontSize: '0.72rem' }}>
+                                <div className="text-[#d1d5db] mt-[2px] text-[0.72rem]">
                                   {log.action === 'SUBMITTED' ? 'Submitted a new application request' : (
                                     <>
                                       Reviewed by: <strong>{log.performer?.full_name || 'Admin'}</strong>
@@ -278,12 +288,12 @@ function DetailModal({ request, historyData, isLoadingHistory, onClose, onApprov
                                   )}
                                 </div>
                                 {log.rejection_reason && (
-                                  <div style={{ color: '#fca5a5', fontStyle: 'italic', background: '#271c1c', padding: '4px 6px', borderRadius: '4px', marginTop: '4px', wordBreak: 'break-all', fontSize: '0.7rem' }}>
+                                  <div className="text-[#fca5a5] italic bg-[#271c1c] px-[6px] py-[4px] rounded-[4px] mt-[4px] break-all text-[0.7rem]">
                                     Reason: {log.rejection_reason}
                                   </div>
                                 )}
                                 {log.can_reapply_at && (
-                                  <div style={{ color: '#fcd34d', fontSize: '0.68rem', marginTop: '2px' }}>
+                                  <div className="text-[#fcd34d] text-[0.68rem] mt-[2px]">
                                     Cooldown until: {new Date(log.can_reapply_at).toLocaleDateString()}
                                   </div>
                                 )}
@@ -294,21 +304,21 @@ function DetailModal({ request, historyData, isLoadingHistory, onClose, onApprov
                       </div>
                     </>
                   ) : (
-                    <div style={{ color: '#888', fontSize: '0.8rem' }}>Unable to retrieve history.</div>
+                    <div className="text-[#888] text-[0.8rem]">Unable to retrieve history.</div>
                   )}
                 </div>
 
                 {/* 6. Current Decision info & Actions */}
-                <div style={{ ...styles.profileSectionCard, border: '1px dashed #2c2c2c', background: '#17171a' }}>
-                  <h3 style={styles.profileSectionTitle}>Status & Reviews</h3>
-                  <div style={styles.profileRow}><strong>Current State:</strong> <span>{request.status.toUpperCase()}</span></div>
+                <div className="bg-[#1c1c20] border border-[#2c2c2c] rounded-[8px] p-[16px] flex flex-col gap-[8px] border-dashed bg-[#17171a]">
+                  <h3 className="text-[0.82rem] font-extrabold uppercase tracking-[0.5px] text-[#70d64d] m-0 mb-[8px] pb-[6px] border-b border-[#2c2c2c]">Status & Reviews</h3>
+                  <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Current State:</strong> <span>{request.status.toUpperCase()}</span></div>
                   {request.status === 'rejected' && (
-                    <div style={{ marginTop: '8px', fontSize: '0.8rem', color: '#ef4444' }}>
+                    <div className="mt-[8px] text-[0.8rem] text-[#ef4444]">
                       <strong>Rejection Reason:</strong> {request.rejection_reason || 'None provided.'}
                     </div>
                   )}
-                  <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end' }}>
-                    <button onClick={handleOpenEditDecision} style={{ ...styles.btn, ...styles.btnGhost, borderColor: '#70d64d', color: '#70d64d' }}>
+                  <div className="mt-[16px] flex justify-end">
+                    <button onClick={handleOpenEditDecision} className="inline-flex items-center gap-[5px] rounded-[5px] text-[0.72rem] font-bold cursor-pointer transition-opacity duration-150 bg-transparent border border-[#70d64d] text-[#70d64d] px-[12px] py-[7px]">
                       Change Decision / Cooldown
                     </button>
                   </div>
@@ -317,18 +327,18 @@ function DetailModal({ request, historyData, isLoadingHistory, onClose, onApprov
             </div>
           ) : (
             /* Edit Decision form view */
-            <form onSubmit={handleSaveDecisionUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <h3 style={{ color: '#fff', fontSize: '1rem', fontWeight: 800, margin: '0 0 10px' }}>
+            <form onSubmit={handleSaveDecisionUpdate} className="flex flex-col gap-[16px]">
+              <h3 className="text-white text-[1rem] font-extrabold m-0 mb-[10px]">
                 Change Decision & Cooldown Period
               </h3>
 
               {/* Status Radio Choice */}
               <div>
-                <label style={{ ...styles.drawerRowLabel, display: 'block', marginBottom: '8px' }}>
+                <label className="text-gray-500 text-[0.75rem] font-semibold uppercase tracking-[0.5px] pr-[12px] shrink-0 block mb-[8px]">
                   New Decision Status
                 </label>
-                <div style={{ display: 'flex', gap: '16px' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#fff', cursor: 'pointer' }}>
+                <div className="flex gap-[16px]">
+                  <label className="flex items-center gap-[8px] text-white cursor-pointer">
                     <input
                       type="radio"
                       name="newStatus"
@@ -338,7 +348,7 @@ function DetailModal({ request, historyData, isLoadingHistory, onClose, onApprov
                     />
                     Approve Request
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#fff', cursor: 'pointer' }}>
+                  <label className="flex items-center gap-[8px] text-white cursor-pointer">
                     <input
                       type="radio"
                       name="newStatus"
@@ -353,16 +363,16 @@ function DetailModal({ request, historyData, isLoadingHistory, onClose, onApprov
 
               {/* Rejected options */}
               {newStatus === 'rejected' && (
-                <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: '#1c1c20', padding: '16px', borderRadius: '8px' }}>
+                <div className="animate-fade-in flex flex-col gap-[12px] bg-[#1c1c20] p-[16px] rounded-[8px]">
                   {/* Cooldown option dropdown */}
                   <div>
-                    <label style={{ ...styles.drawerRowLabel, display: 'block', marginBottom: '6px' }}>
+                    <label className="text-gray-500 text-[0.75rem] font-semibold uppercase tracking-[0.5px] pr-[12px] shrink-0 block mb-[6px]">
                       Cooldown Period
                     </label>
                     <select
                       value={cooldownOption}
                       onChange={e => setCooldownOption(e.target.value)}
-                      style={{ ...styles.textarea, height: '38px', padding: '6px 10px' }}
+                      className="w-full bg-[#1f1f1f] border border-[#2c2c2c] rounded-[6px] text-white text-[0.85rem] px-[12px] py-[10px] outline-none resize-y font-inherit h-[38px] py-[6px] px-[10px]"
                     >
                       <option value="7">7 Days Cooldown</option>
                       <option value="14">14 Days Cooldown</option>
@@ -376,22 +386,22 @@ function DetailModal({ request, historyData, isLoadingHistory, onClose, onApprov
                   {/* Custom Date Input */}
                   {cooldownOption === 'custom' && (
                     <div className="animate-fade-in">
-                      <label style={{ ...styles.drawerRowLabel, display: 'block', marginBottom: '6px' }}>
+                      <label className="text-gray-500 text-[0.75rem] font-semibold uppercase tracking-[0.5px] pr-[12px] shrink-0 block mb-[6px]">
                         Select Re-apply Date
                       </label>
                       <input
                         type="date"
                         value={customDate}
                         onChange={e => setCustomDate(e.target.value)}
-                        style={{ ...styles.textarea, height: '38px', padding: '6px 10px' }}
+                        className="w-full bg-[#1f1f1f] border border-[#2c2c2c] rounded-[6px] text-white text-[0.85rem] px-[12px] py-[10px] outline-none resize-y font-inherit h-[38px] py-[6px] px-[10px]"
                         required
                       />
                     </div>
                   )}
 
                   {/* Optional Rejection Reason checkbox */}
-                  <div style={{ margin: '8px 0 0' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#fff', fontSize: '0.8rem', cursor: 'pointer' }}>
+                  <div className="mt-[8px]">
+                    <label className="flex items-center gap-[8px] text-white text-[0.8rem] cursor-pointer">
                       <input
                         type="checkbox"
                         checked={noReason}
@@ -404,7 +414,7 @@ function DetailModal({ request, historyData, isLoadingHistory, onClose, onApprov
                   {/* Rejection Reason Textarea */}
                   {!noReason && (
                     <div>
-                      <label style={{ ...styles.drawerRowLabel, display: 'block', marginBottom: '6px' }}>
+                      <label className="text-gray-500 text-[0.75rem] font-semibold uppercase tracking-[0.5px] pr-[12px] shrink-0 block mb-[6px]">
                         Reason for Rejection
                       </label>
                       <textarea
@@ -412,7 +422,7 @@ function DetailModal({ request, historyData, isLoadingHistory, onClose, onApprov
                         value={rejectReason}
                         onChange={e => setRejectReason(e.target.value)}
                         placeholder="Provide reasons for rejection..."
-                        style={styles.textarea}
+                        className="w-full bg-[#1f1f1f] border border-[#2c2c2c] rounded-[6px] text-white text-[0.85rem] px-[12px] py-[10px] outline-none resize-y font-inherit"
                       />
                     </div>
                   )}
@@ -420,11 +430,11 @@ function DetailModal({ request, historyData, isLoadingHistory, onClose, onApprov
               )}
 
               {/* Form buttons */}
-              <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
-                <button type="submit" style={{ ...styles.btn, ...styles.btnApprove }} disabled={isPending}>
+              <div className="flex gap-[10px] mt-[16px]">
+                <button type="submit" className="inline-flex items-center gap-[5px] rounded-[5px] text-[0.72rem] font-bold cursor-pointer border-none transition-opacity duration-150 bg-[#70d64d] text-black px-[16px] py-[8px]" disabled={isPending}>
                   {isPending ? 'Saving Update…' : 'Save Changes'}
                 </button>
-                <button type="button" onClick={() => setIsEditingDecision(false)} style={{ ...styles.btn, ...styles.btnGhost }}>
+                <button type="button" onClick={() => setIsEditingDecision(false)} className="inline-flex items-center gap-[5px] rounded-[5px] text-[0.72rem] font-bold cursor-pointer transition-opacity duration-150 bg-transparent border border-[#23232a] text-[#8a8a8a] px-[12px] py-[7px]">
                   Back to Profile
                 </button>
               </div>
@@ -434,11 +444,11 @@ function DetailModal({ request, historyData, isLoadingHistory, onClose, onApprov
 
         {/* Footer actions for pending status */}
         {!isEditingDecision && request.status === 'pending' && (
-          <div style={{ ...styles.drawerFooter, borderTop: '1px solid #2c2c2c', display: 'flex', justifyContent: 'flex-end' }}>
-            <button style={{ ...styles.btn, ...styles.btnApprove }} onClick={() => onApprove(request.id)} disabled={isPending}>
+          <div className="px-[24px] py-[16px] border-t border-[#2c2c2c] flex gap-[10px] justify-end">
+            <button className="inline-flex items-center gap-[5px] rounded-[5px] text-[0.72rem] font-bold cursor-pointer border-none transition-opacity duration-150 bg-[#70d64d] text-black px-[16px] py-[8px]" onClick={() => onApprove(request.id)} disabled={isPending}>
               <Check size={14} /> Approve
             </button>
-            <button style={{ ...styles.btn, ...styles.btnReject }} onClick={() => onReject(request)} disabled={isPending}>
+            <button className="inline-flex items-center gap-[5px] rounded-[5px] text-[0.72rem] font-bold cursor-pointer border-none transition-opacity duration-150 bg-[rgba(239,68,68,0.12)] text-[#ef4444] border border-[rgba(239,68,68,0.3)] px-[16px] py-[8px]" onClick={() => onReject(request)} disabled={isPending}>
               <X size={14} /> Reject
             </button>
           </div>
@@ -460,19 +470,19 @@ function RejectModal({ request, onClose, onConfirm, isPending }) {
 
   return (
     <>
-      <div style={styles.modalOverlay} onClick={onClose} />
-      <div style={styles.modal}>
-        <div style={styles.modalHeader}>
-          <div style={styles.modalIconWrap}><AlertCircle size={20} color="#ef4444" /></div>
+      <div className="fixed inset-0 bg-black/75 backdrop-blur-[4px] z-[600]" onClick={onClose} />
+      <div style={{ animation: 'modalIn 0.2s ease-out' }} className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[440px] bg-[#181818] border border-[#2c2c2c] rounded-[10px] overflow-hidden z-[601] shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
+        <div className="flex items-center gap-[12px] px-[24px] py-[20px] border-b border-[#2c2c2c]">
+          <div className="w-[36px] h-[36px] bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.25)] rounded-full flex items-center justify-center shrink-0"><AlertCircle size={20} color="#ef4444" /></div>
           <div>
-            <h3 style={styles.modalTitle}>Reject Application</h3>
-            <p style={styles.modalSub}>{request?.full_name} — {request?.role}</p>
+            <h3 className="text-white text-[1rem] font-extrabold m-0">Reject Application</h3>
+            <p className="text-gray-500 text-[0.78rem] mt-[2px]">{request?.full_name} — {request?.role}</p>
           </div>
-          <button onClick={onClose} style={styles.drawerClose}><X size={16} /></button>
+          <button onClick={onClose} className="bg-transparent border border-[#2c2c2c] text-[#8a8a8a] rounded-[6px] px-[8px] py-[6px] cursor-pointer flex items-center shrink-0"><X size={16} /></button>
         </div>
-        <form onSubmit={handleSubmit} style={{ padding: '0 24px 24px' }}>
-          <div style={{ margin: '16px 0 8px' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#fff', fontSize: '0.82rem', cursor: 'pointer' }}>
+        <form onSubmit={handleSubmit} className="p-[24px] pt-0">
+          <div className="my-[16px] mx-0 mb-[8px]">
+            <label className="flex items-center gap-[8px] text-white text-[0.82rem] cursor-pointer">
               <input
                 type="checkbox"
                 checked={noReason}
@@ -483,8 +493,8 @@ function RejectModal({ request, onClose, onConfirm, isPending }) {
           </div>
 
           {!noReason && (
-            <div style={{ marginTop: '12px' }}>
-              <label style={{ ...styles.drawerRowLabel, display: 'block', marginBottom: '8px' }}>
+            <div className="mt-[12px]">
+              <label className="text-gray-500 text-[0.75rem] font-semibold uppercase tracking-[0.5px] pr-[12px] shrink-0 block mb-[8px]">
                 Reason for Rejection
               </label>
               <textarea
@@ -492,17 +502,17 @@ function RejectModal({ request, onClose, onConfirm, isPending }) {
                 value={reason}
                 onChange={e => setReason(e.target.value)}
                 placeholder="Describe why this application is being rejected…"
-                style={styles.textarea}
+                className="w-full bg-[#1f1f1f] border border-[#2c2c2c] rounded-[6px] text-white text-[0.85rem] px-[12px] py-[10px] outline-none resize-y font-inherit"
                 autoFocus
               />
             </div>
           )}
 
-          <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-            <button type="submit" style={{ ...styles.btn, ...styles.btnReject, flex: 1 }} disabled={isPending}>
+          <div className="flex gap-[10px] mt-[20px]">
+            <button type="submit" className="inline-flex items-center gap-[5px] rounded-[5px] text-[0.72rem] font-bold cursor-pointer border-none transition-opacity duration-150 bg-[rgba(239,68,68,0.12)] text-[#ef4444] border border-[rgba(239,68,68,0.3)] px-[16px] py-[8px] flex-1" disabled={isPending}>
               <X size={14} /> {isPending ? 'Rejecting…' : 'Confirm Rejection'}
             </button>
-            <button type="button" onClick={onClose} style={{ ...styles.btn, ...styles.btnGhost }}>
+            <button type="button" onClick={onClose} className="inline-flex items-center gap-[5px] rounded-[5px] text-[0.72rem] font-bold cursor-pointer transition-opacity duration-150 bg-transparent border border-[#23232a] text-[#8a8a8a] px-[12px] py-[7px]">
               Cancel
             </button>
           </div>
@@ -596,40 +606,42 @@ export default function AdminDashboard() {
   return (
     <div>
       {/* Stat cards */}
-      <div style={styles.statsGrid}>
-        <StatCard label="TOTAL REQUESTS"  value={isLoading ? <span className="skeleton-pulse" style={{ display: 'inline-block', width: '40px', height: '28px', borderRadius: '4px', verticalAlign: 'middle' }} /> : stats.total}    Icon={FileText}  />
-        <StatCard label="PENDING REVIEW"  value={isLoading ? <span className="skeleton-pulse" style={{ display: 'inline-block', width: '40px', height: '28px', borderRadius: '4px', verticalAlign: 'middle' }} /> : stats.pending}  Icon={Clock}     accent />
-        <StatCard label="APPROVED"        value={isLoading ? <span className="skeleton-pulse" style={{ display: 'inline-block', width: '40px', height: '28px', borderRadius: '4px', verticalAlign: 'middle' }} /> : stats.approved} Icon={Users}     />
-        <StatCard label="REJECTED"        value={isLoading ? <span className="skeleton-pulse" style={{ display: 'inline-block', width: '40px', height: '28px', borderRadius: '4px', verticalAlign: 'middle' }} /> : stats.rejected} Icon={Building2} />
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-[16px] mb-[28px]">
+        <StatCard label="TOTAL REQUESTS"  value={isLoading ? <span className="skeleton-pulse inline-block w-[40px] h-[28px] rounded-[4px] align-middle" /> : stats.total}    Icon={FileText}  />
+        <StatCard label="PENDING REVIEW"  value={isLoading ? <span className="skeleton-pulse inline-block w-[40px] h-[28px] rounded-[4px] align-middle" /> : stats.pending}  Icon={Clock}     accent />
+        <StatCard label="APPROVED"        value={isLoading ? <span className="skeleton-pulse inline-block w-[40px] h-[28px] rounded-[4px] align-middle" /> : stats.approved} Icon={Users}     />
+        <StatCard label="REJECTED"        value={isLoading ? <span className="skeleton-pulse inline-block w-[40px] h-[28px] rounded-[4px] align-middle" /> : stats.rejected} Icon={Building2} />
       </div>
 
       {/* Table card */}
-      <div style={styles.tableCard}>
+      <div className="bg-[#121215] border border-[#23232a] rounded-[8px] p-[24px]">
         {/* controls */}
-        <div style={styles.tableControls}>
-          <div style={styles.searchWrap}>
-            <Search size={14} style={styles.searchIcon} />
+        <div className="flex justify-between items-center mb-[20px] flex-wrap gap-[12px]">
+          <div className="relative flex items-center flex-1 min-w-[220px]">
+            <Search size={14} className="absolute left-[12px] text-gray-500 pointer-events-none" />
             <input
               type="text"
               placeholder="Search by name, email, or mobile…"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              style={styles.searchInput}
+              className="w-full bg-[#0c0c0e] border border-[#23232a] rounded-[6px] text-white text-[0.85rem] pl-[36px] pr-[12px] py-[8px] outline-none"
             />
           </div>
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+          <div className="flex gap-[6px] flex-wrap">
             {['all', 'pending', 'approved', 'rejected'].map(s => (
               <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
-                style={{ ...styles.filterBtn, ...(statusFilter === s ? styles.filterBtnActive : {}) }}
+                className={`bg-[#0c0c0e] border border-[#23232a] rounded-[6px] px-[14px] py-[7px] text-[0.8rem] cursor-pointer ${
+                  statusFilter === s ? 'bg-[#70d64d] text-black border-[#70d64d] font-bold' : 'text-gray-500'
+                }`}
               >
                 {s.charAt(0).toUpperCase() + s.slice(1)}
               </button>
             ))}
             <button
               onClick={() => refetch()}
-              style={{ ...styles.filterBtn, display: 'flex', alignItems: 'center', gap: '5px' }}
+              className="bg-[#0c0c0e] border border-[#23232a] text-gray-500 rounded-[6px] px-[14px] py-[7px] text-[0.8rem] cursor-pointer flex items-center gap-[5px]"
             >
               <RefreshCw size={13} /> Refresh
             </button>
@@ -637,12 +649,12 @@ export default function AdminDashboard() {
         </div>
 
         {/* table */}
-        <div style={{ overflowX: 'auto' }}>
-          <table style={styles.table}>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-left">
             <thead>
               <tr>
                 {['Full Name', 'Email', 'Mobile', 'Role', 'Status', 'Submitted', 'Actions'].map(h => (
-                  <th key={h} style={styles.th}>{h.toUpperCase()}</th>
+                  <th key={h} className="text-gray-500 text-[0.68rem] font-bold px-[14px] py-[12px] border-b border-[#23232a] tracking-[0.5px] whitespace-nowrap">{h.toUpperCase()}</th>
                 ))}
               </tr>
             </thead>
@@ -650,47 +662,47 @@ export default function AdminDashboard() {
               {isLoading ? (
                 [...Array(5)].map((_, i) => (
                   <tr key={`skeleton-${i}`}>
-                    <td style={styles.td}>
-                      <div className="skeleton-pulse" style={{ width: '120px', height: '16px', borderRadius: '4px' }} />
+                    <td className="p-[14px] border-b border-[#1a1a22] align-middle">
+                      <div className="skeleton-pulse w-[120px] h-[16px] rounded-[4px]" />
                     </td>
-                    <td style={styles.td}>
-                      <div className="skeleton-pulse" style={{ width: '150px', height: '14px', borderRadius: '4px' }} />
+                    <td className="p-[14px] border-b border-[#1a1a22] align-middle">
+                      <div className="skeleton-pulse w-[150px] h-[14px] rounded-[4px]" />
                     </td>
-                    <td style={styles.td}>
-                      <div className="skeleton-pulse" style={{ width: '90px', height: '14px', borderRadius: '4px' }} />
+                    <td className="p-[14px] border-b border-[#1a1a22] align-middle">
+                      <div className="skeleton-pulse w-[90px] h-[14px] rounded-[4px]" />
                     </td>
-                    <td style={styles.td}>
-                      <div className="skeleton-pulse" style={{ width: '80px', height: '22px', borderRadius: '12px' }} />
+                    <td className="p-[14px] border-b border-[#1a1a22] align-middle">
+                      <div className="skeleton-pulse w-[80px] h-[22px] rounded-[12px]" />
                     </td>
-                    <td style={styles.td}>
-                      <div className="skeleton-pulse" style={{ width: '70px', height: '20px', borderRadius: '4px' }} />
+                    <td className="p-[14px] border-b border-[#1a1a22] align-middle">
+                      <div className="skeleton-pulse w-[70px] h-[20px] rounded-[4px]" />
                     </td>
-                    <td style={styles.td}>
-                      <div className="skeleton-pulse" style={{ width: '100px', height: '14px', borderRadius: '4px' }} />
+                    <td className="p-[14px] border-b border-[#1a1a22] align-middle">
+                      <div className="skeleton-pulse w-[100px] h-[14px] rounded-[4px]" />
                     </td>
-                    <td style={styles.td}>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <div className="skeleton-pulse" style={{ width: '70px', height: '28px', borderRadius: '6px' }} />
-                        <div className="skeleton-pulse" style={{ width: '70px', height: '28px', borderRadius: '6px' }} />
+                    <td className="p-[14px] border-b border-[#1a1a22] align-middle">
+                      <div className="flex gap-[8px]">
+                        <div className="skeleton-pulse w-[70px] h-[28px] rounded-[6px]" />
+                        <div className="skeleton-pulse w-[70px] h-[28px] rounded-[6px]" />
                       </div>
                     </td>
                   </tr>
                 ))
               ) : filtered.length === 0 ? (
-                <tr><td colSpan={7} style={styles.emptyCell}>No requests match your criteria.</td></tr>
+                <tr><td colSpan={7} className="text-center p-[40px] text-gray-500 text-[0.88rem]">No requests match your criteria.</td></tr>
               ) : filtered.map(req => (
-                <tr key={req.id} style={styles.tr}>
-                  <td style={styles.td}><strong style={{ color: '#fff', fontSize: '0.88rem' }}>{req.full_name}</strong></td>
-                  <td style={{ ...styles.td, color: '#8a8a8a', fontSize: '0.83rem' }}>{req.email}</td>
-                  <td style={{ ...styles.td, color: '#8a8a8a', fontSize: '0.83rem' }}>{req.mobile}</td>
-                  <td style={styles.td}><RoleChip role={req.role} /></td>
-                  <td style={styles.td}><StatusBadge status={req.status} /></td>
-                  <td style={{ ...styles.td, color: '#6b6b6b', fontSize: '0.8rem' }}>{fmtDate(req.created_at)}</td>
-                  <td style={styles.td}>
-                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                <tr key={req.id} className="transition-colors duration-100">
+                  <td className="p-[14px] border-b border-[#1a1a22] align-middle"><strong className="text-white text-[0.88rem]">{req.full_name}</strong></td>
+                  <td className="p-[14px] border-b border-[#1a1a22] align-middle text-[#8a8a8a] text-[0.83rem]">{req.email}</td>
+                  <td className="p-[14px] border-b border-[#1a1a22] align-middle text-[#8a8a8a] text-[0.83rem]">{req.mobile}</td>
+                  <td className="p-[14px] border-b border-[#1a1a22] align-middle"><RoleChip role={req.role} /></td>
+                  <td className="p-[14px] border-b border-[#1a1a22] align-middle"><StatusBadge status={req.status} /></td>
+                  <td className="p-[14px] border-b border-[#1a1a22] align-middle text-[#6b6b6b] text-[0.8rem]">{fmtDate(req.created_at)}</td>
+                  <td className="p-[14px] border-b border-[#1a1a22] align-middle">
+                    <div className="flex gap-[6px] items-center">
                       <button
                         onClick={() => setSelectedReq(req)}
-                        style={{ ...styles.btn, ...styles.btnGhost, padding: '5px 8px' }}
+                        className="inline-flex items-center gap-[5px] rounded-[5px] text-[0.72rem] font-bold cursor-pointer transition-opacity duration-150 bg-transparent border border-[#23232a] text-[#8a8a8a] px-[8px] py-[5px]"
                         title="View details"
                       >
                         <Eye size={13} />
@@ -700,7 +712,7 @@ export default function AdminDashboard() {
                           <button
                             onClick={() => handleApprove(req.id)}
                             disabled={reviewQuery.isFetching}
-                            style={{ ...styles.btn, ...styles.btnApproveSmall }}
+                            className="inline-flex items-center gap-[5px] rounded-[5px] text-[0.72rem] font-bold cursor-pointer border-none transition-opacity duration-150 bg-[rgba(112,214,77,0.1)] text-[#70d64d] border border-[rgba(112,214,77,0.3)] px-[9px] py-[5px]"
                             title="Approve"
                           >
                             <Check size={12} /> Approve
@@ -708,7 +720,7 @@ export default function AdminDashboard() {
                           <button
                             onClick={() => handleOpenReject(req)}
                             disabled={reviewQuery.isFetching}
-                            style={{ ...styles.btn, ...styles.btnRejectSmall }}
+                            className="inline-flex items-center gap-[5px] rounded-[5px] text-[0.72rem] font-bold cursor-pointer border-none transition-opacity duration-150 bg-[rgba(239,68,68,0.08)] text-[#ef4444] border border-[rgba(239,68,68,0.25)] px-[9px] py-[5px]"
                             title="Reject"
                           >
                             <X size={12} /> Reject
@@ -718,7 +730,7 @@ export default function AdminDashboard() {
                       {req.status !== 'pending' && (
                         <button
                           onClick={() => setSelectedReq(req)}
-                          style={{ ...styles.btn, ...styles.btnGhost, padding: '3px 8px', fontSize: '0.72rem', borderColor: '#70d64d', color: '#70d64d' }}
+                          className="inline-flex items-center gap-[5px] rounded-[5px] text-[0.72rem] font-bold cursor-pointer transition-opacity duration-150 bg-transparent border border-[#70d64d] text-[#70d64d] px-[8px] py-[3px]"
                         >
                           Change Decision
                         </button>
@@ -732,8 +744,8 @@ export default function AdminDashboard() {
         </div>
 
         {/* footer */}
-        <div style={styles.tableFooter}>
-          <span style={{ color: '#6b6b6b', fontSize: '0.8rem' }}>
+        <div className="mt-[16px] flex justify-end">
+          <span className="text-[#6b6b6b] text-[0.8rem]">
             Showing {filtered.length} of {requests.length} entries
           </span>
         </div>
@@ -765,66 +777,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
-/* ─── styles ──────────────────────────────────────────────────────────── */
-const styles = {
-  /* stat cards */
-  statsGrid:    { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '28px' },
-  statCard:     { background: '#121215', border: '1px solid #23232a', borderRadius: '8px', padding: '18px 20px' },
-  statCardAccent: { background: 'linear-gradient(135deg,#121215,#162203)', borderColor: '#374f05' },
-  statHead:     { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-  statLabel:    { color: '#6b7280', fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' },
-  statValue:    { fontSize: '2rem', fontWeight: 800, color: '#fff', marginTop: '6px' },
-
-  /* table card */
-  tableCard:    { background: '#121215', border: '1px solid #23232a', borderRadius: '8px', padding: '24px' },
-  tableControls:{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' },
-  searchWrap:   { position: 'relative', display: 'flex', alignItems: 'center', flex: 1, minWidth: '220px' },
-  searchIcon:   { position: 'absolute', left: '12px', color: '#6b7280', pointerEvents: 'none' },
-  searchInput:  { width: '100%', background: '#0c0c0e', border: '1px solid #23232a', borderRadius: '6px', color: '#fff', fontSize: '0.85rem', padding: '8px 12px 8px 36px', outline: 'none' },
-  filterBtn:    { background: '#0c0c0e', border: '1px solid #23232a', color: '#6b7280', borderRadius: '6px', padding: '7px 14px', fontSize: '0.8rem', cursor: 'pointer' },
-  filterBtnActive: { background: '#70d64d', color: '#000', borderColor: '#70d64d', fontWeight: 700 },
-  table:        { width: '100%', borderCollapse: 'collapse', textAlign: 'left' },
-  th:           { color: '#6b7280', fontSize: '0.68rem', fontWeight: 700, padding: '12px 14px', borderBottom: '1px solid #23232a', letterSpacing: '0.5px', whiteSpace: 'nowrap' },
-  td:           { padding: '14px', borderBottom: '1px solid #1a1a22', verticalAlign: 'middle' },
-  tr:           { transition: 'background 0.1s' },
-  emptyCell:    { textAlign: 'center', padding: '40px', color: '#6b7280', fontSize: '0.88rem' },
-  tableFooter:  { marginTop: '16px', display: 'flex', justifyContent: 'flex-end' },
-
-  /* buttons */
-  btn:            { display: 'inline-flex', alignItems: 'center', gap: '5px', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', border: 'none', transition: 'opacity 0.15s' },
-  btnApprove:     { background: '#70d64d', color: '#000', padding: '8px 16px' },
-  btnReject:      { background: 'rgba(239,68,68,0.12)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', padding: '8px 16px' },
-  btnGhost:       { background: 'transparent', border: '1px solid #23232a', color: '#8a8a8a', padding: '7px 12px' },
-  btnApproveSmall:{ background: 'rgba(112,214,77,0.1)', color: '#70d64d', border: '1px solid rgba(112,214,77,0.3)', padding: '5px 9px' },
-  btnRejectSmall: { background: 'rgba(239,68,68,0.08)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.25)', padding: '5px 9px' },
-
-  /* drawer */
-  drawerBackdrop:{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(3px)', zIndex: 500 },
-  drawer:        { position: 'fixed', top: 0, right: 0, bottom: 0, width: '440px', maxWidth: '95vw', background: '#181818', borderLeft: '1px solid #2c2c2c', zIndex: 501, display: 'flex', flexDirection: 'column', animation: 'slideIn 0.22s ease-out' },
-  drawerHeader:  { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '24px 24px 0' },
-  drawerTitle:   { fontSize: '1.15rem', fontWeight: 800, color: '#fff', margin: 0 },
-  drawerAccentBar:{ height: '2px', background: '#70d64d', margin: '16px 24px 0' },
-  drawerBody:    { flex: 1, overflowY: 'auto', padding: '16px 24px 24px' },
-  drawerClose:   { background: 'transparent', border: '1px solid #2c2c2c', color: '#8a8a8a', borderRadius: '6px', padding: '6px 8px', cursor: 'pointer', display: 'flex', alignItems: 'center', flexShrink: 0 },
-  drawerRow:     { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '8px 0', borderBottom: '1px solid #1e1e1e' },
-  drawerRowLabel:{ color: '#6b7280', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', paddingRight: '12px', flexShrink: 0 },
-  drawerRowValue:{ color: '#e0e0e0', fontSize: '0.83rem', textAlign: 'right', wordBreak: 'break-all' },
-  drawerFooter:  { padding: '16px 24px', borderTop: '1px solid #2c2c2c', display: 'flex', gap: '10px' },
-  nestedBox:     { background: '#1f1f1f', border: '1px solid #2c2c2c', borderRadius: '6px', padding: '8px 12px' },
-  tag:           { background: '#1e293b', color: '#38bdf8', fontSize: '0.72rem', fontWeight: 600, padding: '3px 8px', borderRadius: '4px' },
-
-  /* reject modal */
-  modalOverlay:  { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)', zIndex: 600 },
-  modal:         { position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '100%', maxWidth: '440px', background: '#181818', border: '1px solid #2c2c2c', borderRadius: '10px', overflow: 'hidden', zIndex: 601, boxShadow: '0 20px 60px rgba(0,0,0,0.8)', animation: 'modalIn 0.2s ease-out' },
-  modalHeader:   { display: 'flex', alignItems: 'center', gap: '12px', padding: '20px 24px', borderBottom: '1px solid #2c2c2c' },
-  modalIconWrap: { width: '36px', height: '36px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  modalTitle:    { color: '#fff', fontSize: '1rem', fontWeight: 800, margin: 0 },
-  modalSub:      { color: '#6b7280', fontSize: '0.78rem', marginTop: '2px' },
-  textarea:      { width: '100%', background: '#1f1f1f', border: '1px solid #2c2c2c', borderRadius: '6px', color: '#fff', fontSize: '0.85rem', padding: '10px 12px', outline: 'none', resize: 'vertical', fontFamily: 'inherit' },
-  profileModal:  { position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: '90vw', maxWidth: '780px', background: '#181818', border: '1px solid #2c2c2c', borderRadius: '10px', overflow: 'hidden', zIndex: 601, boxShadow: '0 20px 60px rgba(0,0,0,0.8)', animation: 'modalIn 0.2s ease-out' },
-  profileSectionCard: { background: '#1c1c20', border: '1px solid #2c2c2c', borderRadius: '8px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px' },
-  profileSectionTitle:{ fontSize: '0.82rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#70d64d', margin: '0 0 8px', borderBottom: '1px solid #2c2c2c', paddingBottom: '6px' },
-  profileRow:         { display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', borderBottom: '1px solid #232328', paddingBottom: '4px' },
-  profileLink:        { color: '#70d64d', textDecoration: 'none', fontWeight: 600 },
-};

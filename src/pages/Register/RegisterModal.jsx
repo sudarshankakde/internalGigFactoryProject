@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Mail, Phone, User, Building2, FileText, ArrowRight, ArrowLeft, Check, CheckSquare, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { api } from '../../utils/api';
@@ -118,6 +118,33 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
     signatureName: '',
   });
 
+  const formDataRef = useRef(formData);
+  useEffect(() => {
+    formDataRef.current = formData;
+  }, [formData]);
+
+  const validateField = async (name, value) => {
+    const schema = role === 'freelancer' ? freelancerSchema : agencySchema;
+    try {
+      const currentFormData = { ...formDataRef.current, [name]: value };
+      await schema.validateAt(name, currentFormData);
+      setErrors((prev) => {
+        if (!prev[name]) return prev;
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+    } catch (err) {
+      setErrors((prev) => {
+        if (prev[name] === err.message) return prev;
+        return {
+          ...prev,
+          [name]: err.message,
+        };
+      });
+    }
+  };
+
   // Prefill check on mount / props change
   useEffect(() => {
     if (reapplyData) {
@@ -183,6 +210,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
       [fieldName]: city,
     }));
     setShowLocations(false);
+    validateField(fieldName, city);
   };
 
   const handleLocationKeyDown = (e, fieldName) => {
@@ -211,22 +239,24 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
   };
 
   const handleLocationBlur = () => {
+    const fieldName = role === 'freelancer' ? 'location' : 'headquarters';
     setTimeout(() => {
       setShowLocations(false);
+      validateField(fieldName, formDataRef.current[fieldName]);
     }, 200);
   };
 
   const handleServiceToggle = (serviceId) => {
-    setFormData((prev) => {
-      const selected = prev.selectedServices.includes(serviceId)
-        ? prev.selectedServices.filter((s) => s !== serviceId)
-        : [...prev.selectedServices, serviceId];
-      
-      if (errors.selectedServices) {
-        setErrors((prevErr) => ({ ...prevErr, selectedServices: '' }));
-      }
-      return { ...prev, selectedServices: selected };
-    });
+    const selected = formData.selectedServices.includes(serviceId)
+      ? formData.selectedServices.filter((s) => s !== serviceId)
+      : [...formData.selectedServices, serviceId];
+
+    setFormData((prev) => ({
+      ...prev,
+      selectedServices: selected,
+    }));
+
+    validateField('selectedServices', selected);
   };
 
   const handleSoftwareToggle = (swName) => {
@@ -323,7 +353,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
   ];
 
   return (
-    <div className="register-modal-overlay" onClick={(e) => e.target.classList.contains('register-modal-overlay') && onClose()}>
+    <div className="register-modal-overlay">
       <div className="register-card wizard register-modal-card">
         
         {/* Close Button */}
@@ -391,6 +421,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                     value={role === 'freelancer' ? formData.fullName : formData.authPersonName}
                     placeholder={role === 'freelancer' ? 'Your professional name' : 'Submitting representative'}
                     onChange={handleInputChange}
+                    onBlur={(e) => validateField(e.target.name, e.target.value)}
                   />
                 </div>
                 {errors[role === 'freelancer' ? 'fullName' : 'authPersonName'] && (
@@ -409,6 +440,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                     value={formData.designation}
                     placeholder="e.g. BIM Modeller, Architect, Director"
                     onChange={handleInputChange}
+                    onBlur={(e) => validateField(e.target.name, e.target.value)}
                   />
                 </div>
                 {errors.designation && <span className="validation-error">{errors.designation}</span>}
@@ -426,6 +458,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                     placeholder="email@domain.com"
                     onChange={handleInputChange}
                     disabled={!!email}
+                    onBlur={(e) => validateField(e.target.name, e.target.value)}
                   />
                 </div>
                 {errors.email && <span className="validation-error">{errors.email}</span>}
@@ -442,12 +475,13 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                     value={formData.mobile}
                     placeholder="10-digit number"
                     onChange={handleInputChange}
+                    onBlur={(e) => validateField(e.target.name, e.target.value)}
                   />
                 </div>
                 {errors.mobile && <span className="validation-error">{errors.mobile}</span>}
               </div>
 
-              <div className="input-group" style={{ position: 'relative' }}>
+              <div className="input-group relative">
                 <label htmlFor="location">{role === 'freelancer' ? 'Current Location *' : 'Company Headquarters *'}</label>
                 <div className="input-wrapper">
                   <span className="input-icon"><Building2 size={18} /></span>
@@ -492,13 +526,14 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                     value={formData.linkedinUrl}
                     placeholder="https://linkedin.com/in/..."
                     onChange={handleInputChange}
+                    onBlur={(e) => validateField(e.target.name, e.target.value)}
                   />
                 </div>
                 {errors.linkedinUrl && <span className="validation-error">{errors.linkedinUrl}</span>}
               </div>
 
               {role === 'agency' && (
-                <div className="input-group" style={{ gridColumn: 'span 2' }}>
+                <div className="input-group col-span-2">
                   <label htmlFor="website">Company Website</label>
                   <div className="input-wrapper">
                     <span className="input-icon"><Building2 size={18} /></span>
@@ -509,6 +544,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                       value={formData.website}
                       placeholder="https://..."
                       onChange={handleInputChange}
+                      onBlur={(e) => validateField(e.target.name, e.target.value)}
                     />
                   </div>
                   {errors.website && <span className="validation-error">{errors.website}</span>}
@@ -534,6 +570,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                         value={formData.legalNamePan}
                         placeholder="Exactly as written on PAN"
                         onChange={handleInputChange}
+                        onBlur={(e) => validateField(e.target.name, e.target.value)}
                       />
                     </div>
                     {errors.legalNamePan && <span className="validation-error">{errors.legalNamePan}</span>}
@@ -550,6 +587,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                         value={formData.personalPan}
                         placeholder="10-character PAN"
                         onChange={handleInputChange}
+                        onBlur={(e) => validateField(e.target.name, e.target.value)}
                       />
                     </div>
                     {errors.personalPan && <span className="validation-error">{errors.personalPan}</span>}
@@ -568,6 +606,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                         value={formData.registeredName}
                         placeholder="As per official incorporation records"
                         onChange={handleInputChange}
+                        onBlur={(e) => validateField(e.target.name, e.target.value)}
                       />
                     </div>
                     {errors.registeredName && <span className="validation-error">{errors.registeredName}</span>}
@@ -584,6 +623,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                         value={formData.companyPan}
                         placeholder="10-character Company PAN"
                         onChange={handleInputChange}
+                        onBlur={(e) => validateField(e.target.name, e.target.value)}
                       />
                     </div>
                     {errors.companyPan && <span className="validation-error">{errors.companyPan}</span>}
@@ -600,6 +640,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                         value={formData.gstNumber}
                         placeholder="15-character GST"
                         onChange={handleInputChange}
+                        onBlur={(e) => validateField(e.target.name, e.target.value)}
                       />
                     </div>
                     {errors.gstNumber && <span className="validation-error">{errors.gstNumber}</span>}
@@ -616,6 +657,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                         value={formData.cin}
                         placeholder="Corporate Identification Number"
                         onChange={handleInputChange}
+                        onBlur={(e) => validateField(e.target.name, e.target.value)}
                       />
                     </div>
                     {errors.cin && <span className="validation-error">{errors.cin}</span>}
@@ -628,7 +670,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
           {/* SECTION 3: SERVICES */}
           <div className="register-form-section">
             <h3 className="register-section-title">3. Services &amp; Specialisation</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '15px' }}>
+            <p className="text-[var(--text-muted)] text-[0.85rem] mb-[15px]">
               Select the services you offer (select at least one)
             </p>
             <div className="services-grid">
@@ -649,7 +691,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
               })}
             </div>
             {errors.selectedServices && (
-              <div className="validation-error" style={{ marginBottom: '15px' }}>{errors.selectedServices}</div>
+              <div className="validation-error mb-[15px]">{errors.selectedServices}</div>
             )}
 
             {/* DYNAMIC SERVICE CONFIGURATION PANELS */}
@@ -657,7 +699,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
               {formData.selectedServices.includes('BIM') && (
                 <div className="nested-service-panel">
                   <h4 className="nested-panel-title">BIM &amp; 2D Drafting Details</h4>
-                  <div className="input-group" style={{ marginBottom: '15px' }}>
+                  <div className="input-group mb-[15px]">
                     <label>SOFTWARE STACK</label>
                     <div className="software-chips">
                       {['Revit', 'AutoCAD', 'Navisworks', 'Tekla', 'Civil 3D'].map((sw) => {
@@ -678,7 +720,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                     <div className="input-group">
                       <label>MAX LOD CAPABILITY</label>
                       <select 
-                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--text-main)', outline: 'none' }}
+                        className="w-full p-3 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-md text-[var(--text-main)] outline-none"
                         value={formData.bimDetails.maxLod}
                         onChange={(e) => handleNestedChange('bimDetails', 'maxLod', e.target.value)}
                       >
@@ -697,7 +739,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                           placeholder="e.g., BIM 360, ACC, ProjectWise"
                           value={formData.bimDetails.cdeExperience}
                           onChange={(e) => handleNestedChange('bimDetails', 'cdeExperience', e.target.value)}
-                          style={{ paddingLeft: '14px' }}
+                          className="pl-[14px]"
                         />
                       </div>
                     </div>
@@ -717,14 +759,14 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                           placeholder="e.g., Laser Scanner, Total Station, Drone"
                           value={formData.auditDetails.equipmentOwned}
                           onChange={(e) => handleNestedChange('auditDetails', 'equipmentOwned', e.target.value)}
-                          style={{ paddingLeft: '14px' }}
+                          className="pl-[14px]"
                         />
                       </div>
                     </div>
                     <div className="input-group">
                       <label>SERVICE RADIUS</label>
                       <select 
-                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--text-main)', outline: 'none' }}
+                        className="w-full p-3 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-md text-[var(--text-main)] outline-none"
                         value={formData.auditDetails.serviceRadius}
                         onChange={(e) => handleNestedChange('auditDetails', 'serviceRadius', e.target.value)}
                       >
@@ -751,14 +793,14 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                           placeholder="e.g., 5, 8"
                           value={formData.peerReviewDetails.teamExperience}
                           onChange={(e) => handleNestedChange('peerReviewDetails', 'teamExperience', e.target.value)}
-                          style={{ paddingLeft: '14px' }}
+                          className="pl-[14px]"
                         />
                       </div>
                     </div>
                     <div className="input-group">
                       <label>SPECIALISATION</label>
                       <select 
-                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--text-main)', outline: 'none' }}
+                        className="w-full p-3 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-md text-[var(--text-main)] outline-none"
                         value={formData.peerReviewDetails.specialisation}
                         onChange={(e) => handleNestedChange('peerReviewDetails', 'specialisation', e.target.value)}
                       >
@@ -780,7 +822,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                     <div className="input-group">
                       <label>MEASUREMENT STANDARDS</label>
                       <select 
-                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--text-main)', outline: 'none' }}
+                        className="w-full p-3 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-md text-[var(--text-main)] outline-none"
                         value={formData.boqDetails.measurementStandards}
                         onChange={(e) => handleNestedChange('boqDetails', 'measurementStandards', e.target.value)}
                       >
@@ -799,7 +841,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                           placeholder="e.g., CostX, PlanSwift, Excel"
                           value={formData.boqDetails.estimationSoftware}
                           onChange={(e) => handleNestedChange('boqDetails', 'estimationSoftware', e.target.value)}
-                          style={{ paddingLeft: '14px' }}
+                          className="pl-[14px]"
                         />
                       </div>
                     </div>
@@ -810,7 +852,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
               {formData.selectedServices.includes('Viz') && (
                 <div className="nested-service-panel">
                   <h4 className="nested-panel-title">3D Visualisation Details</h4>
-                  <div className="input-group" style={{ marginBottom: '15px' }}>
+                  <div className="input-group mb-[15px]">
                     <label>RENDERING ENGINE(S)</label>
                     <div className="input-wrapper">
                       <input 
@@ -818,7 +860,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                         placeholder="e.g., V-Ray, Corona, Lumion, Unreal Engine"
                         value={formData.vizDetails.renderingEngines}
                         onChange={(e) => handleNestedChange('vizDetails', 'renderingEngines', e.target.value)}
-                        style={{ paddingLeft: '14px' }}
+                        className="pl-[14px]"
                       />
                     </div>
                   </div>
@@ -826,7 +868,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                     <div className="input-group">
                       <label>HARDWARE CAPACITY</label>
                       <select 
-                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--text-main)', outline: 'none' }}
+                        className="w-full p-3 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-md text-[var(--text-main)] outline-none"
                         value={formData.vizDetails.hardwareCapacity}
                         onChange={(e) => handleNestedChange('vizDetails', 'hardwareCapacity', e.target.value)}
                       >
@@ -839,7 +881,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                     <div className="input-group">
                       <label>ANIMATION CAPABILITY</label>
                       <select 
-                        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--text-main)', outline: 'none' }}
+                        className="w-full p-3 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-md text-[var(--text-main)] outline-none"
                         value={formData.vizDetails.animationCapability}
                         onChange={(e) => handleNestedChange('vizDetails', 'animationCapability', e.target.value)}
                       >
@@ -857,7 +899,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
           <div className="register-form-section">
             <h3 className="register-section-title">4. Portfolio &amp; Commercials</h3>
             <div className="form-grid-2">
-              <div className="input-group" style={{ gridColumn: 'span 2' }}>
+              <div className="input-group col-span-2">
                 <label htmlFor="portfolioUrl">Portfolio / Work Samples URL</label>
                 <div className="input-wrapper">
                   <span className="input-icon"><FileText size={18} /></span>
@@ -868,6 +910,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                     value={formData.portfolioUrl}
                     placeholder="Dropbox / Drive / Website link"
                     onChange={handleInputChange}
+                    onBlur={(e) => validateField(e.target.name, e.target.value)}
                   />
                 </div>
                 {errors.portfolioUrl && <span className="validation-error">{errors.portfolioUrl}</span>}
@@ -878,9 +921,10 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                 <select 
                   id="commercialBasis"
                   name="commercialBasis"
-                  style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--text-main)', outline: 'none' }}
+                  className="w-full p-3 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-md text-[var(--text-main)] outline-none"
                   value={formData.commercialBasis}
                   onChange={handleInputChange}
+                  onBlur={(e) => validateField(e.target.name, e.target.value)}
                 >
                   <option value="">Select Option</option>
                   <option value="Hourly Rate">Hourly Rate</option>
@@ -902,6 +946,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                     value={formData.baseRate}
                     placeholder="e.g. 500, 1500"
                     onChange={handleInputChange}
+                    onBlur={(e) => validateField(e.target.name, e.target.value)}
                   />
                 </div>
                 {errors.baseRate && <span className="validation-error">{errors.baseRate}</span>}
@@ -912,9 +957,10 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                 <select 
                   id="noticePeriod"
                   name="noticePeriod"
-                  style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--text-main)', outline: 'none' }}
+                  className="w-full p-3 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-md text-[var(--text-main)] outline-none"
                   value={formData.noticePeriod}
                   onChange={handleInputChange}
+                  onBlur={(e) => validateField(e.target.name, e.target.value)}
                 >
                   <option value="">Select Option</option>
                   <option value="Immediate">Immediate</option>
@@ -931,9 +977,10 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                   <select 
                     id="availability"
                     name="availability"
-                    style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--text-main)', outline: 'none' }}
+                    className="w-full p-3 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-md text-[var(--text-main)] outline-none"
                     value={formData.availability}
                     onChange={handleInputChange}
+                    onBlur={(e) => validateField(e.target.name, e.target.value)}
                   >
                     <option value="">Select Option</option>
                     <option value="Full-time">Full-time</option>
@@ -954,6 +1001,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                       value={formData.teamSize}
                       placeholder="Approx. number of experts"
                       onChange={handleInputChange}
+                      onBlur={(e) => validateField(e.target.name, e.target.value)}
                     />
                   </div>
                   {errors.teamSize && <span className="validation-error">{errors.teamSize}</span>}
@@ -974,6 +1022,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                   name="declarationAccepted"
                   checked={formData.declarationAccepted}
                   onChange={handleInputChange}
+                  onBlur={(e) => validateField(e.target.name, e.target.checked)}
                 />
                 <span className="declaration-text">
                   I hereby certify that all PAN / GST / CIN details provided are authentic. I represent that I am authorized to register on this platform, and I understand that onboarding is subject to a technical audit of previous work.
@@ -994,6 +1043,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                     value={formData.signatureName}
                     placeholder="Type your full name as signature"
                     onChange={handleInputChange}
+                    onBlur={(e) => validateField(e.target.name, e.target.value)}
                   />
                 </div>
                 {errors.signatureName && <span className="validation-error">{errors.signatureName}</span>}
@@ -1020,12 +1070,11 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
             </button>
             <button 
               type="submit" 
-              className="register-submit-btn" 
+              className="register-submit-btn w-auto py-3 px-6" 
               disabled={submitting}
-              style={{ width: 'auto', padding: '12px 24px' }}
             >
               {submitting ? 'Submitting Application...' : (reapplyData ? 'Resubmit Application' : 'Submit Application')}
-              {!submitting && <CheckSquare size={16} style={{ marginLeft: '6px' }} />}
+              {!submitting && <CheckSquare size={16} className="ml-1.5" />}
             </button>
           </div>
 

@@ -8,9 +8,17 @@ const fmtDate = (d) =>
 function AgencyLogo({ name, logo, size = 42 }) {
   const initials = name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
   return logo ? (
-    <img src={logo} alt={name} style={{ width: size, height: size, borderRadius: '8px', objectFit: 'cover', flexShrink: 0, border: '1px solid #23232a', background: '#1c1c20' }} />
+    <img 
+      src={logo} 
+      alt={name} 
+      style={{ width: size, height: size }} 
+      className="rounded-[8px] object-cover shrink-0 border border-[#23232a] bg-[#1c1c20]" 
+    />
   ) : (
-    <div style={{ width: size, height: size, borderRadius: '8px', background: 'linear-gradient(135deg,#2e1065,#4c1d95)', border: '1px solid #3b2a6a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: `${size * 0.3}px`, fontWeight: 800, color: '#c084fc', flexShrink: 0 }}>
+    <div 
+      style={{ width: size, height: size, fontSize: `${size * 0.3}px` }} 
+      className="rounded-[8px] bg-gradient-to-br from-[#2e1065] to-[#4c1d95] border border-[#3b2a6a] flex items-center justify-center font-extrabold text-[#c084fc] shrink-0"
+    >
       {initials}
     </div>
   );
@@ -19,19 +27,19 @@ function AgencyLogo({ name, logo, size = 42 }) {
 export const AgencyCard = ({ agencies, isLoading, onSelectAgency }) => {
   if (isLoading) {
     return (
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '16px' }}>
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-[16px]">
         {[...Array(6)].map((_, i) => (
-          <div key={i} style={{ background: '#121215', border: '1px solid #23232a', borderRadius: '10px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div className="skeleton-pulse" style={{ width: '48px', height: '48px', borderRadius: '8px' }} />
-              <div style={{ flex: 1 }}>
-                <div className="skeleton-pulse" style={{ width: '70%', height: '14px', borderRadius: '4px', marginBottom: '6px' }} />
-                <div className="skeleton-pulse" style={{ width: '30%', height: '10px', borderRadius: '4px' }} />
+          <div key={i} className="bg-[#121215] border border-[#23232a] rounded-[10px] p-[20px] flex flex-col gap-[14px]">
+            <div className="flex items-center gap-[12px]">
+              <div className="skeleton-pulse w-[48px] h-[48px] rounded-[8px]" />
+              <div className="flex-1">
+                <div className="skeleton-pulse w-[70%] h-[14px] rounded-[4px] mb-[6px]" />
+                <div className="skeleton-pulse w-[30%] h-[10px] rounded-[4px]" />
               </div>
             </div>
-            <div className="skeleton-pulse" style={{ width: '80%', height: '12px', borderRadius: '4px' }} />
-            <div style={{ borderTop: '1px solid #1c1c20', paddingTop: '12px' }}>
-              <div className="skeleton-pulse" style={{ width: '100%', height: '18px', borderRadius: '4px' }} />
+            <div className="skeleton-pulse w-[80%] h-[12px] rounded-[4px]" />
+            <div className="border-t border-[#1c1c20] pt-[12px]">
+              <div className="skeleton-pulse w-[100%] h-[18px] rounded-[4px]" />
             </div>
           </div>
         ))}
@@ -41,56 +49,43 @@ export const AgencyCard = ({ agencies, isLoading, onSelectAgency }) => {
 
   if (agencies.length === 0) {
     return (
-      <div style={{ background: '#121215', border: '1px solid #23232a', borderRadius: '10px', padding: '48px', textAlign: 'center', color: '#6b7280' }}>
+      <div className="bg-[#121215] border border-[#23232a] rounded-[10px] p-[48px] text-center text-gray-500">
         No agencies found.
       </div>
     );
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '16px' }}>
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-[16px]">
       {agencies.map(a => {
         const ap = a.agency_profile;
         return (
           <div
             key={a.id}
             onClick={() => onSelectAgency(a)}
-            style={{
-              background: '#121215',
-              border: '1px solid #23232a',
-              borderRadius: '10px',
-              padding: '20px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '14px',
-              position: 'relative',
-              transition: 'transform 0.2s, border-color 0.2s',
-              cursor: 'pointer'
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.border = '1px solid #70d64d';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.transform = 'none';
-              e.currentTarget.style.border = '1px solid #23232a';
-            }}
+            className="bg-[#121215] border border-[#23232a] rounded-[10px] p-[20px] flex flex-col gap-[14px] relative cursor-pointer transition-all duration-200 hover:-translate-y-[2px] hover:border-[#70d64d]"
           >
             {/* Status Badge top right */}
-            <div style={{ position: 'absolute', top: '20px', right: '20px' }}>
+            <div className="absolute top-[20px] right-[20px]">
               <StatusBadge status={a.account_status} />
             </div>
 
             {/* Profile header */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="flex items-center gap-[12px]">
               <AgencyLogo name={ap?.agency_name || a.full_name} logo={ap?.logo} size={46} />
-              <div style={{ overflow: 'hidden', paddingRight: '60px' }}>
-                <h4 style={{ color: '#fff', fontSize: '0.92rem', fontWeight: 700, margin: 0, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+              <div className="overflow-hidden pr-[60px]">
+                <h4 className="text-white text-[0.92rem] font-bold m-0 text-ellipsis overflow-hidden whitespace-nowrap">
                   {ap?.agency_name || a.full_name}
                 </h4>
                 {ap?.website && (
-                  <a href={ap.website} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#70d64d', fontSize: '0.7rem', textDecoration: 'none', marginTop: '2px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }} onClick={e => e.stopPropagation()}>
-                    <Globe size={10} style={{ flexShrink: 0 }} /> {ap.website.replace(/^https?:\/\//, '')}
+                  <a 
+                    href={ap.website} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="flex items-center gap-[4px] text-[#70d64d] text-[0.7rem] no-underline mt-[2px] text-ellipsis overflow-hidden whitespace-nowrap hover:underline" 
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <Globe size={10} className="shrink-0" /> {ap.website.replace(/^https?:\/\//, '')}
                   </a>
                 )}
               </div>
@@ -98,44 +93,44 @@ export const AgencyCard = ({ agencies, isLoading, onSelectAgency }) => {
 
             {/* Industry chip & info */}
             <div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+              <div className="flex flex-wrap gap-[6px] items-center">
                 {ap?.industry ? (
-                  <span style={{ background: '#1c1917', color: '#f59e0b', fontSize: '0.65rem', fontWeight: 600, padding: '2px 8px', borderRadius: '4px' }}>
+                  <span className="bg-[#1c1917] text-[#f59e0b] text-[0.65rem] font-semibold px-[8px] py-[2px] rounded-[4px]">
                     {ap.industry}
                   </span>
                 ) : (
-                  <span style={{ color: '#4b4b57', fontSize: '0.7rem', fontStyle: 'italic' }}>No industry specified</span>
+                  <span className="text-[#4b4b57] text-[0.7rem] italic">No industry specified</span>
                 )}
               </div>
               {/* Location & Contact Person */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px', fontSize: '0.75rem', color: '#8a8a8a' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <div className="flex justify-between items-center mt-[8px] text-[0.75rem] text-[#8a8a8a]">
+                <span className="flex items-center gap-[4px]">
                   <MapPin size={11} color="#6b7280" />
                   {ap?.city && ap?.country ? `${ap.city}, ${ap.country}` : 'Remote'}
                 </span>
-                <span style={{ fontWeight: 500, color: '#d1d5db' }}>
+                <span className="font-medium text-[#d1d5db]">
                   POC: {a.full_name}
                 </span>
               </div>
             </div>
 
             {/* Key stats: team members & projects */}
-            <div style={{ display: 'flex', gap: '10px', background: '#0c0c0e', padding: '10px', borderRadius: '6px', border: '1px solid #1a1a22', justifyContent: 'space-around' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
-                <span style={{ color: '#6b7280', fontSize: '0.65rem', fontWeight: 600, textTransform: 'uppercase' }}>Team</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+            <div className="flex gap-[10px] bg-[#0c0c0e] p-[10px] rounded-[6px] border border-[#1a1a22] justify-around">
+              <div className="flex flex-col items-center gap-[2px]">
+                <span className="text-gray-500 text-[0.65rem] font-semibold uppercase">Team</span>
+                <div className="flex items-center gap-[4px] mt-[2px]">
                   <Users size={12} color="#c084fc" />
-                  <span style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 700 }}>
+                  <span className="text-white text-[0.85rem] font-bold">
                     {ap?._count?.team_members ?? ap?.employee_count ?? 0}
                   </span>
                 </div>
               </div>
-              <div style={{ width: '1px', background: '#1a1a22' }} />
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
-                <span style={{ color: '#6b7280', fontSize: '0.65rem', fontWeight: 600, textTransform: 'uppercase' }}>Projects</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+              <div className="w-[1px] bg-[#1a1a22]" />
+              <div className="flex flex-col items-center gap-[2px]">
+                <span className="text-gray-500 text-[0.65rem] font-semibold uppercase">Projects</span>
+                <div className="flex items-center gap-[4px] mt-[2px]">
                   <Briefcase size={12} color="#70d64d" />
-                  <span style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 700 }}>
+                  <span className="text-white text-[0.85rem] font-bold">
                     {ap?.total_projects ?? 0}
                   </span>
                 </div>
@@ -143,21 +138,21 @@ export const AgencyCard = ({ agencies, isLoading, onSelectAgency }) => {
             </div>
 
             {/* Profile Completion */}
-            <div style={{ background: '#0c0c0e', padding: '10px', borderRadius: '6px', border: '1px solid #1a1a22' }}>
+            <div className="bg-[#0c0c0e] p-[10px] rounded-[6px] border border-[#1a1a22]">
               <CompletionBar value={ap?.profile_completion || 0} />
             </div>
 
             {/* Contact and Registered Date Footer */}
-            <div style={{ borderTop: '1px solid #1a1a22', paddingTop: '12px', marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#8a8a8a', fontSize: '0.74rem', overflow: 'hidden' }}>
-                <Mail size={12} color="#6b7280" style={{ flexShrink: 0 }} />
-                <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{a.email}</span>
+            <div className="border-t border-[#1a1a22] pt-[12px] mt-auto flex flex-col gap-[6px]">
+              <div className="flex items-center gap-[6px] text-[#8a8a8a] text-[0.74rem] overflow-hidden">
+                <Mail size={12} color="#6b7280" className="shrink-0" />
+                <span className="text-ellipsis overflow-hidden whitespace-nowrap">{a.email}</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#8a8a8a', fontSize: '0.74rem' }}>
-                <Phone size={12} color="#6b7280" style={{ flexShrink: 0 }} />
+              <div className="flex items-center gap-[6px] text-[#8a8a8a] text-[0.74rem]">
+                <Phone size={12} color="#6b7280" className="shrink-0" />
                 <span>{a.mobile || '—'}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #1a1a22', paddingTop: '8px', marginTop: '4px', fontSize: '0.7rem', color: '#5b5b67' }}>
+              <div className="flex justify-between items-center border-t border-[#1a1a22] pt-[8px] mt-[4px] text-[0.7rem] text-[#5b5b67]">
                 <span>Registered: {fmtDate(a.created_at)}</span>
               </div>
             </div>
@@ -167,4 +162,5 @@ export const AgencyCard = ({ agencies, isLoading, onSelectAgency }) => {
     </div>
   );
 };
+
 export default AgencyCard;

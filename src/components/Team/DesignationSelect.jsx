@@ -181,126 +181,21 @@ export const DesignationSelect = ({ value = '', onChange, placeholder = 'Select 
     setCustom('');
   };
 
-  /* Shared inline styles */
-  const S = {
-    trigger: {
-      width: '100%',
-      background: '#0c0c10',
-      border: '1px solid #2a2a35',
-      borderRadius: '8px',
-      padding: '10px 14px',
-      color: value ? '#fff' : '#5b5b70',
-      fontSize: '0.875rem',
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      gap: '8px',
-      outline: 'none',
-      transition: 'border-color 0.18s',
-      boxSizing: 'border-box',
-    },
-    searchBox: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
-      padding: '10px 12px',
-      borderBottom: '1px solid #1e1e26',
-      flexShrink: 0,
-    },
-    searchInput: {
-      flex: 1,
-      background: 'transparent',
-      border: 'none',
-      outline: 'none',
-      color: '#fff',
-      fontSize: '0.82rem',
-    },
-    list: { overflowY: 'auto', flex: 1 },
-    item: (selected, hovered) => ({
-      padding: '9px 14px',
-      fontSize: '0.83rem',
-      color: selected ? '#70d64d' : '#d1d5db',
-      background: hovered ? '#1c1c24' : 'transparent',
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      gap: '8px',
-      transition: 'background 0.12s',
-    }),
-    addNewRow: {
-      borderTop: '1px solid #1e1e26',
-      padding: '10px 12px',
-      flexShrink: 0,
-    },
-    addNewInput: {
-      width: '100%',
-      background: '#0c0c10',
-      border: '1px solid #2a2a35',
-      borderRadius: '6px',
-      padding: '7px 10px',
-      color: '#fff',
-      fontSize: '0.82rem',
-      outline: 'none',
-      marginBottom: '8px',
-      boxSizing: 'border-box',
-    },
-    addNewBtn: {
-      width: '100%',
-      background: '#70d64d',
-      color: '#000',
-      border: 'none',
-      borderRadius: '6px',
-      padding: '7px',
-      fontSize: '0.8rem',
-      fontWeight: 800,
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '6px',
-    },
-    toggleAddNew: {
-      width: '100%',
-      background: 'transparent',
-      border: '1px dashed #2a2a35',
-      borderRadius: '6px',
-      padding: '8px',
-      color: '#6b7280',
-      fontSize: '0.78rem',
-      fontWeight: 600,
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '6px',
-      transition: 'color 0.15s, border-color 0.15s',
-    },
-  };
-
   return (
-    <div ref={wrapRef} style={{ position: 'relative', width: '100%' }}>
+    <div ref={wrapRef} className="relative w-full">
       {/* Trigger button */}
       <button
         ref={triggerRef}
         type="button"
-        style={S.trigger}
+        className={`w-full bg-[#0c0c10] border border-[#2a2a35] focus:border-[#70d64d] rounded-lg py-[10px] px-[14px] text-sm cursor-pointer flex items-center justify-between gap-2 outline-none transition-colors duration-[180ms] box-border ${value ? 'text-white' : 'text-[#5b5b70]'}`}
         onClick={handleOpen}
-        onFocus={e => { e.currentTarget.style.borderColor = '#70d64d'; }}
-        onBlur={e => { e.currentTarget.style.borderColor = '#2a2a35'; }}
       >
-        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <span className="overflow-hidden text-ellipsis whitespace-nowrap">
           {value || placeholder}
         </span>
         <ChevronDown
           size={15}
-          style={{
-            flexShrink: 0,
-            color: '#6b7280',
-            transform: open ? 'rotate(180deg)' : 'none',
-            transition: 'transform 0.2s',
-          }}
+          className={`shrink-0 text-[#6b7280] transition-transform duration-200 ${open ? 'rotate-180' : 'none'}`}
         />
       </button>
 
@@ -308,28 +203,19 @@ export const DesignationSelect = ({ value = '', onChange, placeholder = 'Select 
       {open && createPortal(
         <div
           id="designation-drop-portal"
+          className="fixed bg-[#141418] border border-[#2a2a35] rounded-[10px] z-[999999] shadow-[0_16px_48px_rgba(0,0,0,0.8)] overflow-hidden max-h-[320px] flex flex-col"
           style={{
-            position:      'fixed',
             top:           dropPos.top,
             left:          dropPos.left,
             width:         dropPos.width,
-            background:    '#141418',
-            border:        '1px solid #2a2a35',
-            borderRadius:  '10px',
-            zIndex:        999999,
-            boxShadow:     '0 16px 48px rgba(0,0,0,0.8)',
-            overflow:      'hidden',
-            maxHeight:     '320px',
-            display:       'flex',
-            flexDirection: 'column',
           }}
         >
           {/* Search */}
-          <div style={S.searchBox}>
-            <Search size={13} style={{ color: '#6b7280', flexShrink: 0 }} />
+          <div className="flex items-center gap-2 p-[10px_12px] border-b border-[#1e1e26] shrink-0">
+            <Search size={13} className="text-[#6b7280] shrink-0" />
             <input
               autoFocus
-              style={S.searchInput}
+              className="flex-1 bg-transparent border-none outline-none text-white text-[0.82rem]"
               placeholder="Search designation..."
               value={query}
               onChange={e => setQuery(e.target.value)}
@@ -337,9 +223,9 @@ export const DesignationSelect = ({ value = '', onChange, placeholder = 'Select 
           </div>
 
           {/* Scrollable list — capped so footer is always visible */}
-          <div style={{ ...S.list, maxHeight: '190px' }}>
+          <div className="overflow-y-auto flex-1 max-h-[190px]">
             {filtered.length === 0 && (
-              <div style={{ padding: '16px', textAlign: 'center', color: '#5b5b70', fontSize: '0.8rem', fontStyle: 'italic' }}>
+              <div className="p-4 text-center text-[#5b5b70] text-[0.8rem] italic">
                 No matching designation found
               </div>
             )}
@@ -349,33 +235,30 @@ export const DesignationSelect = ({ value = '', onChange, placeholder = 'Select 
                 label={d}
                 selected={d === value}
                 onSelect={() => handleSelect(d)}
-                itemStyle={S.item}
               />
             ))}
           </div>
 
           {/* Custom add row */}
-          <div style={S.addNewRow}>
+          <div className="border-t border-[#1e1e26] p-[10px_12px] shrink-0">
             {addingNew ? (
               <>
                 <input
                   autoFocus
-                  style={S.addNewInput}
+                  className="w-full bg-[#0c0c10] border border-[#2a2a35] rounded-md py-1.75 px-2.5 text-white text-[0.82rem] outline-none mb-2 box-border"
                   placeholder="Type custom designation..."
                   value={custom}
                   onChange={e => setCustom(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddCustom(); } }}
                 />
-                <button type="button" style={S.addNewBtn} onClick={handleAddCustom}>
+                <button type="button" className="w-full bg-[#70d64d] text-black border-none rounded-md p-1.75 text-[0.8rem] font-extrabold cursor-pointer flex items-center justify-center gap-1.5" onClick={handleAddCustom}>
                   <Check size={13} /> Use This Designation
                 </button>
               </>
             ) : (
               <button
                 type="button"
-                style={S.toggleAddNew}
-                onMouseEnter={e => { e.currentTarget.style.color = '#70d64d'; e.currentTarget.style.borderColor = '#70d64d'; }}
-                onMouseLeave={e => { e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.borderColor = '#2a2a35'; }}
+                className="w-full bg-transparent border border-dashed border-[#2a2a35] hover:border-[#70d64d] rounded-md p-2 text-[#6b7280] hover:text-[#70d64d] text-[0.78rem] font-semibold cursor-pointer flex items-center justify-center gap-1.5 transition-all duration-150"
                 onClick={() => setAddingNew(true)}
               >
                 <Plus size={13} /> Not in list? Add custom designation
@@ -390,17 +273,17 @@ export const DesignationSelect = ({ value = '', onChange, placeholder = 'Select 
 };
 
 /* Small item with hover state */
-function DesignationItem({ label, selected, onSelect, itemStyle }) {
+function DesignationItem({ label, selected, onSelect }) {
   const [hovered, setHovered] = useState(false);
   return (
     <div
-      style={itemStyle(selected, hovered)}
+      className={`py-[9px] px-[14px] text-[0.83rem] cursor-pointer flex items-center justify-between gap-2 transition-colors duration-100 ${selected ? 'text-[#70d64d]' : 'text-[#d1d5db]'} ${hovered ? 'bg-[#1c1c24]' : 'bg-transparent'}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={onSelect}
     >
       <span>{label}</span>
-      {selected && <Check size={13} style={{ flexShrink: 0, color: '#70d64d' }} />}
+      {selected && <Check size={13} className="shrink-0 text-[#70d64d]" />}
     </div>
   );
 }
