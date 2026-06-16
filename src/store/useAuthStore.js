@@ -24,7 +24,8 @@ export const useAuthStore = create(
 
       fetchPublicSettings: async () => {
         try {
-          const response = await fetch("http://localhost:5000/api/auth/public-settings");
+          const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+          const response = await fetch(`${baseUrl}/auth/public-settings`);
           if (response.ok) {
             const data = await response.json();
             if (data.success) {
