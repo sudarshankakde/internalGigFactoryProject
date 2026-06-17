@@ -26,11 +26,12 @@ import AdminFreelancers        from './pages/Admin/AdminFreelancers.jsx';
 import AdminAgencies           from './pages/Admin/AdminAgencies.jsx';
 import AdminUserProfile        from './pages/Admin/AdminUserProfile.jsx';
 import AdminSettings           from './pages/Admin/AdminSettings.jsx';
-
+import ProjectDetailView      from './components/Admin/ProjectDetailView.jsx';
 
 /* ── Layout ── */
 import AppLayout from './components/Layout/AppLayout.jsx';
 import Maintenance from './pages/Maintenance/Maintenance.jsx';
+import AdminProjects from './pages/Admin/AdminProjects.jsx';
 
 /* ─────────────────────────────────────────────────────────────── */
 /* Route guards                                                     */
@@ -134,6 +135,17 @@ function App() {
         <Route path="/admin/agencies" element={
           <AdminRoute title="Agencies">
             <AdminAgencies />
+          </AdminRoute>
+        } />
+
+        <Route path="/admin/projects" element={
+          <AdminRoute title="Projects">
+            <AdminProjects />
+          </AdminRoute>
+        } />
+        <Route path="/admin/projects/:id" element={
+          <AdminRoute title="Project Details">
+            <ProjectDetailView />
           </AdminRoute>
         } />
         <Route path="/admin/users/:id/profile" element={
