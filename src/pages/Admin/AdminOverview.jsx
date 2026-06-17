@@ -80,7 +80,7 @@ export default function AdminOverview() {
     refetchInterval: 60_000,
   });
 
-  const { data: reqData } = useQuery({
+  const { data: reqData, isLoading: isReqLoading } = useQuery({
     queryKey: ['admin-registration-requests-overview'],
     queryFn: () => api.get('/auth/registration-requests').then(r => r.requests || []),
   });
@@ -166,7 +166,7 @@ export default function AdminOverview() {
           </div>
 
           <div className="flex flex-col gap-[12px]">
-            {recentRequests.length === 0 ? (
+            {isReqLoading ? (
               [...Array(4)].map((_, i) => (
                 <div key={i} className="flex items-center gap-[12px] py-[10px] border-b border-[#1a1a22]">
                   <div className="skeleton-pulse w-[36px] h-[36px] rounded-full shrink-0" />
@@ -176,6 +176,10 @@ export default function AdminOverview() {
                   </div>
                 </div>
               ))
+            ) : recentRequests.length === 0 ? (
+              <p className="text-gray-500 text-[0.85rem] m-0 text-center py-[24px]">
+                No recent registration requests.
+              </p>
             ) : recentRequests.map(req => {
               const statusColor = req.status === 'approved' ? '#70d64d' : req.status === 'rejected' ? '#ef4444' : '#f59e0b';
               const roleColor = req.role === 'agency' ? '#c084fc' : '#38bdf8';
