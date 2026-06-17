@@ -1,0 +1,608 @@
+/* ==========================================================================
+   1. BACKDROP BLUR OVERLAY & SCROLLBARS
+   ========================================================================== */
+.register-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 12, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 10000;
+  display: flex;
+  align-items: flex-start; /* Align card to top so it overflows and scrolls downwards naturally */
+  justify-content: center;
+  padding: 40px 24px; /* Margins at the top and bottom of the scrolling viewport */
+  overflow-y: auto; /* Screen-level scrollbar */
+  animation: gf-overlay-in 0.2s ease-out;
+}
+
+/* Custom Scrollbar for the screen-level scroll */
+.register-modal-overlay::-webkit-scrollbar {
+  width: 8px;
+}
+
+.register-modal-overlay::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.register-modal-overlay::-webkit-scrollbar-thumb {
+  background: #2b2b30;
+  border-radius: 4px;
+}
+
+.register-modal-overlay::-webkit-scrollbar-thumb:hover {
+  background: #3a3a42;
+}
+
+/* ==========================================================================
+   2. MAIN CARD WRAPPER
+   ========================================================================== */
+.register-card {
+  width: 100%;
+  max-width: 480px;
+  background-color: var(--card-bg);
+  padding: 40px 28px;
+  border-radius: 10px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+  text-align: center;
+}
+
+.register-card.wizard {
+  max-width: 800px;
+  width: 100%;
+}
+
+.register-modal-card {
+  background-color: #141416 !important; /* Rich solid dark card */
+  border: 1px solid #25252a !important;
+  border-radius: 12px !important;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.9) !important;
+  position: relative;
+  text-align: center;
+  margin: 0 auto;
+  animation: gf-modal-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  padding: 48px 40px !important;
+}
+
+/* Close button on top right */
+.register-modal-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: transparent;
+  border: none !important;
+  color: var(--text-muted);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  z-index: 10;
+  opacity: 0.6;
+}
+
+.register-modal-close:hover {
+  color: var(--text-main);
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+}
+
+/* ==========================================================================
+   3. BRANDING & HEADER
+   ========================================================================== */
+.register-branding-logo-box {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.register-brand-img {
+  width: 100%;
+  max-width: 180px;
+  height: auto;
+  object-fit: contain;
+}
+
+.register-title {
+  color: var(--text-main);
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.register-subtitle {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  letter-spacing: 1.2px;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.divider-line {
+  border: none;
+  height: 2px;
+  background-color: var(--accent-lime);
+  margin: 20px 0 24px 0;
+}
+
+/* ==========================================================================
+   4. ROLE TABS
+   ========================================================================== */
+.role-tab-container {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.role-tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+}
+
+.role-tab-btn.active {
+  background-color: #1e1e24;
+  color: var(--text-main);
+  border-bottom: 2px solid var(--accent-lime);
+}
+
+/* ==========================================================================
+   5. FORM GRID & INPUT GROUPS
+   ========================================================================== */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  text-align: left;
+}
+
+.register-form-section {
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin-bottom: 36px;
+  text-align: left;
+}
+
+.register-section-title {
+  color: var(--accent-lime) !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  display: flex;
+  align-items: center;
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
+}
+
+.register-section-title::after {
+  content: "";
+  flex-grow: 1;
+  height: 1px;
+  background-color: #25252b;
+  margin-left: 16px;
+}
+
+.section-badge {
+  background-color: #2e7d32; /* Sleek mid-tone green */
+  color: #ffffff;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group label,
+.register-form-section label,
+.nested-service-panel label {
+  text-transform: uppercase;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 1px;
+  color: var(--text-muted) !important;
+  margin-bottom: 8px !important;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  color: #52525b;
+  display: flex;
+  align-items: center;
+}
+
+.textarea-icon {
+  top: 14px;
+  align-items: flex-start;
+}
+
+.register-modal-card .input-wrapper input,
+.register-modal-card textarea {
+  width: 100%;
+  padding: 12px 12px 12px 42px;
+  background-color: #0c0c0e !important; /* Pitch black input fields */
+  border: 1px solid #232328 !important;
+  border-radius: 6px;
+  color: var(--text-main) !important;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.register-modal-card textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.register-modal-card .input-wrapper input:focus,
+.register-modal-card textarea:focus {
+  border-color: var(--accent-lime) !important;
+  box-shadow: 0 0 0 1px rgba(112, 214, 77, 0.1) !important;
+}
+
+.validation-error {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* Premium Custom Select Dropdowns */
+.register-modal-card select {
+  width: 100% !important;
+  padding: 12px 40px 12px 14px !important;
+  background-color: #0c0c0e !important;
+  border: 1px solid #232328 !important;
+  border-radius: 6px !important;
+  color: var(--text-main) !important;
+  outline: none !important;
+  font-size: 0.9rem !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  cursor: pointer !important;
+
+  /* Custom chevron SVG graphic in color #8a8a8a */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238a8a8a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 14px center !important;
+  background-size: 14px !important;
+}
+
+.register-modal-card select:focus {
+  border-color: var(--accent-lime) !important;
+  box-shadow: 0 0 0 1px rgba(112, 214, 77, 0.1) !important;
+}
+
+.register-modal-card select option {
+  background-color: #141416 !important; /* Match modal card context */
+  color: var(--text-main) !important;
+  padding: 12px !important;
+}
+
+/* ==========================================================================
+   6. AUTOCOMPLETE DROPDOWN
+   ========================================================================== */
+.suggestions-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+  margin-top: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  list-style: none;
+  padding: 0;
+}
+
+.suggestion-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  transition: background-color 0.15s ease;
+  text-align: left;
+}
+
+.suggestion-item:hover,
+.suggestion-item.highlighted {
+  background-color: #1e1e24;
+  color: var(--accent-lime);
+}
+
+/* ==========================================================================
+   7. SERVICES GRID & DYNAMIC DETAILS PANELS
+   ========================================================================== */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.service-card {
+  border: 1px solid var(--input-border);
+  background-color: #0c0c0e;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.service-card:hover {
+  border-color: #3f3f46;
+}
+
+.service-card.active {
+  border-color: var(--accent-lime);
+  background-color: rgba(110, 221, 77, 0.05);
+}
+
+.service-checkbox-indicator {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--text-muted);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+}
+
+.service-card.active .service-checkbox-indicator {
+  background-color: var(--accent-lime);
+  border-color: var(--accent-lime);
+  color: #000;
+}
+
+.service-label-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.service-card.active .service-label-text {
+  color: var(--text-main);
+}
+
+.nested-service-panel {
+  background-color: #0c0c0e !important; /* Inset panel background */
+  border: 1px solid #222228 !important;
+  border-radius: 8px !important;
+  padding: 24px !important;
+  margin-top: 20px !important;
+  margin-bottom: 20px !important;
+  animation: gf-slide-down 0.25s ease-out;
+}
+
+.nested-panel-title {
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  color: var(--text-main) !important;
+  margin-bottom: 18px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  border-bottom: 1px solid #222228 !important;
+  padding-bottom: 8px !important;
+}
+
+.software-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+  margin-bottom: 12px;
+}
+
+.software-chip {
+  padding: 8px 18px !important;
+  border-radius: 20px !important;
+  border: 1px solid #25252a !important;
+  background-color: #16161a !important;
+  color: var(--text-muted) !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  transition: all 0.15s ease !important;
+}
+
+.software-chip:hover {
+  border-color: #3f3f46 !important;
+  color: var(--text-main) !important;
+}
+
+.software-chip.active {
+  background-color: rgba(112, 214, 77, 0.1) !important;
+  border-color: var(--accent-lime) !important;
+  color: var(--accent-lime) !important;
+}
+
+/* ==========================================================================
+   8. DECLARATION & SIGNATURE
+   ========================================================================== */
+.declaration-box {
+  background-color: rgba(110, 221, 77, 0.03);
+  border: 1px solid rgba(110, 221, 77, 0.15);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.declaration-checkbox-wrapper {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.declaration-checkbox-wrapper input {
+  margin-top: 4px;
+  accent-color: var(--accent-lime);
+}
+
+.declaration-text {
+  font-size: 0.80rem;
+  color: var(--text-main);
+  line-height: 1.5;
+  user-select: none;
+  font-weight: 400;
+  opacity: 0.7;
+  text-transform: capitalize;
+
+}
+
+/* ==========================================================================
+   9. WIZARD FOOTER ACTIONS
+   ========================================================================== */
+.wizard-footer-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.wizard-back-btn {
+  padding: 12px 24px;
+  background-color: transparent;
+  border: 1px solid var(--input-border);
+  color: var(--text-muted);
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wizard-back-btn:hover {
+  background-color: #1e1e24;
+  color: var(--text-main);
+}
+
+.register-submit-btn {
+  background-color: var(--accent-lime);
+  color: #000000;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  transition: opacity 0.15s ease;
+}
+
+.register-submit-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.register-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   10. ANIMATIONS & RESPONSIVE QUERIES
+   ========================================================================== */
+@keyframes gf-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes gf-modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes gf-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .register-modal-overlay {
+    padding: 24px 12px;
+  }
+  .register-modal-card {
+    padding: 24px 16px !important;
+  }
+  .register-modal-close {
+    top: 16px;
+    right: 16px;
+  }
+}

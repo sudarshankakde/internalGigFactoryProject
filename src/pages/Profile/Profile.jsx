@@ -1,0 +1,312 @@
+import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { useAuthStore } from '../../store/useAuthStore';
+import './Profile.css';
+
+// Import subcomponents
+import { ProfileSkeleton } from '../../components/Profile/ProfileSkeleton';
+import { ProfileHeader } from '../../components/Profile/ProfileHeader';
+import { ProfileStats } from '../../components/Profile/ProfileStats';
+import { ProfileAbout } from '../../components/Profile/ProfileAbout';
+import { WorkHistory } from '../../components/Profile/WorkHistory';
+import { TeamStructure } from '../../components/Profile/TeamStructure';
+import { CapabilityCloud } from '../../components/Profile/CapabilityCloud';
+import { ServiceSpecs } from '../../components/Profile/ServiceSpecs';
+import { DocumentsList } from '../../components/Profile/DocumentsList';
+import { EditProfileModal } from '../../components/Profile/EditProfileModal';
+
+const getInitials = (name) => {
+  if (!name) return 'U';
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+};
+
+const SERVICE_LABELS = {
+  BIM: 'BIM & 2D Drafting',
+  Audit: 'As-Built Audit',
+  Peer: 'Peer Review',
+  BOQ: 'BOQ Creation',
+  Viz: '3D Visualisation',
+};
+
+export const Profile = () => {
+  const user = useAuthStore((state) => state.user);
+  const profile = useAuthStore((state) => state.profile);
+  const isLoading = useAuthStore((state) => state.isProfileLoading);
+  const error = useAuthStore((state) => state.profileError);
+  const fetchProfile = useAuthStore((state) => state.fetchProfile);
+  const updateProfile = useAuthStore((state) => state.updateProfile);
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [formData, setFormData] = useState({});
+  const [activeTab, setActiveTab] = useState('basic');
+
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
+
+  useEffect(() => {
+    if (isEditModalOpen) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [isEditModalOpen]);
+
+  const handleEditClick = () => {
+    setActiveTab('basic');
+    const isFreelancerRole = user?.role === 'freelancer';
+    const initialSelectedServices = profile?.service_details?.selectedServices || [];
+    const bimDetails = profile?.service_details?.bimDetails || { softwareStack: [], maxLod: '', cdeExperience: '' };
+    const auditDetails = profile?.service_details?.auditDetails || { equipmentOwned: '', serviceRadius: '' };
+    const peerReviewDetails = profile?.service_details?.peerReviewDetails || { teamExperience: '', specialisation: '' };
+    const boqDetails = profile?.service_details?.boqDetails || { measurementStandards: '', estimationSoftware: '' };
+    const vizDetails = profile?.service_details?.vizDetails || { renderingEngines: '', hardwareCapacity: '', animationCapability: 'No' };
+    
+    if (isFreelancerRole) {
+      setFormData({
+        title: profile?.title || '',
+        bio: profile?.bio || '',
+        experienceYears: profile?.experience_years || 0,
+        hourlyRate: profile?.hourly_rate || 0,
+        availability: profile?.availability || 'AVAILABLE',
+        portfolioUrl: profile?.portfolio_url || '',
+        resumeUrl: profile?.resume_url || '',
+        linkedinUrl: profile?.linkedin_url || '',
+        legalNamePan: profile?.legal_name_pan || '',
+        personalPan: profile?.personal_pan || '',
+        commercialBasis: profile?.commercial_basis || '',
+        noticePeriod: profile?.notice_period || '',
+        selectedServices: initialSelectedServices,
+        skillsList: (profile?.freelancer_skills || []).map(s => s.skill_name).join(', '),
+        bimDetails,
+        auditDetails,
+        peerReviewDetails,
+        boqDetails,
+        vizDetails,
+        profilePhoto: profile?.user?.profile_photo || '',
+      });
+    } else {
+      setFormData({
+        agencyName: profile?.agency_name || '',
+        description: profile?.description || '',
+        gstNumber: profile?.gst_number || '',
+        website: profile?.website || '',
+        employeeCount: profile?.employee_count || 0,
+        foundedYear: profile?.founded_year || 2020,
+        industry: profile?.industry || '',
+        city: profile?.city || '',
+        country: profile?.country || '',
+        linkedinUrl: profile?.linkedin_url || '',
+        cin: profile?.cin || '',
+        companyPan: profile?.company_pan || '',
+        commercialBasis: profile?.commercial_basis || '',
+        noticePeriod: profile?.notice_period || '',
+        selectedServices: initialSelectedServices,
+        bimDetails,
+        auditDetails,
+        peerReviewDetails,
+        boqDetails,
+        vizDetails,
+        logo: profile?.logo || '',
+      });
+    }
+    setIsEditModalOpen(true);
+  };
+
+  const handleServiceToggle = (serviceId) => {
+    const currentSelected = formData.selectedServices || [];
+    const newSelected = currentSelected.includes(serviceId)
+      ? currentSelected.filter(id => id !== serviceId)
+      : [...currentSelected, serviceId];
+    
+    setFormData({ ...formData, selectedServices: newSelected });
+  };
+
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (isFreelancer) {
+          setFormData((prev) => ({ ...prev, profilePhoto: reader.result }));
+        } else {
+          setFormData((prev) => ({ ...prev, logo: reader.result }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleNestedChange = (section, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [section]: { ...prev[section], [field]: value },
+    }));
+  };
+
+  const handleSoftwareToggle = (swName) => {
+    setFormData((prev) => {
+      const stack = prev.bimDetails?.softwareStack || [];
+      const newStack = stack.includes(swName)
+        ? stack.filter((s) => s !== swName)
+        : [...stack, swName];
+      return {
+        ...prev,
+        bimDetails: { ...prev.bimDetails, softwareStack: newStack }
+      };
+    });
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    const isFreelancerRole = user?.role === 'freelancer';
+    let payload = { ...formData };
+    
+    const serviceDetails = {
+      selectedServices: formData.selectedServices || [],
+      bimDetails: formData.bimDetails || { softwareStack: [], maxLod: '', cdeExperience: '' },
+      auditDetails: formData.auditDetails || { equipmentOwned: '', serviceRadius: '' },
+      peerReviewDetails: formData.peerReviewDetails || { teamExperience: '', specialisation: '' },
+      boqDetails: formData.boqDetails || { measurementStandards: '', estimationSoftware: '' },
+      vizDetails: formData.vizDetails || { renderingEngines: '', hardwareCapacity: '', animationCapability: 'No' }
+    };
+    
+    payload.serviceDetails = serviceDetails;
+
+    if (isFreelancerRole) {
+      const customSkills = formData.skillsList
+        ? formData.skillsList.split(',').map(s => s.trim()).filter(Boolean)
+        : [];
+      payload.skillsList = Array.from(new Set([...customSkills, ...formData.selectedServices]));
+      payload.experienceYears = parseInt(formData.experienceYears, 10) || 0;
+      payload.hourlyRate = parseFloat(formData.hourlyRate) || 0;
+    } else {
+      payload.employeeCount = parseInt(formData.employeeCount, 10) || 0;
+      payload.foundedYear = parseInt(formData.foundedYear, 10) || 2020;
+    }
+    
+    delete payload.selectedServices;
+    delete payload.bimDetails;
+    delete payload.auditDetails;
+    delete payload.peerReviewDetails;
+    delete payload.boqDetails;
+    delete payload.vizDetails;
+
+    const res = await updateProfile(payload);
+    setIsSaving(false);
+    if (res && res.success) {
+      toast.success('Settings updated successfully!');
+      setIsEditModalOpen(false);
+    } else {
+      toast.error(res?.error || 'Failed to update settings.');
+    }
+  };
+
+  if (isLoading) {
+    return <ProfileSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="profile-workspace-view text-center p-10">
+        <p className="text-[#ef4444] font-semibold">Failed to load profile details: {error}</p>
+      </div>
+    );
+  }
+
+  const role = user?.role || 'freelancer';
+  const isFreelancer = role === 'freelancer';
+  const name = isFreelancer ? profile?.user?.full_name : profile?.agency_name;
+  const avatar = isFreelancer ? profile?.user?.profile_photo : profile?.logo;
+  const subtitle = isFreelancer ? profile?.title : profile?.industry || 'Digital Services Agency';
+  const emailVal = profile?.user?.email;
+  const phoneVal = profile?.user?.mobile;
+  const locationVal = profile?.city && profile?.country ? `${profile.city}, ${profile.country}` : 'Not Specified';
+  const webVal = isFreelancer ? profile?.portfolio_url : profile?.website;
+  const initials = getInitials(name);
+
+  const skills = isFreelancer 
+    ? (profile?.freelancer_skills || [])
+    : (profile?.service_details?.selectedServices || []).map(code => ({ skill_name: SERVICE_LABELS[code] || code }));
+
+  return (
+    <div className="profile-workspace-view animate-fade-in">
+      <ProfileHeader
+        isFreelancer={isFreelancer}
+        name={name}
+        avatar={avatar}
+        subtitle={subtitle}
+        emailVal={emailVal}
+        phoneVal={phoneVal}
+        locationVal={locationVal}
+        webVal={webVal}
+        foundedYear={profile?.founded_year}
+        initials={initials}
+        availability={profile?.availability}
+        handleEditClick={handleEditClick}
+      />
+
+      <ProfileStats
+        isFreelancer={isFreelancer}
+        totalProjects={profile?.total_projects}
+        hourlyRate={profile?.hourly_rate}
+        commercialBasis={profile?.commercial_basis}
+        employeeCount={profile?.employee_count}
+      />
+
+      <div className="profile-details-split-grid">
+        <div className="profile-details-left-pane">
+          <ProfileAbout
+            isFreelancer={isFreelancer}
+            bio={profile?.bio}
+            description={profile?.description}
+          />
+
+          {isFreelancer ? (
+            <WorkHistory workHistory={profile?.work_history} />
+          ) : (
+            <TeamStructure teamMembers={profile?.team_members || []} employeeCount={profile?.employee_count} />
+          )}
+        </div>
+
+        <div className="profile-details-right-pane">
+          <CapabilityCloud
+            isFreelancer={isFreelancer}
+            skills={skills}
+          />
+
+          <ServiceSpecs serviceDetails={profile?.service_details} />
+
+          <DocumentsList
+            isFreelancer={isFreelancer}
+            resumeUrl={profile?.resume_url}
+            verifications={profile?.verifications}
+          />
+        </div>
+      </div>
+
+      {isEditModalOpen && (
+        <EditProfileModal
+          isFreelancer={isFreelancer}
+          formData={formData}
+          setFormData={setFormData}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          isSaving={isSaving}
+          onClose={() => setIsEditModalOpen(false)}
+          onSubmit={handleFormSubmit}
+          profile={profile}
+          handlePhotoUpload={handlePhotoUpload}
+          handleServiceToggle={handleServiceToggle}
+          handleSoftwareToggle={handleSoftwareToggle}
+          handleNestedChange={handleNestedChange}
+        />
+      )}
+    </div>
+  );
+};
