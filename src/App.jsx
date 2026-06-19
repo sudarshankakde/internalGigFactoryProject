@@ -20,6 +20,7 @@ import { Team }         from './pages/Team/Team.jsx';
 import UserSettings     from './pages/UserSettings/UserSettings.jsx';
 import BrowseProjects   from './pages/BrowseProjects/BrowseProjects.jsx';
 import ProjectDetail    from './pages/BrowseProjects/ProjectDetail.jsx';
+import MyApplications   from './pages/MyApplications/MyApplications.jsx';
 
 
 /* ── Admin pages ── */
@@ -228,6 +229,13 @@ function App() {
           <PrivateRoute>
             <AppLayout pageTitle="Project Detail">
               <ProjectDetail />
+            </AppLayout>
+          </PrivateRoute>
+        } />
+        <Route path="/applications" element={
+          <PrivateRoute>
+            <AppLayout pageTitle="My Applications">
+              <MyApplications />
             </AppLayout>
           </PrivateRoute>
         } />

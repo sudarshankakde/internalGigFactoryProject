@@ -3,7 +3,7 @@ import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { 
   ArrowLeft, Clock, Wallet, Check, X, Plus, Users, Award, Edit, Trash2,
   Briefcase, Calendar, Paperclip, Folder, FileText, Tag, ExternalLink,
-  UploadCloud
+  UploadCloud, AlertTriangle
 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../utils/api';
@@ -179,10 +179,16 @@ export default function ProjectDetailView() {
   const [isViewPaymentModalOpen, setIsViewPaymentModalOpen] = useState(false);
   const [paymentDetailsToView, setPaymentDetailsToView] = useState(null);
   const [viewingMilestoneTitle, setViewingMilestoneTitle] = useState('');
+  const [selectedBidForProposal, setSelectedBidForProposal] = useState(null);
+
+  // New edit payment states
+  const [isEditPaymentModalOpen, setIsEditPaymentModalOpen] = useState(false);
+  const [editingPayment, setEditingPayment] = useState(null);
+  const [paymentAmount, setPaymentAmount] = useState('');
 
   // Disable background scrolling when any modal is open
   useEffect(() => {
-    const isAnyModalOpen = isEditProjectOpen || isMilestoneModalOpen || isPaymentModalOpen || isViewPaymentModalOpen;
+    const isAnyModalOpen = isEditProjectOpen || isMilestoneModalOpen || isPaymentModalOpen || isViewPaymentModalOpen || isEditPaymentModalOpen || !!selectedBidForProposal;
     if (isAnyModalOpen) {
       document.body.classList.add('overflow-hidden');
     } else {
@@ -191,7 +197,7 @@ export default function ProjectDetailView() {
     return () => {
       document.body.classList.remove('overflow-hidden');
     };
-  }, [isEditProjectOpen, isMilestoneModalOpen, isPaymentModalOpen]);
+  }, [isEditProjectOpen, isMilestoneModalOpen, isPaymentModalOpen, isViewPaymentModalOpen, isEditPaymentModalOpen, selectedBidForProposal]);
 
 
   // Payment form state
@@ -358,6 +364,9 @@ export default function ProjectDetailView() {
     formData.append('payment_method', paymentMethod);
     formData.append('transaction_reference', transactionRef);
     formData.append('remarks', paymentRemarks);
+    if (paymentAmount) {
+      formData.append('amount', paymentAmount);
+    }
     if (proofFile) {
       formData.append('proof', proofFile);
     }
@@ -369,11 +378,45 @@ export default function ProjectDetailView() {
       setSelectedPayment(null);
       setTransactionRef('');
       setPaymentRemarks('');
+      setPaymentAmount('');
       setProofFile(null);
       queryClient.invalidateQueries({ queryKey: ['admin-project-detail', id] });
       queryClient.invalidateQueries({ queryKey: ['admin-projects'] });
     } catch (err) {
       toast.error(err.message || 'Failed to record payment.');
+    }
+  };
+
+  const handleEditPaymentSubmit = async (e) => {
+    e.preventDefault();
+    if (!transactionRef.trim()) {
+      toast.error('Transaction reference is required.');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('payment_method', paymentMethod);
+    formData.append('transaction_reference', transactionRef);
+    formData.append('remarks', paymentRemarks);
+    if (paymentAmount) {
+      formData.append('amount', paymentAmount);
+    }
+    if (proofFile) {
+      formData.append('proof', proofFile);
+    }
+
+    try {
+      await api.putFile(`/projects/payments/${editingPayment.id}`, formData);
+      toast.success('Milestone payment updated successfully!');
+      setIsEditPaymentModalOpen(false);
+      setEditingPayment(null);
+      setTransactionRef('');
+      setPaymentRemarks('');
+      setPaymentAmount('');
+      setProofFile(null);
+      queryClient.invalidateQueries({ queryKey: ['admin-project-detail', id] });
+      queryClient.invalidateQueries({ queryKey: ['admin-projects'] });
+    } catch (err) {
+      toast.error(err.message || 'Failed to update payment.');
     }
   };
 
@@ -483,6 +526,11 @@ export default function ProjectDetailView() {
   const milestones = project.milestones || [];
   const applications = project.applications || [];
   const assignments = project.assignments || [];
+
+  const activeAssignment = assignments.find(a => a.status === 'active');
+  const assignedAmount = activeAssignment ? Number(activeAssignment.assigned_amount) : null;
+  const totalPaid = project.milestone_payments?.filter(p => p.status === 'paid').reduce((sum, p) => sum + Number(p.amount), 0) || 0;
+  const remainingBidBalance = assignedAmount !== null ? assignedAmount - totalPaid : null;
 
   return (
     <div className="flex flex-col gap-[20px]">
@@ -850,16 +898,32 @@ export default function ProjectDetailView() {
                                 <span className="text-gray-500">Payment: </span>
                                 <span className={`font-semibold uppercase ${ms.payment_status === 'paid' ? 'text-[#70d64d]' : 'text-gray-400'}`}>{ms.payment_status}</span>
                                 {milestonePayment && milestonePayment.status === 'paid' && (
-                                  <button
-                                    onClick={() => {
-                                      setPaymentDetailsToView(milestonePayment);
-                                      setViewingMilestoneTitle(ms.title);
-                                      setIsViewPaymentModalOpen(true);
-                                    }}
-                                    className="ml-1 bg-[#202024] hover:bg-[#2d2d34] border border-[#2d2d34] text-[#70d64d] rounded-[4px] px-[8px] py-[3px] text-[0.68rem] font-bold cursor-pointer transition-colors flex items-center gap-1 hover:border-[#70d64d]/40"
-                                  >
-                                    <Wallet size={11} /> View Receipt
-                                  </button>
+                                  <div className="flex gap-1.5 items-center ml-1">
+                                    <button
+                                      onClick={() => {
+                                        setPaymentDetailsToView(milestonePayment);
+                                        setViewingMilestoneTitle(ms.title);
+                                        setIsViewPaymentModalOpen(true);
+                                      }}
+                                      className="bg-[#202024] hover:bg-[#2d2d34] border border-[#2d2d34] text-[#70d64d] rounded-[4px] px-[8px] py-[3px] text-[0.68rem] font-bold cursor-pointer transition-colors flex items-center gap-1 hover:border-[#70d64d]/40"
+                                    >
+                                      <Wallet size={11} /> View Receipt
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        setEditingPayment(milestonePayment);
+                                        setPaymentAmount(milestonePayment.amount ? milestonePayment.amount.toString() : '');
+                                        setPaymentMethod(milestonePayment.payment_method || 'bank_transfer');
+                                        setTransactionRef(milestonePayment.transaction_reference || '');
+                                        setPaymentRemarks(milestonePayment.remarks || '');
+                                        setProofFile(null);
+                                        setIsEditPaymentModalOpen(true);
+                                      }}
+                                      className="bg-[#202024] hover:bg-[#2d2d34] border border-[#2d2d34] text-amber-500 rounded-[4px] px-[8px] py-[3px] text-[0.68rem] font-bold cursor-pointer transition-colors flex items-center gap-1 hover:border-amber-500/40"
+                                    >
+                                      <Edit size={11} /> Edit Payment
+                                    </button>
+                                  </div>
                                 )}
                               </div>
                             </div>
@@ -881,7 +945,7 @@ export default function ProjectDetailView() {
                                 Delete
                               </button>
                               
-                              {ms.status !== 'completed' && (
+                              {project.status === 'assigned' && ms.status !== 'completed' && (
                                 <button
                                   onClick={() => handleCompleteMilestone(ms.id)}
                                   className="bg-[#70d64d] text-black border-none font-bold rounded-[6px] px-[12px] py-[5px] text-[0.72rem] cursor-pointer hover:bg-[#8ee67b] transition-colors"
@@ -894,6 +958,11 @@ export default function ProjectDetailView() {
                                 <button
                                   onClick={() => {
                                     setSelectedPayment(milestonePayment);
+                                    setPaymentAmount(milestonePayment.amount ? milestonePayment.amount.toString() : '');
+                                    setPaymentMethod(milestonePayment.payment_method || 'bank_transfer');
+                                    setTransactionRef(milestonePayment.transaction_reference || '');
+                                    setPaymentRemarks(milestonePayment.remarks || '');
+                                    setProofFile(null);
                                     setIsPaymentModalOpen(true);
                                   }}
                                   className="bg-amber-500 text-black border-none font-bold rounded-[6px] px-[12px] py-[5px] text-[0.72rem] cursor-pointer hover:bg-amber-600 transition-colors"
@@ -941,9 +1010,36 @@ export default function ProjectDetailView() {
                         </div>
 
                         {app.proposal && (
-                          <div className="bg-[#121215] border border-[#1a1a22] p-[10px] rounded-[6px]">
-                            <span className="text-[#8a8a8a] text-[0.62rem] block uppercase font-bold tracking-[0.5px] mb-1">Proposal</span>
-                            <p className="text-[#8a8a8a] text-[0.78rem] m-0 leading-relaxed italic">"{app.proposal}"</p>
+                          <div 
+                            onClick={() => setSelectedBidForProposal(app)}
+                            className="bg-[#121215] border border-[#1a1a22] hover:border-gray-500/50 p-[12px] rounded-[6px] cursor-pointer transition-colors group"
+                            title="Click to view full proposal & details"
+                          >
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="text-[#8a8a8a] text-[0.62rem] block uppercase font-bold tracking-[0.5px]">Proposal</span>
+                              <span className="text-[0.65rem] text-[#70d64d] opacity-0 group-hover:opacity-100 transition-opacity">Click to view full details →</span>
+                            </div>
+                            <p 
+                              className="text-[#8a8a8a] text-[0.78rem] m-0 leading-relaxed italic"
+                              style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                            >
+                              "{app.proposal}"
+                            </p>
+                          </div>
+                        )}
+
+                        {(app.attachment_url || app.cover_letter) && (
+                          <div className="flex gap-2.5 items-center text-[0.7rem] text-gray-500 mt-1">
+                            {app.cover_letter && (
+                              <span className="flex items-center gap-1">
+                                <FileText size={12} className="text-gray-400" /> Cover Letter
+                              </span>
+                            )}
+                            {app.attachment_url && (
+                              <span className="flex items-center gap-1 text-[#70d64d]">
+                                <Paperclip size={12} /> Attachment
+                              </span>
+                            )}
                           </div>
                         )}
 
@@ -960,6 +1056,13 @@ export default function ProjectDetailView() {
                           </div>
 
                           <div className="flex gap-[8px] flex-wrap">
+                            <button
+                              onClick={() => setSelectedBidForProposal(app)}
+                              className="bg-[#1a1a20] hover:bg-[#252530] border border-[#2d2d38] text-gray-300 hover:text-white font-bold rounded-[6px] px-[12px] py-[6px] text-[0.72rem] cursor-pointer transition-colors"
+                            >
+                              View Proposal
+                            </button>
+
                             {/* Pending / Applied bids: Approve & Reject */}
                             {(app.status === 'pending' || app.status === 'applied' || app.status === 'reviewed') && (
                               <>
@@ -1121,24 +1224,60 @@ export default function ProjectDetailView() {
         {/* Modal: Record Payment */}
         {isPaymentModalOpen && selectedPayment && (
           <>
-            <div onClick={() => { setIsPaymentModalOpen(false); setSelectedPayment(null); }} className="fixed inset-0 bg-black/80 backdrop-blur-[4px] z-[800]" />
+            <div onClick={() => { setIsPaymentModalOpen(false); setSelectedPayment(null); setProofFile(null); }} className="fixed inset-0 bg-black/80 backdrop-blur-[4px] z-[800]" />
             <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[92vw] max-w-[500px] max-h-[90vh] bg-[#121215] border border-[#23232a] rounded-[16px] shadow-2xl z-[801] flex flex-col overflow-hidden">
               <div className="flex items-center justify-between p-5 border-b border-[#23232a] bg-[#0c0c0e] shrink-0">
                 <div>
                   <h3 className="text-white font-extrabold text-[1.1rem] m-0">Record Milestone Payment</h3>
                   <p className="text-gray-500 text-[0.75rem] m-0 mt-1">Enter payment release and transaction details.</p>
                 </div>
-                <button onClick={() => { setIsPaymentModalOpen(false); setSelectedPayment(null); }} className="text-gray-400 hover:text-white border-none bg-transparent cursor-pointer p-1"><X size={18} /></button>
+                <button onClick={() => { setIsPaymentModalOpen(false); setSelectedPayment(null); setProofFile(null); }} className="text-gray-400 hover:text-white border-none bg-transparent cursor-pointer p-1"><X size={18} /></button>
               </div>
               <form onSubmit={handleRecordPaymentSubmit} className="p-5 flex flex-col gap-4 m-0 overflow-y-auto flex-1">
+                {assignedAmount !== null && (
+                  <div className="bg-[#1f1d18] border border-amber-500/20 px-4 py-3.5 rounded-[10px] text-[0.78rem] flex flex-col gap-1.5">
+                    <div className="flex items-center gap-1.5 text-amber-500 font-bold">
+                      <AlertTriangle size={15} />
+                      <span>Contract / Bid Budget Reference</span>
+                    </div>
+                    <div className="text-gray-300 flex flex-col gap-1 mt-1">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Accepted Bid:</span>
+                        <span className="font-semibold text-white">₹{assignedAmount.toLocaleString('en-IN')}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Total Paid So Far:</span>
+                        <span className="font-semibold text-white">₹{totalPaid.toLocaleString('en-IN')}</span>
+                      </div>
+                      <div className="flex justify-between border-t border-gray-800 pt-1 mt-1">
+                        <span className="text-gray-500 font-bold">Remaining Bid Budget:</span>
+                        <span className="font-black text-[#70d64d]">₹{remainingBidBalance.toLocaleString('en-IN')}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex items-center gap-3 bg-[#182318] border border-[#70d64d]/20 px-4 py-3.5 rounded-[10px]">
                   <div className="bg-[#70d64d]/10 p-2 rounded-[8px]">
                     <Wallet className="text-[#70d64d]" size={20} />
                   </div>
                   <div className="flex-1">
-                    <span className="text-gray-400 text-[0.75rem] uppercase font-bold tracking-[0.5px] block">Amount to Release</span>
-                    <span className="text-[1.35rem] text-[#70d64d] font-black leading-none block mt-1">₹{Number(selectedPayment.amount).toLocaleString('en-IN')}</span>
+                    <span className="text-gray-400 text-[0.75rem] uppercase font-bold tracking-[0.5px] block">Default Milestone Budget</span>
+                    <span className="text-[1.15rem] text-[#70d64d] font-bold leading-none block mt-1">₹{Number(selectedPayment.amount).toLocaleString('en-IN')}</span>
                   </div>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-400 text-[0.78rem] font-semibold">Payment Amount (₹) *</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    required
+                    value={paymentAmount}
+                    onChange={(e) => setPaymentAmount(e.target.value)}
+                    placeholder="Enter amount to pay..."
+                    className="bg-[#0c0c0e] border border-[#23232a] text-white rounded-[6px] px-3 py-2.5 text-[0.85rem] outline-none focus:border-[#70d64d] transition-colors"
+                  />
                 </div>
                 
                 <div className="flex flex-col gap-1">
@@ -1216,6 +1355,137 @@ export default function ProjectDetailView() {
                     className="bg-[#70d64d] text-black border-none font-bold rounded-[6px] px-6 py-2.5 text-[0.8rem] cursor-pointer hover:bg-[#8ee67b] transition-colors"
                   >
                     Record Payment
+                  </button>
+                </div>
+              </form>
+            </div>
+          </>
+        )}
+
+        {/* Modal: Edit Payment */}
+        {isEditPaymentModalOpen && editingPayment && (
+          <>
+            <div onClick={() => { setIsEditPaymentModalOpen(false); setEditingPayment(null); setProofFile(null); }} className="fixed inset-0 bg-black/80 backdrop-blur-[4px] z-[800]" />
+            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[92vw] max-w-[500px] max-h-[90vh] bg-[#121215] border border-[#23232a] rounded-[16px] shadow-2xl z-[801] flex flex-col overflow-hidden">
+              <div className="flex items-center justify-between p-5 border-b border-[#23232a] bg-[#0c0c0e] shrink-0">
+                <div>
+                  <h3 className="text-white font-extrabold text-[1.1rem] m-0">Edit Milestone Payment</h3>
+                  <p className="text-gray-500 text-[0.75rem] m-0 mt-1">Update payment release and transaction details.</p>
+                </div>
+                <button onClick={() => { setIsEditPaymentModalOpen(false); setEditingPayment(null); setProofFile(null); }} className="text-gray-400 hover:text-white border-none bg-transparent cursor-pointer p-1"><X size={18} /></button>
+              </div>
+              <form onSubmit={handleEditPaymentSubmit} className="p-5 flex flex-col gap-4 m-0 overflow-y-auto flex-1">
+                {assignedAmount !== null && (
+                  <div className="bg-[#1f1d18] border border-amber-500/20 px-4 py-3.5 rounded-[10px] text-[0.78rem] flex flex-col gap-1.5">
+                    <div className="flex items-center gap-1.5 text-amber-500 font-bold">
+                      <AlertTriangle size={15} />
+                      <span>Contract / Bid Budget Reference</span>
+                    </div>
+                    <div className="text-gray-300 flex flex-col gap-1 mt-1">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Accepted Bid:</span>
+                        <span className="font-semibold text-white">₹{assignedAmount.toLocaleString('en-IN')}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Total Paid So Far:</span>
+                        <span className="font-semibold text-white">₹{totalPaid.toLocaleString('en-IN')}</span>
+                      </div>
+                      <div className="flex justify-between border-t border-gray-800 pt-1 mt-1">
+                        <span className="text-gray-500 font-bold">Remaining Bid Budget:</span>
+                        <span className="font-black text-[#70d64d]">₹{remainingBidBalance.toLocaleString('en-IN')}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-400 text-[0.78rem] font-semibold">Payment Amount (₹) *</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    required
+                    value={paymentAmount}
+                    onChange={(e) => setPaymentAmount(e.target.value)}
+                    placeholder="Enter amount to pay..."
+                    className="bg-[#0c0c0e] border border-[#23232a] text-white rounded-[6px] px-3 py-2.5 text-[0.85rem] outline-none focus:border-[#70d64d] transition-colors"
+                  />
+                </div>
+                
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-400 text-[0.78rem] font-semibold">Payment Method *</label>
+                  <select
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="bg-[#0c0c0e] border border-[#23232a] text-white rounded-[6px] px-3 py-2 text-[0.85rem] outline-none focus:border-[#70d64d] transition-colors cursor-pointer"
+                  >
+                    <option value="bank_transfer">Bank Transfer (NEFT/RTGS/IMPS)</option>
+                    <option value="upi">UPI (GPay/PhonePe/etc)</option>
+                    <option value="cash">Cash Payment</option>
+                    <option value="card">Credit/Debit Card</option>
+                    <option value="other">Other Payment Mode</option>
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-400 text-[0.78rem] font-semibold">Transaction Reference ID *</label>
+                  <input
+                    type="text"
+                    required
+                    value={transactionRef}
+                    onChange={(e) => setTransactionRef(e.target.value)}
+                    placeholder="Enter transaction reference code..."
+                    className="bg-[#0c0c0e] border border-[#23232a] text-white rounded-[6px] px-3 py-2.5 text-[0.85rem] outline-none focus:border-[#70d64d] transition-colors"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-400 text-[0.78rem] font-semibold">Payment Remarks</label>
+                  <textarea
+                    value={paymentRemarks}
+                    onChange={(e) => setPaymentRemarks(e.target.value)}
+                    placeholder="Add optional notes, remarks or details..."
+                    rows={3}
+                    className="bg-[#0c0c0e] border border-[#23232a] text-white rounded-[6px] px-3 py-2.5 text-[0.85rem] outline-none resize-none focus:border-[#70d64d] transition-colors"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-gray-400 text-[0.78rem] font-semibold">Payment Proof / Receipt <span className="text-gray-600 font-normal">(Optional)</span></label>
+                  <label className="flex items-center justify-center flex-col gap-2 bg-[#0c0c0e] border border-dashed border-[#23232a] hover:border-[#70d64d]/40 rounded-[8px] p-5 cursor-pointer transition-colors group">
+                    <input
+                      type="file"
+                      onChange={(e) => setProofFile(e.target.files[0])}
+                      className="hidden"
+                    />
+                    {proofFile ? (
+                      <div className="flex items-center gap-2 text-[#70d64d]">
+                        <FileText size={20} />
+                        <span className="text-[0.82rem] font-bold truncate max-w-[240px]">{proofFile.name}</span>
+                        <span className="text-gray-500 text-[0.72rem]">({(proofFile.size / 1024).toFixed(1)} KB)</span>
+                      </div>
+                    ) : (
+                      <>
+                        <UploadCloud size={24} className="text-gray-500 group-hover:text-gray-300 transition-colors" />
+                        <span className="text-gray-400 text-[0.8rem] font-medium group-hover:text-gray-200 transition-colors">Select new receipt or PDF proof (optional update)</span>
+                        <span className="text-gray-600 text-[0.7rem]">PDF, JPG, PNG, WEBP</span>
+                      </>
+                    )}
+                  </label>
+                </div>
+
+                <div className="flex justify-end gap-3 border-t border-[#23232a] pt-4 mt-2">
+                  <button
+                    type="button"
+                    onClick={() => { setIsEditPaymentModalOpen(false); setEditingPayment(null); setProofFile(null); }}
+                    className="bg-transparent border border-[#23232a] text-gray-300 hover:text-white rounded-[6px] px-5 py-2.5 text-[0.8rem] cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-amber-500 hover:bg-amber-600 text-black font-bold border-none rounded-[6px] px-5 py-2.5 text-[0.8rem] cursor-pointer transition-colors"
+                  >
+                    Save Changes
                   </button>
                 </div>
               </form>
@@ -1334,6 +1604,217 @@ export default function ProjectDetailView() {
                     Close
                   </button>
                 </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Modal: View Proposal Details */}
+        {selectedBidForProposal && (
+          <>
+            <div onClick={() => setSelectedBidForProposal(null)} className="fixed inset-0 bg-black/80 backdrop-blur-[4px] z-[800]" />
+            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[92vw] max-w-[650px] max-h-[90vh] bg-[#121215] border border-[#23232a] rounded-[16px] shadow-2xl z-[801] flex flex-col overflow-hidden">
+              <div className="flex items-center justify-between p-5 border-b border-[#23232a] bg-[#0c0c0e] shrink-0">
+                <div>
+                  <h3 className="text-white font-extrabold text-[1.1rem] m-0">Proposal Details</h3>
+                  <p className="text-gray-500 text-[0.75rem] m-0 mt-1">Submitted by {selectedBidForProposal.applicant?.full_name}</p>
+                </div>
+                <button onClick={() => setSelectedBidForProposal(null)} className="text-gray-400 hover:text-white border-none bg-transparent cursor-pointer p-1"><X size={18} /></button>
+              </div>
+              <div className="p-6 flex flex-col gap-5 m-0 overflow-y-auto flex-1 text-[0.85rem] text-gray-300">
+                
+                {/* Profile Overview Row */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 bg-[#0c0c0e] border border-[#23232a] p-4 rounded-[10px]">
+                  <div>
+                    <span className="text-gray-500 text-[0.68rem] uppercase font-bold tracking-[0.5px] block">Applicant</span>
+                    <span className="text-white font-semibold block mt-0.5">{selectedBidForProposal.applicant?.full_name || 'Anonymous User'}</span>
+                    <span className="text-gray-500 text-[0.72rem] block mt-0.5">{selectedBidForProposal.applicant?.email}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 text-[0.68rem] uppercase font-bold tracking-[0.5px] block">Bid Amount</span>
+                    <span className="text-[#70d64d] font-bold block mt-0.5">
+                      {selectedBidForProposal.bid_amount ? `₹${Number(selectedBidForProposal.bid_amount).toLocaleString('en-IN')}` : '—'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 text-[0.68rem] uppercase font-bold tracking-[0.5px] block">Delivery Time</span>
+                    <span className="text-white font-semibold block mt-0.5">
+                      {selectedBidForProposal.estimated_days ? `${selectedBidForProposal.estimated_days} Days` : '—'}
+                    </span>
+                  </div>
+                  <div className="col-span-2 sm:col-span-3 border-t border-[#1a1a22] pt-3 mt-1 flex justify-between items-center flex-wrap gap-2">
+                    <div>
+                      <span className="text-gray-500 text-[0.68rem] uppercase font-bold tracking-[0.5px] block">Applicant Role</span>
+                      <span className="text-white font-semibold block mt-0.5 capitalize">{selectedBidForProposal.applicant?.role || 'Freelancer'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 text-[0.68rem] uppercase font-bold tracking-[0.5px] block mb-1">Status</span>
+                      <span className={`text-[0.65rem] font-bold px-[8px] py-[3px] rounded-[4px] uppercase ${
+                        selectedBidForProposal.status === 'accepted' ? 'bg-[#70d64d]/10 text-[#70d64d]' : selectedBidForProposal.status === 'rejected' ? 'bg-red-500/10 text-red-400' : selectedBidForProposal.status === 'shortlisted' ? 'bg-amber-500/10 text-amber-400' : 'bg-sky-500/10 text-sky-400'
+                      }`}>
+                        {selectedBidForProposal.status}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Proposal Text */}
+                {selectedBidForProposal.proposal && (
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-gray-500 text-[0.68rem] uppercase font-bold tracking-[0.5px]">Execution Strategy / Proposal</span>
+                    <div className="bg-[#0c0c0e] border border-[#23232a] p-4 rounded-[8px] text-gray-300 whitespace-pre-wrap leading-relaxed">
+                      {selectedBidForProposal.proposal}
+                    </div>
+                  </div>
+                )}
+
+                {/* Cover Letter Text */}
+                {selectedBidForProposal.cover_letter && (
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-gray-500 text-[0.68rem] uppercase font-bold tracking-[0.5px]">Cover Letter</span>
+                    <div className="bg-[#0c0c0e] border border-[#23232a] p-4 rounded-[8px] text-gray-300 whitespace-pre-wrap leading-relaxed">
+                      {selectedBidForProposal.cover_letter}
+                    </div>
+                  </div>
+                )}
+
+                {/* Attachment Link */}
+                {selectedBidForProposal.attachment_url && (
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-gray-500 text-[0.68rem] uppercase font-bold tracking-[0.5px]">Supporting Document / Attachment</span>
+                    <div className="bg-[#0c0c0e] border border-[#23232a] p-4 rounded-[8px] flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <Paperclip size={16} className="text-gray-500 shrink-0" />
+                        <span className="text-white text-[0.82rem] font-medium truncate" title={selectedBidForProposal.attachment_url.split('/').pop()}>
+                          {selectedBidForProposal.attachment_url.split('/').pop() || 'attached_document.pdf'}
+                        </span>
+                      </div>
+                      <a 
+                        href={selectedBidForProposal.attachment_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="bg-[#202024] hover:bg-[#2d2d34] border border-[#2d2d34] text-gray-300 hover:text-white rounded-[6px] px-3.5 py-2 text-[0.75rem] font-bold cursor-pointer transition-colors no-underline shrink-0 flex items-center gap-1.5 hover:border-[#70d64d]/40"
+                      >
+                        <ExternalLink size={13} /> View Attachment
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons if pending/shortlisted/rejected */}
+                <div className="flex justify-between items-center gap-3 border-t border-[#23232a] pt-4 mt-2">
+                  <div className="flex gap-2 flex-wrap">
+                    {/* Pending / Applied bids: Approve, Shortlist, Reject */}
+                    {(selectedBidForProposal.status === 'pending' || selectedBidForProposal.status === 'applied' || selectedBidForProposal.status === 'reviewed') && (
+                      <>
+                        <button
+                          onClick={() => {
+                            handleApprove(selectedBidForProposal.id);
+                            setSelectedBidForProposal(null);
+                          }}
+                          className="bg-[#70d64d] text-black border-none font-bold rounded-[6px] px-[14px] py-[8px] text-[0.75rem] cursor-pointer hover:bg-[#8ee67b] transition-colors"
+                        >
+                          Approve & Assign
+                        </button>
+                        <button
+                          onClick={() => {
+                            handleChangeBidStatus(selectedBidForProposal.id, 'shortlisted', 'Shortlisted');
+                            setSelectedBidForProposal(null);
+                          }}
+                          className="bg-amber-500/20 text-amber-400 border-none font-bold rounded-[6px] px-[14px] py-[8px] text-[0.75rem] cursor-pointer hover:bg-amber-500/30 transition-colors"
+                        >
+                          Shortlist
+                        </button>
+                        <button
+                          onClick={() => {
+                            handleReject(selectedBidForProposal.id);
+                            setSelectedBidForProposal(null);
+                          }}
+                          className="bg-[#ef444433] text-[#ef4444] border-none font-bold rounded-[6px] px-[14px] py-[8px] text-[0.75rem] cursor-pointer hover:bg-[#ef444455] transition-colors"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+
+                    {/* Shortlisted bids: Approve, Reject, Reset */}
+                    {selectedBidForProposal.status === 'shortlisted' && (
+                      <>
+                        <button
+                          onClick={() => {
+                            handleApprove(selectedBidForProposal.id);
+                            setSelectedBidForProposal(null);
+                          }}
+                          className="bg-[#70d64d] text-black border-none font-bold rounded-[6px] px-[14px] py-[8px] text-[0.75rem] cursor-pointer hover:bg-[#8ee67b] transition-colors"
+                        >
+                          Approve & Assign
+                        </button>
+                        <button
+                          onClick={() => {
+                            handleReject(selectedBidForProposal.id);
+                            setSelectedBidForProposal(null);
+                          }}
+                          className="bg-[#ef444433] text-[#ef4444] border-none font-bold rounded-[6px] px-[14px] py-[8px] text-[0.75rem] cursor-pointer hover:bg-[#ef444455] transition-colors"
+                        >
+                          Reject
+                        </button>
+                        <button
+                          onClick={() => {
+                            handleChangeBidStatus(selectedBidForProposal.id, 'pending', 'Pending');
+                            setSelectedBidForProposal(null);
+                          }}
+                          className="bg-gray-500/20 text-gray-400 border-none font-bold rounded-[6px] px-[14px] py-[8px] text-[0.75rem] cursor-pointer hover:bg-gray-500/30 transition-colors"
+                        >
+                          Reset Decision
+                        </button>
+                      </>
+                    )}
+
+                    {/* Rejected bids: Reset or Shortlist */}
+                    {selectedBidForProposal.status === 'rejected' && (
+                      <>
+                        <button
+                          onClick={() => {
+                            handleChangeBidStatus(selectedBidForProposal.id, 'pending', 'Pending');
+                            setSelectedBidForProposal(null);
+                          }}
+                          className="bg-sky-500/20 text-sky-400 border-none font-bold rounded-[6px] px-[14px] py-[8px] text-[0.75rem] cursor-pointer hover:bg-sky-500/30 transition-colors"
+                        >
+                          Reset to Pending
+                        </button>
+                        <button
+                          onClick={() => {
+                            handleChangeBidStatus(selectedBidForProposal.id, 'shortlisted', 'Shortlisted');
+                            setSelectedBidForProposal(null);
+                          }}
+                          className="bg-amber-500/20 text-amber-400 border-none font-bold rounded-[6px] px-[14px] py-[8px] text-[0.75rem] cursor-pointer hover:bg-amber-500/30 transition-colors"
+                        >
+                          Shortlist
+                        </button>
+                      </>
+                    )}
+
+                    {/* Accepted bids: Revoke */}
+                    {selectedBidForProposal.status === 'accepted' && (
+                      <button
+                        onClick={() => {
+                          handleResetAssignment();
+                          setSelectedBidForProposal(null);
+                        }}
+                        className="bg-[#ef444433] text-[#ef4444] border border-[#ef4444]/30 font-bold rounded-[6px] px-[14px] py-[8px] text-[0.75rem] cursor-pointer hover:bg-[#ef444455] transition-colors"
+                      >
+                        Revoke Assignment
+                      </button>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setSelectedBidForProposal(null)}
+                    className="bg-[#202024] hover:bg-[#2d2d34] border border-[#2d2d34] text-gray-300 hover:text-white rounded-[6px] px-5 py-2.5 text-[0.78rem] font-bold cursor-pointer transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+
               </div>
             </div>
           </>

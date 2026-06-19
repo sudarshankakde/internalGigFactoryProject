@@ -19,10 +19,10 @@ import { ProjectsTable } from '../../components/Dashboard/ProjectsTable';
 import { ActivityTimeline } from '../../components/Dashboard/ActivityTimeline';
 
 export const Dashboard = () => {
-  const loggedInUser = useAuthStore((state) => state.user);
-  const initialRole = loggedInUser ? loggedInUser.role : 'admin';
+  const loggedInUser = useAuthStore((state) => state.user) || {};
+  const profile = useAuthStore((state) => state.profile);
+  const role = loggedInUser.role || 'freelancer';
   
-  const [role, setRole] = useState(initialRole);
   const [activeAdminTab, setActiveAdminTab] = useState('applications');
   const [rejectTarget, setRejectTarget] = useState(null); // drives reject modal
 
@@ -38,6 +38,25 @@ export const Dashboard = () => {
     },
     enabled: role === 'admin',
   });
+
+  // ── Fetch user specific dashboard data ────────────────────────────────────────────
+  const { data: dashboardData } = useQuery({
+    queryKey: ['my-projects-dashboard'],
+    queryFn: () => api.get('/projects/my-projects'),
+    enabled: role !== 'admin',
+    keepPreviousData: true,
+  });
+
+  // ── Fetch notifications ────────────────────────────────────────────────────────
+  const { data: notificationsData } = useQuery({
+    queryKey: ['dashboard-notifications'],
+    queryFn: () => api.get('/notifications'),
+    enabled: role !== 'admin',
+  });
+
+  const rawApplications = dashboardData?.applications || [];
+  const ongoing = dashboardData?.ongoing || [];
+  const notifications = notificationsData?.notifications || [];
 
   // Re-fetch when role becomes admin
   useEffect(() => {
@@ -105,15 +124,10 @@ export const Dashboard = () => {
   const handleOpenReject     = (req)        => setRejectTarget(req);
   const handleConfirmReject  = (id, reason) => setRejectParams({ id, reason });
 
-  /* Mock Datasets mapped for Admin and User states */
+  /* Mock Datasets mapped for Admin state */
   const [adminApplications, setAdminApplications] = useState([
     { id: 1, type: 'FREELANCER', name: 'Sarah Johnson', project: 'E-commerce Website Redesign', email: 'sarah.j@email.com', status: 'PENDING' },
     { id: 2, type: 'AGENCY', name: 'Creative Studios Inc.', project: 'Mobile App Development', email: 'contact@creativestudios.com', status: 'SELECTED' }
-  ]);
-
-  const [userProjects] = useState([
-    { id: 101, title: 'BIM Modeling for Airport Expansion', subtitle: 'Providing detailed 3D structural models and clash detection for Terminal B...', budget: '$8,500', status: 'IN PROGRESS' },
-    { id: 102, title: 'Construction Site 4D Simulation', subtitle: 'Time-scaled visualization for downtown high-rise project. Awaiting schedule...', budget: '$6,000', status: 'PENDING' }
   ]);
 
   const handleAdminAction = (id, nextStatus) => {
@@ -171,6 +185,16 @@ export const Dashboard = () => {
     }
   ], [adminApplications]);
 
+  const userProjects = useMemo(() => {
+    return ongoing.map(item => ({
+      id: item.project?.id,
+      title: item.project?.title || 'Untitled Project',
+      subtitle: item.project?.description || 'No description provided.',
+      budget: item.assigned_amount ? `₹${Number(item.assigned_amount).toLocaleString('en-IN')}` : (item.project?.budget ? `₹${Number(item.project.budget).toLocaleString('en-IN')}` : 'Undisclosed'),
+      status: item.project?.status ? item.project.status.toUpperCase() : 'IN PROGRESS',
+    }));
+  }, [ongoing]);
+
   const userColumns = useMemo(() => [
     {
       header: 'PROJECT WORKSPACE',
@@ -186,15 +210,26 @@ export const Dashboard = () => {
     {
       header: 'STATUS',
       accessorKey: 'status',
-      cell: info => <span className={`status-badge state-${info.getValue().replace(' ', '').toLowerCase()}`}>{info.getValue()}</span>
+      cell: info => {
+        const val = info.getValue() || 'IN PROGRESS';
+        const cleanVal = val.replace(/\s+/g, '').toLowerCase();
+        return <span className={`status-badge state-${cleanVal}`}>{val}</span>;
+      }
     },
     {
       header: 'MANAGEMENT',
-      cell: () => <button className="btn-details-action">VIEW DETAILS</button>
+      cell: info => (
+        <button 
+          className="btn-details-action" 
+          onClick={() => navigate(`/projects/${info.row.original.id}`)}
+        >
+          VIEW DETAILS
+        </button>
+      )
     }
-  ], []);
+  ], [navigate]);
 
-  // Set selected dataset dynamically based on simulated role state
+  // Set selected dataset dynamically
   const tableData = useMemo(() => role === 'admin' ? adminApplications : userProjects, [role, adminApplications, userProjects]);
   const tableColumns = useMemo(() => role === 'admin' ? adminColumns : userColumns, [role, adminColumns, userColumns]);
 
@@ -204,6 +239,85 @@ export const Dashboard = () => {
     getCoreRowModel: getCoreRowModel()
   });
 
+  const completedProjectsCount = useMemo(() => {
+    return role === 'freelancer' 
+      ? (profile?.completed_projects || 0) 
+      : (profile?.total_completed_projects || 0);
+  }, [profile, role]);
+
+  const totalEarnings = useMemo(() => {
+    // If profile has total_earnings, use that
+    const profileEarnings = Number(profile?.total_earnings || profile?.total_completed_projects_earnings || 0);
+    if (profileEarnings > 0) return profileEarnings;
+    
+    // Otherwise calculate from ongoing project milestones
+    let earnings = 0;
+    ongoing.forEach(item => {
+      const milestones = item.project?.milestones || [];
+      milestones.forEach(m => {
+        if (m.status === 'completed' || m.payment_status === 'paid') {
+          earnings += m.budget ? Number(m.budget) : 0;
+        }
+      });
+    });
+    return earnings;
+  }, [ongoing, profile]);
+
+  const combinedActivities = useMemo(() => {
+    const list = [];
+
+    // 1. Add real notifications
+    notifications.forEach(n => {
+      const refType = n.reference_type || n.referenceType;
+      const refId = n.reference_id || n.referenceId;
+      const targetUrl = n.action_url || (refType === 'project' && refId ? `/projects/${refId}` : null);
+      list.push({
+        id: n.id,
+        title: n.title,
+        message: n.message,
+        created_at: n.created_at,
+        type: n.type || 'notification',
+        targetUrl,
+      });
+    });
+
+    // 2. Add application/bid activities
+    rawApplications.forEach(app => {
+      list.push({
+        id: `app-${app.id}`,
+        title: 'Proposal Submitted',
+        message: `Submitted a bid of ₹${Number(app.bid_amount).toLocaleString('en-IN')} for project "${app.project?.title || 'Untitled'}"`,
+        created_at: app.applied_at,
+        type: 'applied',
+        targetUrl: '/applications',
+      });
+    });
+
+    // 3. Add milestone deliverable submission activities
+    ongoing.forEach(item => {
+      const projectTitle = item.project?.title || 'Untitled Project';
+      const milestones = item.project?.milestones || [];
+      milestones.forEach(m => {
+        const deliverables = m.deliverables || [];
+        deliverables.forEach(del => {
+          list.push({
+            id: `del-${del.id}`,
+            title: 'Deliverable Submitted',
+            message: `Submitted deliverable for Milestone #${m.milestone_no} ("${m.title}") in project "${projectTitle}"`,
+            created_at: del.submitted_at,
+            type: 'deliverable',
+            targetUrl: `/projects/${item.project?.id}`,
+          });
+        });
+      });
+    });
+
+    // Sort by timestamp descending
+    list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    return list;
+  }, [notifications, rawApplications, ongoing]);
+
   return (
     <div>
       {/* Dynamic Contextual Metrics Cards Blocks */}
@@ -211,6 +325,10 @@ export const Dashboard = () => {
         role={role}
         isRequestsLoading={isRequestsLoading}
         registrationRequests={registrationRequests}
+        applicationsCount={rawApplications.length}
+        activeCount={ongoing.length}
+        completedCount={completedProjectsCount}
+        totalEarnings={totalEarnings}
       />
 
       {/* Primary Data Content Area splits: Table Left, Activity Timeline Right if User */}
@@ -230,7 +348,7 @@ export const Dashboard = () => {
         />
 
         {/* Contextual Side Activity Panel rendered for Freelancer / Agency views */}
-        <ActivityTimeline role={role} />
+        <ActivityTimeline role={role} notifications={combinedActivities} />
       </div>
 
       {rejectTarget && (

@@ -1,7 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, Circle } from 'lucide-react';
 
 export const ActiveProjectsList = ({ projects }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="projects-trackers-column">
       {projects.map((project) => (
@@ -12,7 +15,7 @@ export const ActiveProjectsList = ({ projects }) => {
               <span className="client-attribution-text">Client: {project.clientName}</span>
             </div>
             <span className={`engagement-status-tag state-${project.status.toLowerCase().replace(/\s+/g, '')}`}>
-              {project.status}
+              {project.status === 'assigned' ? 'In Progress' : project.status}
             </span>
           </div>
 
@@ -22,8 +25,8 @@ export const ActiveProjectsList = ({ projects }) => {
               <span className="m-label">
                 {project.milestoneValue ? 'MILESTONE VALUE' : 'TOTAL BUDGET'}
               </span>
-              <span className="m-value">
-                ${(project.milestoneValue || project.totalBudget || 0).toLocaleString()}
+              <span className="m-value font-bold text-white">
+                ₹{Number(project.milestoneValue || project.totalBudget || 0).toLocaleString('en-IN')}
               </span>
             </div>
             
@@ -44,7 +47,7 @@ export const ActiveProjectsList = ({ projects }) => {
           <div className="tracker-progress-section">
             <div className="progress-label-row">
               <span>Overall Progress</span>
-              <strong>{project.progressPercentage || 0}%</strong>
+              <strong className="text-[#70d64d]">{project.progressPercentage || 0}%</strong>
             </div>
             <div className="progress-bar-track">
               <div 
@@ -62,11 +65,11 @@ export const ActiveProjectsList = ({ projects }) => {
                 {project.milestones.map((milestone, idx) => (
                   <div className="milestone-check-row" key={idx}>
                     {milestone.isCompleted ? (
-                      <CheckCircle2 size={13} className="icon-done" />
+                      <CheckCircle2 size={13} className="icon-done text-[#70d64d]" />
                     ) : (
                       <Circle size={13} className="icon-pending" />
                     )}
-                    <span className={milestone.isCompleted ? 'text-done' : 'text-pending'}>
+                    <span className={milestone.isCompleted ? 'text-done text-gray-300 font-semibold' : 'text-pending text-gray-500'}>
                       {milestone.name}
                     </span>
                   </div>
@@ -76,7 +79,12 @@ export const ActiveProjectsList = ({ projects }) => {
           )}
           
           <div className="tracker-action-footer">
-            <button className="view-details-action-btn">VIEW DETAILS</button>
+            <button 
+              onClick={() => navigate(`/projects/${project.id}`)}
+              className="view-details-action-btn cursor-pointer"
+            >
+              VIEW DETAILS
+            </button>
           </div>
         </div>
       ))}

@@ -157,15 +157,23 @@ export const ProjectsTable = ({
               ))}
             </thead>
             <tbody>
-              {tableInstance.getRowModel().rows.map(row => (
-                <tr key={row.id}>
-                  {row.getVisibleCells().map(cell => (
-                    <td key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
+              {tableInstance.getRowModel().rows.length === 0 ? (
+                <tr>
+                  <td colSpan={tableInstance.getVisibleFlatColumns().length} className="text-center p-6 text-[var(--text-muted)]">
+                    No active projects found.
+                  </td>
                 </tr>
-              ))}
+              ) : (
+                tableInstance.getRowModel().rows.map(row => (
+                  <tr key={row.id}>
+                    {row.getVisibleCells().map(cell => (
+                      <td key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

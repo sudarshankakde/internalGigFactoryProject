@@ -48,10 +48,10 @@
 .sidebar-brand {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 18px 14px 14px;
   border-bottom: 1px solid var(--border);
-  min-height: 64px;
+  height: var(--topbar-height);
   flex-shrink: 0;
 }
 
@@ -61,14 +61,15 @@
 }
 
 .sidebar-logo {
-  width: 130px;
+  width: 160px;
   object-fit: contain;
   transition: width var(--transition), opacity var(--transition);
 }
 
 .app-sidebar.collapsed .sidebar-logo {
-  width: 36px;
+  width: 30px;
 }
+
 
 .sidebar-collapse-btn {
   background: transparent;
@@ -673,3 +674,12 @@
     max-width: none;
   }
 }
+
+/* Collapsed Sidebar Tooltips overflow override */
+.app-sidebar.collapsed,
+.app-sidebar.collapsed .sidebar-nav,
+.app-sidebar.collapsed .sidebar-bottom,
+.app-sidebar.collapsed .sidebar-nav-item {
+  overflow: visible !important;
+}
+

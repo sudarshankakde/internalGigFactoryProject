@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Filter } from 'lucide-react';
+import { api } from '../../utils/api';
 import './ActiveProject.css';
 
 // Import subcomponents
@@ -8,44 +10,67 @@ import { ActiveProjectsList } from '../../components/ActiveProject/ActiveProject
 import { ActiveProjectsInsights } from '../../components/ActiveProject/ActiveProjectsInsights';
 
 export const ActiveProjects = () => {
-  const [projects, setProjects] = useState([
-    {
-      id: "p_01",
-      title: "Enterprise API Refactor",
-      clientName: "TechNova Solutions",
-      status: "In Progress",
-      totalBudget: 12500,
-      timeTracked: "48h/80h",
-      deadline: "Oct 24",
-      progressPercentage: 60,
-      milestones: [
-        { name: "Architecture Review", isCompleted: true },
-        { name: "Authentication Module Rewrite", isCompleted: false },
-        { name: "Database Migration Scripts", isCompleted: false }
-      ]
-    },
-    {
-      id: "p_02",
-      title: "Design System V2",
-      clientName: "Acme Corp",
-      status: "Pending Review",
-      milestoneValue: 4200,
-      deadline: "Oct 24",
-      progressPercentage: 90,
-      milestones: [
-        { name: "Component Token Audit", isCompleted: true },
-        { name: "Figma Library Sync", isCompleted: true },
-        { name: "Documentation Deploy", isCompleted: false }
-      ]
-    }
-  ]);
+  // Fetch active ongoing engagements
+  const { data: dashboardData, isLoading: isDashboardLoading } = useQuery({
+    queryKey: ['my-projects-dashboard-active'],
+    queryFn: () => api.get('/projects/my-projects'),
+  });
 
-  const [activities] = useState([
-    { type: 'milestone', title: "Milestone Approved for Design System V2.", timestamp: "2 hours ago" },
-    { type: 'upload', title: "File Uploaded: 'auth_flow_v3.ts' to Enterprise API Refactor.", timestamp: "5 hours ago" },
-    { type: 'payment', title: "Payment Received $2,500 from Mobile App Landing Page.", timestamp: "Yesterday" },
-    { type: 'message', title: "New Message from TechNova Solutions regarding timeline.", timestamp: "Yesterday" }
-  ]);
+  // Fetch activities (notifications)
+  const { data: notificationsData, isLoading: isNotifsLoading } = useQuery({
+    queryKey: ['active-projects-notifications'],
+    queryFn: () => api.get('/notifications'),
+  });
+
+  if (isDashboardLoading || isNotifsLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center space-y-4 py-20">
+        <div className="animate-spin w-8 h-8 border-4 border-[#70d64d] border-t-transparent rounded-full" />
+        <span className="text-gray-400 text-sm">Loading active projects...</span>
+      </div>
+    );
+  }
+
+  const ongoing = dashboardData?.ongoing || [];
+  const notifications = notificationsData?.notifications || [];
+
+  // Map backend assignments to UI projects
+  const projects = ongoing.map((item) => {
+    const p = item.project || {};
+    return {
+      id: p.id,
+      title: p.title,
+      clientName: p.client || 'Internal Client',
+      status: p.status,
+      totalBudget: item.assigned_amount || p.budget || 0,
+      deadline: p.end_date ? new Date(p.end_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'TBD',
+      progressPercentage: p.progress_percentage || 0,
+      milestones: (p.milestones || []).map(m => ({
+        name: m.title,
+        isCompleted: m.status === 'completed'
+      }))
+    };
+  });
+
+  // Map notifications to insights timeline activities
+  const activities = notifications.map((n) => {
+    let type = 'message';
+    if (n.type === 'approved' || n.type === 'rejected' || n.type === 'submission') {
+      type = 'milestone';
+    } else if (n.type === 'payment') {
+      type = 'payment';
+    }
+    const refType = n.reference_type || n.referenceType;
+    const refId = n.reference_id || n.referenceId;
+    const targetUrl = n.action_url || (refType === 'project' && refId ? `/projects/${refId}` : null);
+
+    return {
+      type,
+      title: n.title,
+      timestamp: new Date(n.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
+      targetUrl
+    };
+  });
 
   return (
     <div className="active-projects-workspace animate-fade-in">
