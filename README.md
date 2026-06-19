@@ -7,9 +7,12 @@ This is the frontend client application for **GigFactory**, built with React, Vi
 ## 🚀 Key Features
 
 - **Multi-Role Dashboards**: Role-tailored workspace views for Super Admins, Freelancers, and Agencies.
+- **My Applications Dashboard**: An interactive view (`/applications`) for freelancers and agencies showing their project bid applications, complete with high-level stats cards, searching, sorting, status filtering, and custom pagination.
 - **Registration Requests System**: Fully modular table lists, detail panels, and custom re-application cooldown selectors for Admin review.
 - **My Team Management**: Agency-specific interface with forms to add, edit, or remove team members.
-- **Search Debouncing**: Fully integrated client-side debouncing with a **350ms delay** on search/filter fields to prevent performance lags.
+- **Milestone Deliverable Management**: Assigned freelancers/agencies can submit deliverables for project milestones and edit/resubmit their submissions (updating text descriptions, adding new attachments, and removing old ones) before approval.
+- **Admin Milestone Payments**: Administrators can manually record milestone payments and edit/update recorded payment details (amount, payment method, reference number, remarks, receipt proof attachment) directly.
+- **Search Debouncing**: Fully integrated client-side debouncing with a **350ms delay** on search/filter fields (and **400ms** on applications) to prevent performance lags.
 - **Zustand State Store**: Integrated auth token persistence, auto-login capability, and profile synchronization.
 - **Clean Split Components**: Component-level separation of metrics, tables, cards, modals, and skeletons under `src/components/` for optimized rendering.
 
