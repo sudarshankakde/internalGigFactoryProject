@@ -10,7 +10,7 @@ export const CapabilityCloud = ({ isFreelancer, skills }) => {
       </h3>
       <div className="skills-pill-cloud">
         {skills.length === 0 ? (
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No capabilities listed yet.</p>
+          <p className="text-[var(--text-muted)] text-[0.85rem]">No capabilities listed yet.</p>
         ) : (
           skills.map((s, idx) => (
             <span key={s.id || idx} className="skill-pill-node">{s.skill_name}</span>

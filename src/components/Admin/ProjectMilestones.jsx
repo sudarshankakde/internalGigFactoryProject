@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Plus, Edit2, Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import MilestoneModal from './MilestoneModal';
+import ConfirmDialog from './ConfirmDialog';
 import {
   getMilestonesByProject,
   addMilestone,
@@ -15,6 +16,41 @@ export default function ProjectMilestones({ project, onClose }) {
   const [editing, setEditing] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [milestones, setMilestones] = useState([]);
+
+  const [confirmConfig, setConfirmConfig] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'confirm',
+    variant: 'primary',
+    promptPlaceholder: '',
+    defaultValue: '',
+    onConfirm: () => {},
+  });
+
+  const showConfirm = ({
+    title,
+    message,
+    type = 'confirm',
+    variant = 'primary',
+    promptPlaceholder = '',
+    defaultValue = '',
+    onConfirm,
+  }) => {
+    setConfirmConfig({
+      isOpen: true,
+      title,
+      message,
+      type,
+      variant,
+      promptPlaceholder,
+      defaultValue,
+      onConfirm: (val) => {
+        if (onConfirm) onConfirm(val);
+        setConfirmConfig((prev) => ({ ...prev, isOpen: false }));
+      },
+    });
+  };
 
   useEffect(() => {
     if (!project) return;
@@ -37,10 +73,16 @@ export default function ProjectMilestones({ project, onClose }) {
   };
 
   const handleDelete = (m) => {
-    if (!window.confirm('Delete milestone?')) return;
-    deleteMilestone(project.id, m.id);
-    toast.success('Milestone removed');
-    refresh();
+    showConfirm({
+      title: 'Delete Milestone',
+      message: 'Are you sure you want to delete this milestone?',
+      variant: 'danger',
+      onConfirm: () => {
+        deleteMilestone(project.id, m.id);
+        toast.success('Milestone removed');
+        refresh();
+      }
+    });
   };
 
   const handleSave = (vals) => {
@@ -105,6 +147,18 @@ export default function ProjectMilestones({ project, onClose }) {
           onSave={handleSave}
         />
       )}
+
+      <ConfirmDialog
+        isOpen={confirmConfig.isOpen}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        type={confirmConfig.type}
+        variant={confirmConfig.variant}
+        promptPlaceholder={confirmConfig.promptPlaceholder}
+        defaultValue={confirmConfig.defaultValue}
+        onConfirm={confirmConfig.onConfirm}
+        onCancel={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+      />
     </>
   );
 }

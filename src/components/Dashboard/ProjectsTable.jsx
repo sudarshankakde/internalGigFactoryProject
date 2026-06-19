@@ -65,34 +65,34 @@ export const ProjectsTable = ({
                 [...Array(5)].map((_, i) => (
                   <tr key={`skeleton-${i}`}>
                     <td>
-                      <div className="skeleton-pulse" style={{ width: '120px', height: '16px', borderRadius: '4px' }} />
+                      <div className="skeleton-pulse w-[120px] h-4 rounded" />
                     </td>
                     <td>
-                      <div className="skeleton-pulse" style={{ width: '150px', height: '14px', borderRadius: '4px' }} />
+                      <div className="skeleton-pulse w-[150px] h-3.5 rounded" />
                     </td>
                     <td>
-                      <div className="skeleton-pulse" style={{ width: '90px', height: '14px', borderRadius: '4px' }} />
+                      <div className="skeleton-pulse w-[90px] h-3.5 rounded" />
                     </td>
                     <td>
-                      <div className="skeleton-pulse" style={{ width: '80px', height: '22px', borderRadius: '12px' }} />
+                      <div className="skeleton-pulse w-20 h-[22px] rounded-full" />
                     </td>
                     <td>
-                      <div className="skeleton-pulse" style={{ width: '70px', height: '20px', borderRadius: '4px' }} />
+                      <div className="skeleton-pulse w-[70px] h-5 rounded" />
                     </td>
                     <td>
-                      <div className="skeleton-pulse" style={{ width: '100px', height: '14px', borderRadius: '4px' }} />
+                      <div className="skeleton-pulse w-[100px] h-3.5 rounded" />
                     </td>
                     <td>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <div className="skeleton-pulse" style={{ width: '70px', height: '28px', borderRadius: '6px' }} />
-                        <div className="skeleton-pulse" style={{ width: '70px', height: '28px', borderRadius: '6px' }} />
+                      <div className="flex gap-2">
+                        <div className="skeleton-pulse w-[70px] h-7 rounded-md" />
+                        <div className="skeleton-pulse w-[70px] h-7 rounded-md" />
                       </div>
                     </td>
                   </tr>
                 ))
               ) : registrationRequests.length === 0 ? (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: 'center', padding: '24px', color: 'var(--text-muted)' }}>
+                  <td colSpan="7" className="text-center p-6 text-[var(--text-muted)]">
                     No registration requests found.
                   </td>
                 </tr>
@@ -132,7 +132,7 @@ export const ProjectsTable = ({
                           </button>
                         </div>
                       ) : (
-                        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Reviewed</span>
+                        <span className="text-[0.85rem] text-[var(--text-muted)]">Reviewed</span>
                       )}
                     </td>
                   </tr>

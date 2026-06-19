@@ -16,39 +16,55 @@ export const RejectModal = ({ request, onClose, onConfirm, isPending }) => {
 
   return (
     <>
-      <div onClick={onClose} style={{ position:'fixed',inset:0,background:'rgba(0,0,0,0.7)',backdropFilter:'blur(3px)',zIndex:900 }} />
-      <div style={{ position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',width:'100%',maxWidth:'420px',background:'#181818',border:'1px solid #2c2c2c',borderRadius:'10px',overflow:'hidden',zIndex:901,boxShadow:'0 20px 60px rgba(0,0,0,0.8)' }}>
-        <div style={{ height:'3px',background:'#ef4444' }} />
-        <div style={{ padding:'20px 24px', borderBottom:'1px solid #2c2c2c', display:'flex', alignItems:'center', gap:'12px' }}>
-          <div style={{ width:'36px',height:'36px',background:'rgba(239,68,68,0.1)',border:'1px solid rgba(239,68,68,0.25)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0 }}>
+      <div 
+        onClick={onClose} 
+        className="fixed inset-0 bg-black/70 backdrop-blur-[3px] z-[900]" 
+      />
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[420px] bg-[#181818] border border-[#2c2c2c] rounded-[10px] overflow-hidden z-[901] shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
+        <div className="h-[3px] bg-[#ef4444]" />
+        <div className="py-5 px-6 border-b border-[#2c2c2c] flex items-center gap-3">
+          <div className="w-9 h-9 bg-[#ef4444]/10 border border-[#ef4444]/25 rounded-full flex items-center justify-center shrink-0">
             <AlertCircle size={18} color="#ef4444" />
           </div>
-          <div style={{ flex:1 }}>
-            <p style={{ color:'#fff',fontWeight:800,fontSize:'0.95rem',margin:0 }}>Reject Application</p>
-            <p style={{ color:'#6b7280',fontSize:'0.78rem',margin:'2px 0 0' }}>{request.full_name} — {request.role}</p>
+          <div className="flex-1">
+            <p className="text-white font-extrabold text-[0.95rem] m-0">Reject Application</p>
+            <p className="text-[#6b7280] text-[0.78rem] mt-0.5 mb-0 mx-0">{request.full_name} — {request.role}</p>
           </div>
-          <button onClick={onClose} style={{ background:'none',border:'1px solid #2c2c2c',color:'#8a8a8a',borderRadius:'6px',padding:'5px 7px',cursor:'pointer',display:'flex',alignItems:'center' }}><X size={15}/></button>
+          <button 
+            onClick={onClose} 
+            className="bg-transparent border border-[#2c2c2c] text-[#8a8a8a] rounded-md py-[5px] px-[7px] cursor-pointer flex items-center"
+          >
+            <X size={15}/>
+          </button>
         </div>
-        <div style={{ padding:'20px 24px' }}>
-          <label style={{ color:'#8a8a8a',fontSize:'0.78rem',fontWeight:600,display:'block',marginBottom:'8px' }}>Reason for Rejection <span style={{color:'#ef4444'}}>*</span></label>
+        <div className="py-5 px-6">
+          <label className="text-[#8a8a8a] text-[0.78rem] font-semibold block mb-2">
+            Reason for Rejection <span className="text-[#ef4444]">*</span>
+          </label>
           <textarea
             rows={4}
             value={reason}
             onChange={e => setReason(e.target.value)}
             placeholder="Describe why this application is being rejected…"
             autoFocus
-            style={{ width:'100%',background:'#1f1f1f',border:'1px solid #2c2c2c',borderRadius:'6px',color:'#fff',fontSize:'0.85rem',padding:'10px 12px',outline:'none',resize:'vertical',fontFamily:'inherit' }}
+            className="w-full bg-[#1f1f1f] border border-[#2c2c2c] rounded-md text-white text-[0.85rem] py-2.5 px-3 outline-none resize-y font-inherit"
           />
-          <div style={{ display:'flex',gap:'10px',marginTop:'16px' }}>
+          <div className="flex gap-2.5 mt-4">
             <button
               type="button"
               onClick={handleConfirm}
               disabled={isPending}
-              style={{ flex:1,background:'rgba(239,68,68,0.1)',color:'#ef4444',border:'1px solid rgba(239,68,68,0.3)',borderRadius:'6px',padding:'10px 16px',fontSize:'0.83rem',fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'6px' }}
+              className="flex-1 bg-[#ef4444]/10 text-[#ef4444] border border-[#ef4444]/30 rounded-md py-2.5 px-4 text-[0.83rem] font-bold cursor-pointer flex items-center justify-center gap-1.5"
             >
               <X size={13}/> {isPending ? 'Rejecting…' : 'Confirm Rejection'}
             </button>
-            <button type="button" onClick={onClose} style={{ background:'transparent',border:'1px solid #2c2c2c',color:'#8a8a8a',borderRadius:'6px',padding:'10px 16px',fontSize:'0.83rem',cursor:'pointer' }}>Cancel</button>
+            <button 
+              type="button" 
+              onClick={onClose} 
+              className="bg-transparent border border-[#2c2c2c] text-[#8a8a8a] rounded-md py-2.5 px-4 text-[0.83rem] cursor-pointer"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       </div>

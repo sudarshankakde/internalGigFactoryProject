@@ -15,11 +15,12 @@ import {
   BarChart3, Bell, Settings, LogOut, ChevronLeft, ChevronRight,
   Menu, X, User, FileCheck, Shield, ChevronDown, FileSearch,
   Handshake, Banknote, Check, ArrowRight,
-  Calendar,
+  Calendar, Mail,
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../../store/useAuthStore';
 import { api } from '../../utils/api';
+import { useSocket, destroySocket } from '../../hooks/useSocket';
 import gigfactoryLogo  from '../../assets/logo.png';
 import gigfactoryIcon  from '../../assets/logo.png'; // same logo, smaller
 import './AppLayout.css';
@@ -33,6 +34,8 @@ const NAV_CONFIG = {
     { label: 'Agencies',      icon: Building2,        to: '/admin/agencies' },
     { label: 'Projects',      icon: Briefcase,        to: '/admin/projects' },
     { label: 'Analytics',     icon: BarChart3,        to: '/admin/analytics' },
+    { label: 'Logs & Activity', icon: FileText,       to: '/admin/activities' },
+    { label: 'Communication', icon: Mail,             to: '/admin/communication' },
     { label: 'Settings',      icon: Settings,         to: '/admin/settings' },
   ],
   freelancer: [
@@ -234,6 +237,7 @@ export default function AppLayout({ children, pageTitle }) {
 
   const queryClient = useQueryClient();
 
+  // ── Initial fetch of notifications (once on mount) ──────────────────────
   const { data: notifications = [] } = useQuery({
     queryKey: ['notifications'],
     queryFn: async () => {
@@ -245,8 +249,22 @@ export default function AppLayout({ children, pageTitle }) {
         return [];
       }
     },
-    refetchInterval: 15000,
+    // No refetchInterval — Socket.IO handles real-time updates
+    staleTime: Infinity,
   });
+
+  // ── Real-time: receive new notifications via Socket.IO ───────────────────
+  const { on, off } = useSocket();
+  useEffect(() => {
+    const handler = (newNotif) => {
+      queryClient.setQueryData(['notifications'], (prev = []) => [
+        newNotif,
+        ...prev,
+      ]);
+    };
+    on('new_notification', handler);
+    return () => off('new_notification', handler);
+  }, [on, off, queryClient]);
 
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
@@ -288,6 +306,7 @@ export default function AppLayout({ children, pageTitle }) {
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
   const handleLogout = () => {
+    destroySocket();
     clearAuth();
     navigate(role === 'admin' ? '/admin' : '/');
   };

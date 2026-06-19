@@ -18,6 +18,9 @@ import { Profile }      from './pages/Profile/Profile.jsx';
 import { ActiveProjects } from './pages/ActiveProject/ActiveProject.jsx';
 import { Team }         from './pages/Team/Team.jsx';
 import UserSettings     from './pages/UserSettings/UserSettings.jsx';
+import BrowseProjects   from './pages/BrowseProjects/BrowseProjects.jsx';
+import ProjectDetail    from './pages/BrowseProjects/ProjectDetail.jsx';
+
 
 /* ── Admin pages ── */
 import AdminOverview          from './pages/Admin/AdminOverview.jsx';
@@ -26,6 +29,9 @@ import AdminFreelancers        from './pages/Admin/AdminFreelancers.jsx';
 import AdminAgencies           from './pages/Admin/AdminAgencies.jsx';
 import AdminUserProfile        from './pages/Admin/AdminUserProfile.jsx';
 import AdminSettings           from './pages/Admin/AdminSettings.jsx';
+import AdminAnalytics          from './pages/Admin/AdminAnalytics.jsx';
+import AdminActivities         from './pages/Admin/AdminActivities.jsx';
+import AdminCommunication      from './pages/Admin/AdminCommunication.jsx';
 import ProjectDetailView      from './components/Admin/ProjectDetailView.jsx';
 
 /* ── Layout ── */
@@ -158,6 +164,21 @@ function App() {
             <AdminSettings />
           </AdminRoute>
         } />
+        <Route path="/admin/analytics" element={
+          <AdminRoute title="Analytics">
+            <AdminAnalytics />
+          </AdminRoute>
+        } />
+        <Route path="/admin/activities" element={
+          <AdminRoute title="System Activities">
+            <AdminActivities />
+          </AdminRoute>
+        } />
+        <Route path="/admin/communication" element={
+          <AdminRoute title="Communication">
+            <AdminCommunication />
+          </AdminRoute>
+        } />
 
 
         {/* ── Regular user protected routes ── */}
@@ -196,12 +217,27 @@ function App() {
             </AppLayout>
           </PrivateRoute>
         } />
+        <Route path="/projects" element={
+          <PrivateRoute>
+            <AppLayout pageTitle="Browse Projects">
+              <BrowseProjects />
+            </AppLayout>
+          </PrivateRoute>
+        } />
+        <Route path="/projects/:id" element={
+          <PrivateRoute>
+            <AppLayout pageTitle="Project Detail">
+              <ProjectDetail />
+            </AppLayout>
+          </PrivateRoute>
+        } />
+
 
         {/* ── Catch-all ── */}
         <Route path="*" element={<NotFound />} />
 
       </Routes>
-      <ToastContainer position="top-right" theme="dark" />
+      <ToastContainer position="bottom-right" theme="dark" />
     </BrowserRouter>
   );
 }

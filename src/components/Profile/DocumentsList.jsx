@@ -12,20 +12,20 @@ export const DocumentsList = ({ isFreelancer, resumeUrl, verifications }) => {
       </div>
 
       {isFreelancer && resumeUrl ? (
-        <div className="empty-documents-status-placeholder" style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <p className="primary-empty-msg" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className="empty-documents-status-placeholder text-left flex flex-col gap-2">
+          <p className="primary-empty-msg flex items-center gap-2">
             <FileText size={16} color="#70d64d" /> Resume Document
           </p>
-          <a href={resumeUrl} target="_blank" rel="noreferrer" style={{ fontSize: '0.85rem', color: '#70d64d', textDecoration: 'underline', fontWeight: 600 }}>
+          <a href={resumeUrl} target="_blank" rel="noreferrer" className="text-[0.85rem] text-[#70d64d] underline font-semibold">
             View Resume / CV
           </a>
         </div>
       ) : !isFreelancer && verifications && verifications.length > 0 ? (
-        <div className="empty-documents-status-placeholder" style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div className="empty-documents-status-placeholder text-left flex flex-col gap-2">
           {verifications.map((v) => (
-            <div key={v.id} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '6px' }}>
-              <span style={{ fontSize: '0.85rem', color: '#fff' }}>{v.document_type}</span>
-              <span style={{ fontSize: '0.75rem', color: v.verification_status === 'verified' ? '#70d64d' : '#f59e0b' }}>
+            <div key={v.id} className="flex justify-between border-b border-white/5 pb-1.5">
+              <span className="text-[0.85rem] text-white">{v.document_type}</span>
+              <span className={`text-[0.75rem] ${v.verification_status === 'verified' ? 'text-[#70d64d]' : 'text-[#f59e0b]'}`}>
                 {v.verification_status.toUpperCase()}
               </span>
             </div>

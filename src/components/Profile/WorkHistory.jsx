@@ -6,7 +6,7 @@ export const WorkHistory = ({ workHistory }) => {
     <div className="pane-content-card">
       <h3><Briefcase size={18} /> Professional Experience</h3>
       {(!workHistory || workHistory.length === 0) ? (
-        <p className="job-summary-details" style={{ fontStyle: 'italic' }}>No professional experience history listed yet.</p>
+        <p className="job-summary-details italic">No professional experience history listed yet.</p>
       ) : (
         <div className="history-timeline-list">
           {workHistory.map((job) => (

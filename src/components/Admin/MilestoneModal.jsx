@@ -1,74 +1,180 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { RichTextEditor } from '../AdminShared';
 
-export default function MilestoneModal({ milestone = null, onClose, onSave }) {
+export default function MilestoneModal({ milestone = null, onClose, onSave, projectBudget = 0, existingMilestones = [] }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [startDate, setStartDate] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [amount, setAmount] = useState('');
+  const [weightPercentage, setWeightPercentage] = useState('');
   const [status, setStatus] = useState('pending');
 
   useEffect(() => {
     if (milestone) {
       setTitle(milestone.title || '');
       setDescription(milestone.description || '');
-      setDueDate(milestone.due_date ? milestone.due_date.split('T')[0] : '');
-      setAmount(milestone.amount || '');
+      setStartDate(milestone.start_date ? milestone.start_date.substring(0, 10) : '');
+      setDueDate(milestone.due_date ? milestone.due_date.substring(0, 10) : '');
+      setAmount(milestone.budget || milestone.amount || '');
+      setWeightPercentage(milestone.weight_percentage || '');
       setStatus(milestone.status || 'pending');
     }
   }, [milestone]);
+
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const payload = {
       title: title.trim(),
-      description: description.trim(),
+      description: description ? description.trim() : '',
+      start_date: startDate || null,
       due_date: dueDate || null,
+      budget: amount ? Number(amount) : null,
       amount: amount ? Number(amount) : null,
+      weight_percentage: weightPercentage ? Number(weightPercentage) : null,
       status,
     };
     onSave(payload);
   };
 
+  const inputClass = "mt-2 w-full rounded-[8px] border border-[#23232a] bg-[#0c0c0e] px-4 py-3 text-white text-[0.85rem] outline-none focus:border-[#70d64d] transition-colors";
+
   return (
     <>
-      <div onClick={onClose} className="fixed inset-0 bg-black/70 z-[800]" />
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[92vw] max-w-[520px] bg-[#121215] border border-[#23232a] rounded-md z-[801]">
-        <div className="flex items-center justify-between p-4 border-b border-[#23232a]">
-          <h4 className="text-white font-bold">{milestone ? 'Edit Milestone' : 'Add Milestone'}</h4>
-          <button onClick={onClose} className="text-gray-300 p-1"><X size={18} /></button>
+      {/* Backdrop */}
+      <div onClick={onClose} className="fixed inset-0 bg-black/80 backdrop-blur-[6px] z-[800]" />
+      
+      {/* Modal Container */}
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95vw] max-w-[580px] bg-[#121215] border border-[#23232a] rounded-[16px] p-[24px] text-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] z-[801] flex flex-col gap-4">
+        
+        {/* Header */}
+        <div className="flex justify-between items-center border-b border-[#23232a] pb-3">
+          <h3 className="m-0 text-[1.15rem] font-extrabold text-white">
+            {milestone ? 'Edit Milestone' : 'Add Milestone'}
+          </h3>
+          <button onClick={onClose} className="bg-transparent border-none text-gray-500 hover:text-white cursor-pointer transition-colors">
+            <X size={18} />
+          </button>
         </div>
-        <form onSubmit={handleSubmit} className="p-4 space-y-3">
-          <div>
-            <label className="text-gray-400 text-sm">Title</label>
-            <input value={title} onChange={(e) => setTitle(e.target.value)} className="w-full mt-1 p-2 bg-[#0c0c0e] border border-[#23232a] rounded text-white" required />
-          </div>
-          <div>
-            <label className="text-gray-400 text-sm">Description</label>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full mt-1 p-2 bg-[#0c0c0e] border border-[#23232a] rounded text-white" rows={3} />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          
+          {/* Scrollable Fields Wrapper */}
+          <div className="flex flex-col gap-4 max-h-[60vh] overflow-y-auto pr-1">
+            
+            {/* Title */}
             <div>
-              <label className="text-gray-400 text-sm">Due Date</label>
-              <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className="w-full mt-1 p-2 bg-[#0c0c0e] border border-[#23232a] rounded text-white" />
+              <label className="text-gray-300 text-xs">Title *</label>
+              <input 
+                type="text" 
+                value={title} 
+                onChange={(e) => setTitle(e.target.value)} 
+                className={inputClass} 
+                placeholder="e.g. Design Wireframes Approval"
+                required 
+              />
             </div>
+
+            {/* Amount & Weight */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-gray-300 text-xs">Amount (Budget) *</label>
+                <input 
+                  type="number" 
+                  value={amount} 
+                  onChange={(e) => setAmount(e.target.value)} 
+                  className={inputClass} 
+                  placeholder="e.g. 15000"
+                  required 
+                />
+              </div>
+              <div>
+                <label className="text-gray-300 text-xs">Weight % *</label>
+                <input 
+                  type="number" 
+                  step="any"
+                  value={weightPercentage} 
+                  onChange={(e) => setWeightPercentage(e.target.value)} 
+                  className={inputClass} 
+                  placeholder="e.g. 25"
+                  required 
+                />
+              </div>
+            </div>
+
+            {/* Dates */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-gray-300 text-xs">Start Date</label>
+                <input 
+                  type="date" 
+                  value={startDate} 
+                  onChange={(e) => setStartDate(e.target.value)} 
+                  className={inputClass} 
+                />
+              </div>
+              <div>
+                <label className="text-gray-300 text-xs">Due Date</label>
+                <input 
+                  type="date" 
+                  value={dueDate} 
+                  onChange={(e) => setDueDate(e.target.value)} 
+                  className={inputClass} 
+                />
+              </div>
+            </div>
+
+            {/* Status */}
             <div>
-              <label className="text-gray-400 text-sm">Amount</label>
-              <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="w-full mt-1 p-2 bg-[#0c0c0e] border border-[#23232a] rounded text-white" />
+              <label className="text-gray-300 text-xs">Status</label>
+              <select 
+                value={status} 
+                onChange={(e) => setStatus(e.target.value)} 
+                className={inputClass}
+              >
+                <option value="pending">Pending</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed</option>
+              </select>
             </div>
+
+            {/* Description (Rich Text Editor) */}
+            <div>
+              <label className="text-gray-300 text-xs">Description</label>
+              <div className="mt-2">
+                <RichTextEditor
+                  value={description}
+                  onChange={setDescription}
+                  placeholder="Describe the milestone goals, deliverables, and approval criteria..."
+                  compact
+                  minHeight="120px"
+                />
+              </div>
+            </div>
+
           </div>
-          <div>
-            <label className="text-gray-400 text-sm">Status</label>
-            <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full mt-1 p-2 bg-[#0c0c0e] border border-[#23232a] rounded text-white">
-              <option value="pending">Pending</option>
-              <option value="in_progress">In Progress</option>
-              <option value="completed">Completed</option>
-            </select>
+
+          {/* Footer Actions (Fixed at the bottom of form) */}
+          <div className="flex justify-end gap-3 border-t border-[#23232a] pt-4 mt-2">
+            <button 
+              type="button" 
+              onClick={onClose} 
+              className="bg-transparent border border-[#2c2c35] text-[#a1a1aa] rounded-[8px] px-5 py-2.5 text-[0.85rem] font-semibold cursor-pointer hover:bg-white/[0.02] transition-colors"
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              className="bg-[#70d64d] text-black border-none rounded-[8px] px-6 py-2.5 text-[0.85rem] font-bold cursor-pointer hover:bg-[#8ee67b] transition-colors"
+            >
+              {milestone ? 'Save Changes' : 'Create Milestone'}
+            </button>
           </div>
-          <div className="flex justify-end gap-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 border border-[#23232a] rounded text-gray-300">Cancel</button>
-            <button type="submit" className="px-4 py-2 bg-[#70d64d] text-black rounded font-bold">Save</button>
-          </div>
+
         </form>
       </div>
     </>

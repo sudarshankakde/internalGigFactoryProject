@@ -254,24 +254,20 @@ export default function AdminSettings() {
   return (
     <div className="settings-shell">
 
-      {/* ── Sidebar tabs ── */}
-      <aside className="settings-sidebar">
-        <div className="settings-sidebar-header">
-          <h2>Settings</h2>
-        </div>
-        <nav className="settings-tab-nav">
-          {TABS.map(tab => (
-            <button
-              key={tab.id}
-              className={`settings-tab-btn ${activeTab === tab.id ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              <tab.icon size={16} />
-              <span>{tab.label}</span>
-            </button>
-          ))}
-        </nav>
-      </aside>
+      {/* ── Horizontal Navigation Tabs ── */}
+      <nav className="settings-tab-nav-horizontal">
+        {TABS.map(tab => (
+          <button
+            key={tab.id}
+            type="button"
+            className={`settings-tab-btn-horizontal ${activeTab === tab.id ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            <tab.icon size={15} />
+            <span>{tab.label}</span>
+          </button>
+        ))}
+      </nav>
 
       {/* ── Content area ── */}
       <div className="settings-content">

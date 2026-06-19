@@ -52,36 +52,35 @@ export const EditProfileModal = ({
           <div className="profile-modal-scroll-area">
             {activeTab === 'basic' && (
               <>
-                <div className="form-group avatar-upload-group" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '20px', marginBottom: '20px', borderBottom: '1px solid #23232a', paddingBottom: '20px' }}>
-                  <div className="avatar-preview-box" style={{ width: '80px', height: '80px', borderRadius: '12px', border: '1px solid #23232a', backgroundColor: '#1c1c22', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', color: '#8a8f98', fontSize: '1.5rem', fontWeight: '800' }}>
+                <div className="form-group avatar-upload-group flex flex-row items-center gap-5 mb-5 border-b border-[#23232a] pb-5">
+                  <div className="avatar-preview-box w-20 h-20 rounded-xl border border-[#23232a] bg-[#1c1c22] flex items-center justify-center overflow-hidden text-[#8a8f98] text-2xl font-extrabold">
                     {isFreelancer ? (
                       formData.profilePhoto ? (
-                        <img src={formData.profilePhoto} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={formData.profilePhoto} alt="Preview" className="w-full h-full object-cover" />
                       ) : (
                         getInitials(profile?.user?.full_name)
                       )
                     ) : (
                       formData.logo ? (
-                        <img src={formData.logo} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={formData.logo} alt="Preview" className="w-full h-full object-cover" />
                       ) : (
                         getInitials(profile?.agency_name)
                       )
                     )}
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <label style={{ margin: 0 }}>{isFreelancer ? 'Profile Photo' : 'Agency Logo'}</label>
+                  <div className="flex flex-col gap-2">
+                    <label className="m-0">{isFreelancer ? 'Profile Photo' : 'Agency Logo'}</label>
                     <input
                       type="file"
                       accept="image/*"
                       onChange={handlePhotoUpload}
-                      style={{ display: 'none' }}
+                      className="hidden"
                       id="avatar-file-input"
                     />
                     <button
                       type="button"
-                      className="edit-profile-action-btn"
+                      className="edit-profile-action-btn text-[0.8rem] py-1.5 px-3"
                       onClick={() => document.getElementById('avatar-file-input').click()}
-                      style={{ fontSize: '0.8rem', padding: '6px 12px' }}
                     >
                       Upload Photo
                     </button>
@@ -229,7 +228,7 @@ export const EditProfileModal = ({
 
             {activeTab === 'services' && (
               <div className="form-group">
-                <label style={{ marginBottom: '12px' }}>Services Provided (Select at least one)</label>
+                <label className="mb-3">Services Provided (Select at least one)</label>
                 <div className="services-checkbox-grid">
                   {[
                     { id: 'BIM', label: 'BIM & 2D Drafting' },
@@ -254,11 +253,11 @@ export const EditProfileModal = ({
                   })}
                 </div>
 
-                <div className="dynamic-panels-container" style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px' }}>
+                <div className="dynamic-panels-container flex flex-col gap-4 mt-4">
                   {(formData.selectedServices || []).includes('BIM') && (
                     <div className="nested-service-panel">
                       <h4 className="nested-panel-title">BIM &amp; 2D Drafting Details</h4>
-                      <div className="form-group" style={{ marginBottom: '15px' }}>
+                      <div className="form-group mb-[15px]">
                         <label>SOFTWARE STACK</label>
                         <div className="software-chips">
                           {['Revit', 'AutoCAD', 'Navisworks', 'Tekla', 'Civil 3D'].map((sw) => {
@@ -395,7 +394,7 @@ export const EditProfileModal = ({
                   {(formData.selectedServices || []).includes('Viz') && (
                     <div className="nested-service-panel">
                       <h4 className="nested-panel-title">3D Visualisation Details</h4>
-                      <div className="form-group" style={{ marginBottom: '15px' }}>
+                      <div className="form-group mb-[15px]">
                         <label>RENDERING ENGINE(S)</label>
                         <input 
                           type="text"
@@ -433,7 +432,7 @@ export const EditProfileModal = ({
                 </div>
 
                 {isFreelancer && (
-                  <div className="form-group" style={{ marginTop: '20px' }}>
+                  <div className="form-group mt-5">
                     <label>Additional Custom Skills (comma separated)</label>
                     <input
                       type="text"

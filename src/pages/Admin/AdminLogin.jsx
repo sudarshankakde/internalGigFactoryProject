@@ -63,53 +63,53 @@ const AdminLogin = () => {
   };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.card}>
+    <div className="min-h-screen bg-[#0c0c0e] flex items-center justify-center p-5">
+      <div className="w-full max-w-[400px] bg-[#181818] border border-[#2c2c2c] rounded-[10px] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.7)]">
         {/* top accent */}
-        <div style={styles.accentBar} />
+        <div className="h-[3px] bg-[#70d64d]" />
 
-        <div style={styles.body}>
+        <div className="py-9 px-7 text-center">
           {/* logo */}
-          <img src={gigfactoryLogo} alt="GigFactory" style={styles.logo} />
+          <img src={gigfactoryLogo} alt="GigFactory" className="w-[160px] max-w-full object-contain mb-5" />
 
           {/* heading */}
-          <div style={styles.iconBadge}>
+          <div className="inline-flex items-center justify-center w-11 h-11 bg-[#70d64d]/10 border border-[#70d64d]/25 rounded-full mb-3">
             <ShieldCheck size={20} color="#70d64d" />
           </div>
-          <h1 style={styles.title}>ADMIN PORTAL</h1>
-          <p style={styles.subtitle}>SUPERADMIN ACCESS ONLY</p>
+          <h1 className="text-white text-2xl font-extrabold tracking-[0.5px] m-0">ADMIN PORTAL</h1>
+          <p className="text-[#8a8a8a] text-[0.72rem] tracking-[2px] font-semibold mt-1 mb-0">SUPERADMIN ACCESS ONLY</p>
 
-          <hr style={styles.divider} />
+          <hr className="border-none h-[2px] bg-[#70d64d] my-6" />
 
           {/* form */}
-          <form onSubmit={handleSubmit} style={styles.form}>
-            <div style={styles.fieldGroup}>
-              <label style={styles.label} htmlFor="admin-email">Email Address</label>
-              <div style={styles.inputWrap}>
-                <Mail size={16} style={styles.inputIcon} />
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-left">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[#8a8a8a] text-[0.78rem] font-medium" htmlFor="admin-email">Email Address</label>
+              <div className="relative flex items-center">
+                <Mail size={16} className="absolute left-3.5 text-[#52525b] pointer-events-none" />
                 <input
                   id="admin-email"
                   type="email"
                   placeholder="admin@gigfactory.com"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  style={styles.input}
+                  className="w-full bg-[#1f1f1f] border border-[#2c2c2c] rounded-md text-white text-[0.88rem] py-[11px] pr-3 pl-[42px] outline-none"
                   required
                 />
               </div>
             </div>
 
-            <div style={styles.fieldGroup}>
-              <label style={styles.label} htmlFor="admin-password">Password</label>
-              <div style={styles.inputWrap}>
-                <Lock size={16} style={styles.inputIcon} />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[#8a8a8a] text-[0.78rem] font-medium" htmlFor="admin-password">Password</label>
+              <div className="relative flex items-center">
+                <Lock size={16} className="absolute left-3.5 text-[#52525b] pointer-events-none" />
                 <input
                   id="admin-password"
                   type="password"
                   placeholder="Enter admin password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  style={styles.input}
+                  className="w-full bg-[#1f1f1f] border border-[#2c2c2c] rounded-md text-white text-[0.88rem] py-[11px] pr-3 pl-[42px] outline-none"
                   required
                 />
               </div>
@@ -117,8 +117,8 @@ const AdminLogin = () => {
 
             <button
               type="submit"
+              className="w-full bg-[#70d64d] text-black border-none rounded-md py-3 text-[0.95rem] font-extrabold flex items-center justify-center gap-2 mt-1 transition-opacity"
               style={{
-                ...styles.submitBtn,
                 opacity: loginQuery.isFetching ? 0.7 : 1,
                 cursor: loginQuery.isFetching ? 'not-allowed' : 'pointer',
               }}
@@ -129,140 +129,13 @@ const AdminLogin = () => {
             </button>
           </form>
 
-          <p style={styles.footer}>
-            <a href="/" style={styles.footerLink}>← Back to main site</a>
+          <p className="mt-6 text-[0.82rem]">
+            <a href="/" className="text-[#8a8a8a] no-underline">← Back to main site</a>
           </p>
         </div>
       </div>
     </div>
   );
-};
-
-const styles = {
-  page: {
-    minHeight: '100vh',
-    background: '#0c0c0e',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '20px',
-  },
-  card: {
-    width: '100%',
-    maxWidth: '400px',
-    background: '#181818',
-    border: '1px solid #2c2c2c',
-    borderRadius: '10px',
-    overflow: 'hidden',
-    boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
-  },
-  accentBar: {
-    height: '3px',
-    background: '#70d64d',
-  },
-  body: {
-    padding: '36px 28px',
-    textAlign: 'center',
-  },
-  logo: {
-    width: '160px',
-    maxWidth: '100%',
-    objectFit: 'contain',
-    marginBottom: '20px',
-  },
-  iconBadge: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '44px',
-    height: '44px',
-    background: 'rgba(112,214,77,0.1)',
-    border: '1px solid rgba(112,214,77,0.25)',
-    borderRadius: '50%',
-    marginBottom: '12px',
-  },
-  title: {
-    color: '#fff',
-    fontSize: '1.5rem',
-    fontWeight: 800,
-    letterSpacing: '0.5px',
-    margin: 0,
-  },
-  subtitle: {
-    color: '#8a8a8a',
-    fontSize: '0.72rem',
-    letterSpacing: '2px',
-    fontWeight: 600,
-    marginTop: '4px',
-    marginBottom: 0,
-  },
-  divider: {
-    border: 'none',
-    height: '2px',
-    background: '#70d64d',
-    margin: '24px 0',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '16px',
-    textAlign: 'left',
-  },
-  fieldGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-  },
-  label: {
-    color: '#8a8a8a',
-    fontSize: '0.78rem',
-    fontWeight: 500,
-  },
-  inputWrap: {
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  inputIcon: {
-    position: 'absolute',
-    left: '14px',
-    color: '#52525b',
-    pointerEvents: 'none',
-  },
-  input: {
-    width: '100%',
-    background: '#1f1f1f',
-    border: '1px solid #2c2c2c',
-    borderRadius: '6px',
-    color: '#fff',
-    fontSize: '0.88rem',
-    padding: '11px 12px 11px 42px',
-    outline: 'none',
-  },
-  submitBtn: {
-    width: '100%',
-    background: '#70d64d',
-    color: '#000',
-    border: 'none',
-    borderRadius: '6px',
-    padding: '12px',
-    fontSize: '0.95rem',
-    fontWeight: 800,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px',
-    marginTop: '4px',
-    transition: 'opacity 0.15s',
-  },
-  footer: {
-    marginTop: '24px',
-    fontSize: '0.82rem',
-  },
-  footerLink: {
-    color: '#8a8a8a',
-    textDecoration: 'none',
-  },
 };
 
 export default AdminLogin;

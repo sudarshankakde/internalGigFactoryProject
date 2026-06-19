@@ -19,9 +19,9 @@ export const ProfileHeader = ({
   return (
     <header className="profile-identity-banner">
       <div className="profile-identity-main">
-        <div className="profile-large-avatar" style={{ padding: 0, overflow: 'hidden' }}>
+        <div className="profile-large-avatar p-0 overflow-hidden">
           {avatar ? (
-            <img src={avatar} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={avatar} alt={name} className="w-full h-full object-cover" />
           ) : (
             initials
           )}
@@ -44,7 +44,7 @@ export const ProfileHeader = ({
             {webVal && (
               <span>
                 <Globe size={14} />
-                <a href={webVal.startsWith('http') ? webVal : `https://${webVal}`} target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>
+                <a href={webVal.startsWith('http') ? webVal : `https://${webVal}`} target="_blank" rel="noreferrer" className="text-inherit underline">
                   {webVal}
                 </a>
               </span>

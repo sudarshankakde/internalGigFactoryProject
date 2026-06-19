@@ -21,7 +21,7 @@ export const DashboardMetrics = ({ role, isRequestsLoading, registrationRequests
           <div className="m-card-head"><span>NEW REQUESTS</span><FileText size={16} /></div>
           <div className="m-card-val">
             {isRequestsLoading ? (
-              <span className="skeleton-pulse" style={{ display: 'inline-block', width: '40px', height: '28px', borderRadius: '4px' }} />
+              <span className="skeleton-pulse inline-block w-10 h-7 rounded" />
             ) : (
               registrationRequests.filter(r => r.status === 'pending').length
             )}

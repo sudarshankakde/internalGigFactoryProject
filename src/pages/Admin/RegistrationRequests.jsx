@@ -6,14 +6,13 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { api } from '../../utils/api';
-import { Pagination } from '../../components/AdminShared';
+import { Pagination, PageSizeSelector } from '../../components/AdminShared';
 
 // Import subcomponents
 import { RegistrationRequestsTable } from '../../components/Admin/RegistrationRequestsTable';
 import { RegistrationRequestDetailModal } from '../../components/Admin/RegistrationRequestDetailModal';
 import { RegistrationRequestRejectModal } from '../../components/Admin/RegistrationRequestRejectModal';
 
-const PAGE_SIZE = 10;
 
 export default function RegistrationRequests() {
   const queryClient = useQueryClient();
@@ -25,6 +24,7 @@ export default function RegistrationRequests() {
   const [roleFilter,   setRoleFilter]   = useState(() => localStorage.getItem('requests_role_filter') || 'all');
   const [sortBy,       setSortBy]       = useState(() => localStorage.getItem('requests_sort_by') || 'newest');
   const [page,         setPage]         = useState(1);
+  const [limit,        setLimit]        = useState(() => Number(localStorage.getItem('admin_requests_limit')) || 10);
   const [selectedReq,  setSelectedReq]  = useState(null);
   const [rejectTarget, setRejectTarget] = useState(null);
 
@@ -45,8 +45,12 @@ export default function RegistrationRequests() {
     localStorage.setItem('requests_sort_by', sortBy);
   }, [sortBy]);
 
+  useEffect(() => {
+    localStorage.setItem('admin_requests_limit', limit);
+  }, [limit]);
+
   // reset page on filter change
-  useEffect(() => { setPage(1); }, [dSearch, statusFilter, roleFilter, sortBy]);
+  useEffect(() => { setPage(1); }, [dSearch, statusFilter, roleFilter, sortBy, limit]);
   
   const { data: allRequests = [], isLoading, refetch } = useQuery({
     queryKey: ['admin-registration-requests'],
@@ -115,8 +119,8 @@ export default function RegistrationRequests() {
     else if (sortBy === 'name') arr.sort((a, b) => (a.full_name || '').localeCompare(b.full_name || ''));
     return arr;
   }, [allRequests, statusFilter, roleFilter, dSearch, sortBy]);
-  const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
-  const pageItems  = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const totalPages = Math.ceil(sorted.length / limit);
+  const pageItems  = sorted.slice((page - 1) * limit, page * limit);
 
   const stats = useMemo(() => ({
     total:    allRequests.length,
@@ -221,8 +225,11 @@ export default function RegistrationRequests() {
         {/* Footer: count + pagination */}
         <div className="mt-[20px] flex justify-between items-center flex-wrap gap-[12px]">
           <span className="text-gray-500 text-[0.8rem]">
-            Showing {Math.min((page - 1) * PAGE_SIZE + 1, sorted.length)}–{Math.min(page * PAGE_SIZE, sorted.length)} of {sorted.length} results
+            Showing {Math.min((page - 1) * limit + 1, sorted.length)}–{Math.min(page * limit, sorted.length)} of {sorted.length} results
           </span>
+
+          <PageSizeSelector limit={limit} onChangeLimit={setLimit} total={sorted.length} isLoading={isLoading} />
+
           <Pagination page={page} totalPages={totalPages} onPage={setPage} />
         </div>
       </div>

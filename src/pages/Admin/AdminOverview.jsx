@@ -2,7 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users, Building2, FileSearch, CheckCircle2,
-  TrendingUp, ArrowRight, Clock, UserCheck, Bell, X
+  TrendingUp, ArrowRight, Clock, UserCheck, Bell, X,
+  ChevronDown, ChevronUp
 } from 'lucide-react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
@@ -73,6 +74,8 @@ function QuickLink({ icon: Icon, label, desc, to, color }) {
 export default function AdminOverview() {
   const navigate = useNavigate();
   const [isSenderOpen, setIsSenderOpen] = useState(false);
+  const [isRequestsCollapsed, setIsRequestsCollapsed] = useState(false);
+  const [isBidsCollapsed, setIsBidsCollapsed] = useState(false);
 
   const { data: statsData } = useQuery({
     queryKey: ['admin-stats'],
@@ -112,6 +115,7 @@ export default function AdminOverview() {
 
   const stats = statsData?.stats || {};
   const recentRequests = (reqData || []).slice(0, 5);
+  const recentBids = statsData?.recentBids || [];
 
   return (
     <div className="flex flex-col gap-[28px]">
@@ -151,78 +155,161 @@ export default function AdminOverview() {
       {/* Main grid */}
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-5">
 
-        {/* Recent registration requests */}
-        <div className="bg-[#121215] border border-[#23232a] rounded-[12px] p-[24px]">
-          <div className="flex justify-between items-center mb-[20px]">
-            <h2 className="text-white text-[1rem] font-extrabold m-0">
-              Recent Registration Requests
-            </h2>
-            <button
-              onClick={() => navigate('/admin/requests')}
-              className="bg-transparent border border-[#23232a] text-[#70d64d] rounded-[6px] px-[12px] py-[6px] text-[0.75rem] font-bold cursor-pointer flex items-center gap-[5px]"
-            >
-              View All <ArrowRight size={12} />
-            </button>
-          </div>
-
-          <div className="flex flex-col gap-[12px]">
-            {isReqLoading ? (
-              [...Array(4)].map((_, i) => (
-                <div key={i} className="flex items-center gap-[12px] py-[10px] border-b border-[#1a1a22]">
-                  <div className="skeleton-pulse w-[36px] h-[36px] rounded-full shrink-0" />
-                  <div className="flex-1">
-                    <div className="skeleton-pulse w-[40%] h-[14px] rounded-[4px] mb-[6px]" />
-                    <div className="skeleton-pulse w-[60%] h-[12px] rounded-[4px]" />
-                  </div>
-                </div>
-              ))
-            ) : recentRequests.length === 0 ? (
-              <p className="text-gray-500 text-[0.85rem] m-0 text-center py-[24px]">
-                No recent registration requests.
-              </p>
-            ) : recentRequests.map(req => {
-              const statusColor = req.status === 'approved' ? '#70d64d' : req.status === 'rejected' ? '#ef4444' : '#f59e0b';
-              const roleColor = req.role === 'agency' ? '#c084fc' : '#38bdf8';
-              return (
-                <div
-                  key={req.id}
-                  onClick={() => navigate(`/admin/requests?id=${req.id}`)}
-                  className="flex items-center gap-[12px] px-[8px] py-[10px] border-b border-[#1a1a22] cursor-pointer rounded-[6px] transition-colors duration-200 hover:bg-[#181820]"
-                >
-                  <div 
-                    style={{ background: `${roleColor}18`, borderColor: `${roleColor}40`, color: roleColor }} 
-                    className="w-[36px] h-[36px] rounded-full border flex items-center justify-center font-extrabold text-[0.75rem] shrink-0"
+        <div className="flex flex-col gap-6">
+          {/* Recent registration requests */}
+          {recentRequests.length > 0 && (
+            <div className="bg-[#121215] border border-[#23232a] rounded-[12px] p-[24px]">
+              <div className="flex justify-between items-center mb-[20px]">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-white text-[1rem] font-extrabold m-0">
+                    Recent Registration Requests
+                  </h2>
+                  <button
+                    type="button"
+                    onClick={() => setIsRequestsCollapsed(!isRequestsCollapsed)}
+                    className="bg-transparent border-none text-gray-500 hover:text-white cursor-pointer flex items-center p-1"
                   >
-                    {req.full_name?.charAt(0).toUpperCase() || '?'}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-[8px]">
-                      <span className="text-white font-semibold text-[0.85rem] whitespace-nowrap overflow-hidden text-ellipsis">
-                        {req.full_name}
-                      </span>
-                      <span 
-                        style={{ background: `${roleColor}18`, color: roleColor }} 
-                        className="text-[0.62rem] font-bold px-[6px] py-[2px] rounded-[4px] shrink-0"
-                      >
-                        {req.role?.toUpperCase()}
-                      </span>
-                    </div>
-                    <p className="text-gray-500 text-[0.75rem] m-0 mt-[2px] whitespace-nowrap overflow-hidden text-ellipsis">
-                      {req.email}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-end gap-[4px] shrink-0">
-                    <span 
-                      style={{ background: `${statusColor}18`, color: statusColor }} 
-                      className="text-[0.62rem] font-bold px-[7px] py-[2px] rounded-[4px]"
-                    >
-                      {req.status?.toUpperCase()}
-                    </span>
-                    <span className="text-[#4b4b57] text-[0.68rem]">{fmtDate(req.created_at)}</span>
-                  </div>
+                    {isRequestsCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+                  </button>
                 </div>
-              );
-            })}
+                <button
+                  onClick={() => navigate('/admin/requests')}
+                  className="bg-transparent border border-[#23232a] text-[#70d64d] rounded-[6px] px-[12px] py-[6px] text-[0.75rem] font-bold cursor-pointer flex items-center gap-[5px]"
+                >
+                  View All <ArrowRight size={12} />
+                </button>
+              </div>
+
+              {!isRequestsCollapsed && (
+                <div className="flex flex-col gap-[12px] animate-fade-in">
+                  {recentRequests.map(req => {
+                    const statusColor = req.status === 'approved' ? '#70d64d' : req.status === 'rejected' ? '#ef4444' : '#f59e0b';
+                    const roleColor = req.role === 'agency' ? '#c084fc' : '#38bdf8';
+                    return (
+                      <div
+                        key={req.id}
+                        onClick={() => navigate(`/admin/requests?id=${req.id}`)}
+                        className="flex items-center gap-[12px] px-[8px] py-[10px] border-b border-[#1a1a22] cursor-pointer rounded-[6px] transition-colors duration-200 hover:bg-[#181820]"
+                      >
+                        <div 
+                          style={{ background: `${roleColor}18`, borderColor: `${roleColor}40`, color: roleColor }} 
+                          className="w-[36px] h-[36px] rounded-full border flex items-center justify-center font-extrabold text-[0.75rem] shrink-0"
+                        >
+                          {req.full_name?.charAt(0).toUpperCase() || '?'}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-[8px]">
+                            <span className="text-white font-semibold text-[0.85rem] whitespace-nowrap overflow-hidden text-ellipsis">
+                              {req.full_name}
+                            </span>
+                            <span 
+                              style={{ background: `${roleColor}18`, color: roleColor }} 
+                              className="text-[0.62rem] font-bold px-[6px] py-[2px] rounded-[4px] shrink-0"
+                            >
+                              {req.role?.toUpperCase()}
+                            </span>
+                          </div>
+                          <p className="text-gray-500 text-[0.75rem] m-0 mt-[2px] whitespace-nowrap overflow-hidden text-ellipsis">
+                            {req.email}
+                          </p>
+                        </div>
+                        <div className="flex flex-col items-end gap-[4px] shrink-0">
+                          <span 
+                            style={{ background: `${statusColor}18`, color: statusColor }} 
+                            className="text-[0.62rem] font-bold px-[7px] py-[2px] rounded-[4px]"
+                          >
+                            {req.status?.toUpperCase()}
+                          </span>
+                          <span className="text-[#4b4b57] text-[0.68rem]">{fmtDate(req.created_at)}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Recent project bids */}
+          <div className="bg-[#121215] border border-[#23232a] rounded-[12px] p-[24px]">
+            <div className="flex justify-between items-center mb-[20px]">
+              <div className="flex items-center gap-2">
+                <h2 className="text-white text-[1rem] font-extrabold m-0">
+                  Recent Project Bids
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setIsBidsCollapsed(!isBidsCollapsed)}
+                  className="bg-transparent border-none text-gray-500 hover:text-white cursor-pointer flex items-center p-1"
+                >
+                  {isBidsCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+                </button>
+              </div>
+              <button
+                onClick={() => navigate('/admin/projects')}
+                className="bg-transparent border border-[#23232a] text-[#38bdf8] rounded-[6px] px-[12px] py-[6px] text-[0.75rem] font-bold cursor-pointer flex items-center gap-[5px]"
+              >
+                View Projects <ArrowRight size={12} />
+              </button>
+            </div>
+
+            {!isBidsCollapsed && (
+              <div className="flex flex-col gap-[12px] animate-fade-in">
+                {recentBids.length === 0 ? (
+                  <p className="text-gray-500 text-[0.85rem] m-0 text-center py-[24px]">
+                    No recent project bids.
+                  </p>
+                ) : (
+                  recentBids.map(bid => {
+                    const bidderName = bid.applicant?.full_name || 'Bidder';
+                    const role = bid.applicant_type || bid.applicant?.role || 'freelancer';
+                    const roleColor = role === 'agency' ? '#c084fc' : '#38bdf8';
+                    const statusColor = bid.status === 'accepted' ? '#70d64d' : bid.status === 'rejected' ? '#ef4444' : '#f59e0b';
+                    const proj = bid.project || {};
+                    
+                    return (
+                      <div
+                        key={bid.id}
+                        onClick={() => navigate(`/admin/projects/${proj.id}`)}
+                        className="flex items-center gap-[12px] px-[8px] py-[10px] border-b border-[#1a1a22] cursor-pointer rounded-[6px] transition-colors duration-200 hover:bg-[#181820]"
+                      >
+                        <div 
+                          style={{ background: `${roleColor}18`, borderColor: `${roleColor}40`, color: roleColor }} 
+                          className="w-[36px] h-[36px] rounded-full border flex items-center justify-center font-extrabold text-[0.75rem] shrink-0"
+                        >
+                          {bidderName.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-[8px]">
+                            <span className="text-white font-semibold text-[0.85rem] whitespace-nowrap overflow-hidden text-ellipsis">
+                              {bidderName}
+                            </span>
+                            <span 
+                              style={{ background: `${roleColor}18`, color: roleColor }} 
+                              className="text-[0.62rem] font-bold px-[6px] py-[2px] rounded-[4px] shrink-0"
+                            >
+                              {role.toUpperCase()}
+                            </span>
+                          </div>
+                          <p className="text-gray-500 text-[0.75rem] m-0 mt-[2px] whitespace-nowrap overflow-hidden text-ellipsis">
+                            Bid <span className="text-[#70d64d] font-bold">₹{Number(bid.bid_amount).toLocaleString('en-IN')}</span> on <span className="text-white font-semibold">{proj.title}</span> ({proj.project_code})
+                          </p>
+                        </div>
+                        <div className="flex flex-col items-end gap-[4px] shrink-0">
+                          <span 
+                            style={{ background: `${statusColor}18`, color: statusColor }} 
+                            className="text-[0.62rem] font-bold px-[7px] py-[2px] rounded-[4px]"
+                          >
+                            {bid.status?.toUpperCase()}
+                          </span>
+                          <span className="text-[#4b4b57] text-[0.68rem]">{fmtDate(bid.applied_at)}</span>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            )}
           </div>
         </div>
 

@@ -1,7 +1,9 @@
-import React from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { ChevronLeft, ChevronRight, X, Plus, ChevronDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../utils/api';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 
 export const STATUS_CFG = {
@@ -24,12 +26,12 @@ export function StatusBadge({ status }) {
   );
 }
 
-export function CompletionBar({ value = 0 }) {
+export function CompletionBar({ value = 0, label = "Profile" }) {
   const color = value >= 70 ? '#70d64d' : value >= 40 ? '#f59e0b' : '#ef4444';
   return (
     <div>
       <div className="flex justify-between mb-[4px]">
-        <span className="text-gray-500 text-[0.65rem] font-semibold uppercase">Profile</span>
+        <span className="text-gray-500 text-[0.65rem] font-semibold uppercase">{label}</span>
         <span style={{ color }} className="text-[0.65rem] font-bold">{value}%</span>
       </div>
       <div className="h-[4px] bg-[#1c1c20] rounded-[99px] overflow-hidden">
@@ -60,6 +62,24 @@ export function Pagination({ page, totalPages, onPage }) {
       {pages.map(p => <button key={p} onClick={() => onPage(p)} className={p === page ? activeClass : baseClass}>{p}</button>)}
       {end < totalPages && <><span className="text-[#4b4b57]">…</span><button onClick={() => onPage(totalPages)} className={baseClass}>{totalPages}</button></>}
       <button onClick={() => onPage(page + 1)} disabled={page === totalPages} className={page === totalPages ? disabledClass : baseClass}><ChevronRight size={14} /></button>
+    </div>
+  );
+}
+
+export function PageSizeSelector({ limit, onChangeLimit, total, isLoading = false }) {
+  return (
+    <div className="flex items-center gap-[8px] text-[0.8rem] text-gray-500">
+      <span>Show:</span>
+      <select
+        value={limit}
+        onChange={e => onChangeLimit(Number(e.target.value))}
+        className="bg-[#0c0c0e] border border-[#23232a] text-white rounded-[6px] px-[8px] py-[4px] text-[0.8rem] outline-none cursor-pointer"
+      >
+        <option value={10}>10 per page</option>
+        <option value={20} disabled={!isLoading && total <= 10}>20 per page</option>
+        <option value={50} disabled={!isLoading && total <= 20}>50 per page</option>
+        <option value={100} disabled={!isLoading && total <= 50}>100 per page</option>
+      </select>
     </div>
   );
 }
@@ -150,9 +170,299 @@ export function ActivityHistoryView({ id }) {
           </div>
         )}
       </div>
-
-    
     </div>
   );
 }
 
+// Quill toolbar modules — full-featured toolbar
+const QUILL_MODULES = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    [{ indent: '-1' }, { indent: '+1' }],
+    ['blockquote', 'code-block'],
+    ['link'],
+    ['clean'],
+  ],
+};
+
+const QUILL_MODULES_COMPACT = {
+  toolbar: [
+    ['bold', 'italic', 'underline'],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    ['link', 'clean'],
+  ],
+};
+
+/**
+ * RichTextEditor — full-featured Quill rich text editor with dark platform theme.
+ * Props:
+ *   value: string (HTML)
+ *   onChange: (html: string) => void
+ *   onBlur?: () => void
+ *   placeholder?: string
+ *   compact?: boolean  — use a smaller toolbar (for milestone descriptions)
+ *   minHeight?: string — css min-height for the editor area (default '160px')
+ */
+export function RichTextEditor({ value, onChange, onBlur, placeholder, compact = false, minHeight = '160px' }) {
+  return (
+    <div className="gf-quill-wrapper" style={{ '--gf-editor-min-height': minHeight }}>
+      <ReactQuill
+        theme="snow"
+        value={value || ''}
+        onChange={onChange}
+        onBlur={onBlur}
+        placeholder={placeholder}
+        modules={compact ? QUILL_MODULES_COMPACT : QUILL_MODULES}
+      />
+    </div>
+  );
+}
+
+/**
+ * MultiAutocomplete — badge-based multi-select with suggestion dropdown and custom item addition.
+ * Props:
+ *   value: string[]         - current selected items
+ *   onChange: (items: string[]) => void
+ *   suggestions: string[]   - list of suggestions from backend
+ *   placeholder?: string
+ *   label?: string
+ *   error?: string
+ */
+export function MultiAutocomplete({ value = [], onChange, suggestions = [], placeholder = 'Type to search or add...', label, error }) {
+  const [inputVal, setInputVal] = useState('');
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef(null);
+  const inputRef = useRef(null);
+
+  const filtered = suggestions.filter(
+    (s) => !value.includes(s) && s.toLowerCase().includes(inputVal.toLowerCase())
+  );
+
+  const showAddCustom =
+    inputVal.trim().length > 0 &&
+    !suggestions.map((s) => s.toLowerCase()).includes(inputVal.trim().toLowerCase()) &&
+    !value.map((v) => v.toLowerCase()).includes(inputVal.trim().toLowerCase());
+
+  const addItem = useCallback((item) => {
+    const trimmed = item.trim();
+    if (trimmed && !value.includes(trimmed)) {
+      onChange([...value, trimmed]);
+    }
+    setInputVal('');
+    setOpen(false);
+    inputRef.current?.focus();
+  }, [value, onChange]);
+
+  const removeItem = (item) => {
+    onChange(value.filter((v) => v !== item));
+  };
+
+  const handleKeyDown = (e) => {
+    if ((e.key === 'Enter' || e.key === ',') && inputVal.trim()) {
+      e.preventDefault();
+      addItem(inputVal);
+    } else if (e.key === 'Backspace' && !inputVal && value.length > 0) {
+      onChange(value.slice(0, -1));
+    } else if (e.key === 'Escape') {
+      setOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setOpen(false);
+        setInputVal('');
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div ref={containerRef} className="relative">
+      {label && (
+        <label className="text-gray-300 text-xs font-semibold uppercase tracking-wider block mb-2">{label}</label>
+      )}
+      <div
+        className={`min-h-[46px] flex flex-wrap gap-[6px] items-center rounded-[6px] border ${
+          error ? 'border-red-500/80' : open ? 'border-[#70d64d]' : 'border-[#23232a]'
+        } bg-[#0c0c0e] px-3 py-2 cursor-text transition-colors`}
+        onClick={() => { inputRef.current?.focus(); setOpen(true); }}
+      >
+        {value.map((item) => (
+          <span
+            key={item}
+            className="inline-flex items-center gap-1 bg-[#70d64d18] border border-[#70d64d44] text-[#70d64d] rounded-[4px] px-[8px] py-[3px] text-[0.75rem] font-semibold shrink-0"
+          >
+            {item}
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); removeItem(item); }}
+              className="bg-transparent border-none text-[#70d64d] hover:text-white cursor-pointer p-0 ml-[2px] leading-none flex items-center"
+            >
+              <X size={10} />
+            </button>
+          </span>
+        ))}
+        <input
+          ref={inputRef}
+          value={inputVal}
+          onChange={(e) => { setInputVal(e.target.value); setOpen(true); }}
+          onKeyDown={handleKeyDown}
+          onFocus={() => setOpen(true)}
+          placeholder={value.length === 0 ? placeholder : ''}
+          className="flex-1 min-w-[120px] bg-transparent text-white text-[0.85rem] outline-none border-none placeholder:text-gray-600"
+        />
+      </div>
+
+      {error && <span className="text-red-400 text-xs mt-1 block">{error}</span>}
+
+      {open && (filtered.length > 0 || showAddCustom) && (
+        <div className="absolute z-[800] mt-[4px] w-full rounded-[8px] border border-[#23232a] bg-[#111114] shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-hidden">
+          <div className="max-h-[200px] overflow-y-auto py-1">
+            {filtered.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onMouseDown={(e) => { e.preventDefault(); addItem(s); }}
+                className="w-full text-left px-4 py-[10px] text-[0.85rem] text-gray-300 hover:bg-[#1e293b] hover:text-white transition-colors bg-transparent border-none cursor-pointer"
+              >
+                {s}
+              </button>
+            ))}
+            {showAddCustom && (
+              <button
+                type="button"
+                onMouseDown={(e) => { e.preventDefault(); addItem(inputVal); }}
+                className="w-full text-left px-4 py-[10px] text-[0.85rem] text-[#70d64d] hover:bg-[#70d64d18] transition-colors bg-transparent border-none cursor-pointer flex items-center gap-2 font-semibold border-t border-[#23232a]"
+              >
+                <Plus size={12} /> Add &quot;{inputVal.trim()}&quot;
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * SingleAutocomplete — searchable single-value dropdown with custom entry support.
+ * Props:
+ *   value: string           - current value
+ *   onChange: (val: string) => void
+ *   suggestions: string[]   - list of suggestions from backend
+ *   placeholder?: string
+ *   label?: string
+ *   error?: string
+ */
+export function SingleAutocomplete({ value, onChange, suggestions = [], placeholder = 'Select or type...', label, error }) {
+  const [inputVal, setInputVal] = useState(value || '');
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    setInputVal(value || '');
+  }, [value]);
+
+  const filtered = suggestions.filter(
+    (s) => s.toLowerCase().includes(inputVal.toLowerCase())
+  );
+
+  const showAddCustom =
+    inputVal.trim().length > 0 &&
+    !suggestions.map((s) => s.toLowerCase()).includes(inputVal.trim().toLowerCase());
+
+  const selectItem = (item) => {
+    onChange(item);
+    setInputVal(item);
+    setOpen(false);
+  };
+
+  const handleInputChange = (e) => {
+    setInputVal(e.target.value);
+    onChange(e.target.value);
+    setOpen(true);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && inputVal.trim()) {
+      e.preventDefault();
+      selectItem(inputVal.trim());
+    } else if (e.key === 'Escape') {
+      setOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div ref={containerRef} className="relative">
+      {label && (
+        <label className="text-gray-300 text-xs font-semibold uppercase tracking-wider block mb-2">{label}</label>
+      )}
+      <div className="relative">
+        <input
+          value={inputVal}
+          onChange={handleInputChange}
+          onFocus={() => setOpen(true)}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          className={`w-full rounded-[6px] border ${
+            error ? 'border-red-500/80' : open ? 'border-[#70d64d]' : 'border-[#23232a]'
+          } bg-[#0c0c0e] px-4 py-3 pr-10 text-white text-[0.85rem] outline-none transition-colors`}
+        />
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none text-gray-500 hover:text-white cursor-pointer p-0 flex items-center"
+        >
+          <ChevronDown size={14} className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+        </button>
+      </div>
+
+      {error && <span className="text-red-400 text-xs mt-1 block">{error}</span>}
+
+      {open && (filtered.length > 0 || showAddCustom) && (
+        <div className="absolute z-[800] mt-[4px] w-full rounded-[8px] border border-[#23232a] bg-[#111114] shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-hidden">
+          <div className="max-h-[200px] overflow-y-auto py-1">
+            {filtered.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onMouseDown={(e) => { e.preventDefault(); selectItem(s); }}
+                className={`w-full text-left px-4 py-[10px] text-[0.85rem] transition-colors bg-transparent border-none cursor-pointer ${
+                  s === value
+                    ? 'text-[#70d64d] bg-[#70d64d18] font-semibold'
+                    : 'text-gray-300 hover:bg-[#1e293b] hover:text-white'
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+            {showAddCustom && (
+              <button
+                type="button"
+                onMouseDown={(e) => { e.preventDefault(); selectItem(inputVal.trim()); }}
+                className="w-full text-left px-4 py-[10px] text-[0.85rem] text-[#70d64d] hover:bg-[#70d64d18] transition-colors bg-transparent border-none cursor-pointer flex items-center gap-2 font-semibold border-t border-[#23232a]"
+              >
+                <Plus size={12} /> Use &quot;{inputVal.trim()}&quot;
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

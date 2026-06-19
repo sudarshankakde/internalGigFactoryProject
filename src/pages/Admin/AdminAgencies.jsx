@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, RefreshCw, Filter, SortAsc, LayoutGrid, LayoutList } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../utils/api';
-import { Pagination } from '../../components/AdminShared';
+import { Pagination, PageSizeSelector } from '../../components/AdminShared';
 
 // Import subcomponents
 import { AgencyTable } from '../../components/Admin/AgencyTable';
@@ -14,6 +14,7 @@ export default function AdminAgencies() {
   const [status, setStatus] = useState(() => localStorage.getItem('agency_status_filter') || '');
   const [sort,   setSort]   = useState(() => localStorage.getItem('agency_sort') || 'newest');
   const [page,   setPage]   = useState(1);
+  const [limit,  setLimit]  = useState(() => Number(localStorage.getItem('admin_agencies_limit')) || 10);
   const [viewMode, setViewMode] = useState(() => localStorage.getItem('admin_view_mode') || 'list');
   const navigate = useNavigate();
 
@@ -35,12 +36,16 @@ export default function AdminAgencies() {
     localStorage.setItem('admin_view_mode', viewMode);
   }, [viewMode]);
 
-  useEffect(() => { setPage(1); }, [dSearch, status, sort]);
+  useEffect(() => {
+    localStorage.setItem('admin_agencies_limit', limit);
+  }, [limit]);
+
+  useEffect(() => { setPage(1); }, [dSearch, status, sort, limit]);
 
   const { data, isLoading, refetch, isFetching } = useQuery({
-    queryKey: ['admin-agencies', page, dSearch, status, sort],
+    queryKey: ['admin-agencies', page, limit, dSearch, status, sort],
     queryFn: () => {
-      const params = new URLSearchParams({ page, limit: 10, sort });
+      const params = new URLSearchParams({ page, limit, sort });
       if (dSearch) params.set('search', dSearch);
       if (status)  params.set('status', status);
       return api.get(`/profiles/admin/agencies?${params}`);
@@ -155,6 +160,9 @@ export default function AdminAgencies() {
         <span className="text-gray-500 text-[0.8rem]">
           {isLoading ? '…' : `Page ${page} of ${totalPages} · ${total} total`}
         </span>
+
+        <PageSizeSelector limit={limit} onChangeLimit={setLimit} total={total} isLoading={isLoading} />
+
         <Pagination page={page} totalPages={totalPages} onPage={setPage} />
       </div>
 

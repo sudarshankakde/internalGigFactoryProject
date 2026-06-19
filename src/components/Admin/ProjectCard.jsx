@@ -1,157 +1,154 @@
-import React from 'react';
-import { Edit2, Trash2, Eye, TrendingUp } from 'lucide-react';
+import React, { useState } from 'react';
+import { Edit2, Trash2, Eye, TrendingUp, Users, MoreVertical } from 'lucide-react';
+import { CompletionBar } from '../AdminShared';
+import { ProjectStatusBadge } from './ProjectTable';
 
-const ProjectCard = ({ project, onEdit, onDelete, onViewDetails, onTrackProgress, onMilestones, onApplications, onSimApply }) => {
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'IN PROGRESS':
-        return 'bg-lime-400/20 text-lime-400';
-      case 'NOT STARTED':
-        return 'bg-gray-500/20 text-gray-400';
-      case 'COMPLETED':
-        return 'bg-blue-400/20 text-blue-400';
-      default:
-        return 'bg-gray-500/20 text-gray-400';
-    }
-  };
+const fmtDate = (d) =>
+  d ? new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
 
-  const getProgressColor = (progress) => {
-    if (progress >= 75) return 'bg-lime-400';
-    if (progress >= 50) return 'bg-yellow-400';
-    if (progress >= 25) return 'bg-orange-400';
-    return 'bg-red-400';
-  };
+export const ProjectCard = ({ 
+  project, 
+  onEdit, 
+  onDelete, 
+  onViewDetails, 
+  onTrackProgress, 
+  onMilestones, 
+  onApplications, 
+  onSimApply 
+}) => {
+  const [showMenu, setShowMenu] = useState(false);
+  const assignedUser = project.assignments?.[0]?.assigned_to;
+  const avatarSeed = encodeURIComponent(assignedUser?.full_name || 'Unassigned');
+  
+  const isNewProject = project.status === 'open' || project.status === 'NOT STARTED';
 
   return (
-    <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6 hover:border-gray-700 transition-all">
-      {/* Header with Title and Actions */}
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="text-white text-lg font-semibold">{project.title}</h3>
-          <p className="text-gray-400 text-sm mt-1">
-            {project.client} • 
-            <span className={`ml-2 px-2 py-1 rounded text-xs font-medium ${project.category === 'WEB' ? 'bg-blue-500/20 text-blue-400' : project.category === 'MOBILE' ? 'bg-purple-500/20 text-purple-400' : 'bg-pink-500/20 text-pink-400'}`}>
-              {project.category}
-            </span>
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => onEdit(project.id)}
-            className="p-2 hover:bg-gray-700 rounded transition-colors"
-            title="Edit"
-          >
-            <Edit2 size={16} className="text-gray-400 hover:text-white" />
-          </button>
-          <button
-            onClick={() => onDelete(project.id)}
-            className="p-2 hover:bg-red-500/20 rounded transition-colors"
-            title="Delete"
-          >
-            <Trash2 size={16} className="text-gray-400 hover:text-red-400" />
-          </button>
-        </div>
-      </div>
-
-      {/* Status Badge */}
-      <div className="mb-4">
-        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(project.status)}`}>
-          {project.status}
+    <div className="bg-[#121215] border border-[#23232a] rounded-[10px] p-[20px] flex flex-col gap-[14px] relative cursor-pointer transition-all duration-200 hover:-translate-y-[2px] hover:border-[#70d64d]">
+      
+      {/* Top Status Badge, Priority & 3-Dot Options Dropdown */}
+      <div className="flex justify-between items-center">
+        <span className={`text-[0.62rem] font-bold px-[6px] py-[2px] rounded-[4px] uppercase ${project.priority === 'high' ? 'bg-red-500/10 text-red-400' : project.priority === 'medium' ? 'bg-amber-500/10 text-amber-400' : 'bg-green-500/10 text-green-400'}`}>
+          {project.priority || 'medium'}
         </span>
+        <div className="flex items-center gap-[8px] relative">
+          <ProjectStatusBadge status={project.status} />
+          
+          <button 
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowMenu(!showMenu);
+            }} 
+            className="p-[4px] hover:bg-[#1c1c24] border border-transparent rounded text-gray-500 hover:text-white cursor-pointer transition-colors bg-transparent flex items-center justify-center"
+          >
+            <MoreVertical size={14} />
+          </button>
+
+          {showMenu && (
+            <>
+              <div className="fixed inset-0 z-[100]" onClick={(e) => { e.stopPropagation(); setShowMenu(false); }} />
+              <div className="absolute right-0 top-[26px] bg-[#0c0c0e] border border-[#23232a] rounded-[6px] py-[4px] min-w-[100px] shadow-[0_4px_12px_rgba(0,0,0,0.5)] z-[101] flex flex-col">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMenu(false);
+                    onEdit && onEdit(project.id);
+                  }}
+                  className="px-[12px] py-[8px] text-left text-gray-300 hover:text-white hover:bg-[#1a1a22] text-[0.75rem] font-semibold border-none bg-transparent cursor-pointer flex items-center gap-[6px] w-full"
+                >
+                  <Edit2 size={12} /> Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMenu(false);
+                    onDelete && onDelete(project.id);
+                  }}
+                  className="px-[12px] py-[8px] text-left text-[#ef4444] hover:text-[#f87171] hover:bg-[#ef444411] text-[0.75rem] font-semibold border-none bg-transparent cursor-pointer flex items-center gap-[6px] w-full"
+                >
+                  <Trash2 size={12} /> Delete
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
-      {/* Budget and Deadline */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <p className="text-gray-400 text-xs uppercase tracking-wider">Budget (USD)</p>
-          <p className="text-white text-lg font-semibold">{project.budget}</p>
-        </div>
-        <div>
-          <p className="text-gray-400 text-xs uppercase tracking-wider">Deadline</p>
-          <p className="text-white text-lg font-semibold">{project.deadline}</p>
-        </div>
+      {/* Title & Start Date */}
+      <div>
+        <h4 
+          onClick={() => onViewDetails && onViewDetails(project.id)} 
+          className="text-white text-[1rem] font-bold m-0 hover:text-[#70d64d] transition-colors cursor-pointer text-ellipsis overflow-hidden line-clamp-1"
+        >
+          {project.title}
+        </h4>
+        <p className="text-gray-500 text-[0.72rem] m-0 mt-[4px]">
+          Start Date: <span className="text-gray-300 font-semibold">{fmtDate(project.start_date)}</span>
+          <span className="text-[#4b4b57] mx-[6px]">·</span>
+          <span className="capitalize">{project.project_type || 'fixed'}</span>
+        </p>
       </div>
 
-      {/* Assigned Members and Applicants */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <p className="text-gray-400 text-xs uppercase tracking-wider mb-2">Assigned Members</p>
-          <div className="flex items-center gap-2">
-            {project.assignedMembers && project.assignedMembers.length > 0 ? (
-              <>
-                <img
-                  src={project.assignedMembers[0].avatar}
-                  alt={project.assignedMembers[0].name}
-                  className="w-6 h-6 rounded-full"
-                />
-                <p className="text-white text-sm">{project.assignedMembers[0].name}</p>
-              </>
-            ) : (
-              <p className="text-gray-400 text-sm">Unassigned</p>
-            )}
-          </div>
-        </div>
-        <div>
-          <p className="text-gray-400 text-xs uppercase tracking-wider mb-2">Applicants</p>
-          <p className="text-lime-400 font-semibold">{project.applicantsCount} Total</p>
-        </div>
-      </div>
-
-      {/* Progress */}
-      {project.status === 'IN PROGRESS' && (
-        <>
-          <div className="mb-3">
-            <div className="flex justify-between items-center mb-1">
-              <p className="text-white text-sm">Progress</p>
-              <p className="text-lime-400 font-semibold">{project.progress}%</p>
-            </div>
-            <div className="w-full bg-gray-700 rounded-full h-2">
-              <div
-                className={`h-2 rounded-full transition-all ${getProgressColor(project.progress)}`}
-                style={{ width: `${project.progress}%` }}
-              ></div>
-            </div>
-          </div>
-        </>
+      {/* Description */}
+      {project.description && (
+        <p className="text-gray-400 text-[0.78rem] m-0 line-clamp-2 leading-relaxed">
+          {project.description.replace(/<[^>]*>/g, '')}
+        </p>
       )}
 
-      {/* Action Buttons */}
-      <div className="flex gap-3 mt-6">
-        <button
-          onClick={() => onViewDetails(project.id)}
-          className="flex-1 border border-gray-700 text-gray-300 py-2 rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
-        >
-          <Eye size={16} />
-          View Details
-        </button>
-        <button
-          onClick={() => onTrackProgress(project.id)}
-          className="flex-1 bg-lime-400 text-black py-2 rounded-lg hover:bg-lime-300 transition-colors font-semibold flex items-center justify-center gap-2"
-        >
-          <TrendingUp size={16} />
-          Track Progress
-        </button>
-        {/* <button
-          onClick={() => onMilestones && onMilestones(project)}
-          className="flex-1 border border-gray-700 text-gray-300 py-2 rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
-          title="Manage Milestones"
-        >
-          Milestones
-        </button>
-        <button
-          onClick={() => onApplications && onApplications(project)}
-          className="flex-1 border border-gray-700 text-gray-300 py-2 rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
-          title="View Applications"
-        >
-          Applications
-        </button> */}
+      {/* Budget & Deadline */}
+      <div className="grid grid-cols-2 gap-[12px] bg-[#0c0c0e] p-[10px] rounded-[6px] border border-[#1a1a22]">
+        <div>
+          <span className="text-[#8a8a8a] text-[0.65rem] block uppercase font-semibold">Budget</span>
+          <span className="text-[#70d64d] font-bold text-[0.88rem]">
+            {project.budget ? `₹${Number(project.budget).toLocaleString('en-IN')}` : '—'}
+          </span>
+        </div>
+        <div>
+          <span className="text-[#8a8a8a] text-[0.65rem] block uppercase font-semibold">Deadline</span>
+          <span className="text-white font-semibold text-[0.8rem]">{fmtDate(project.end_date)}</span>
+        </div>
       </div>
 
-      {/* Simulate apply buttons for demo (freelancer / agency) */}
-      <div className="flex gap-2 mt-3">
-        <button onClick={() => onSimApply && onSimApply(project, 'freelancer')} className="text-xs px-2 py-1 border border-[#23232a] rounded text-gray-300">Sim Apply (Freelancer)</button>
-        <button onClick={() => onSimApply && onSimApply(project, 'agency')} className="text-xs px-2 py-1 border border-[#23232a] rounded text-gray-300">Sim Apply (Agency)</button>
+      {/* Progress & Bids */}
+      <div className="flex flex-col gap-[10px]">
+        {!isNewProject && (
+          <div>
+            <CompletionBar value={project.progress_percentage || 0} label="Progress" />
+          </div>
+        )}
+        
+        {isNewProject && (
+          <div className="flex items-center text-[0.72rem] mt-[2px]">
+            <button 
+              onClick={() => onApplications && onApplications(project)}
+              className="flex items-center gap-[4px] bg-[#1e293b] hover:bg-[#2e3e56] text-[#38bdf8] text-[0.68rem] font-bold px-[8px] py-[4px] rounded-[4px] border-none cursor-pointer transition-colors shrink-0"
+            >
+              <Users size={10} />
+              {project.applications_count || 0} Bids
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* Action Buttons */}
+      <div className="border-t border-[#1a1a22] pt-[12px] mt-auto flex gap-[8px]">
+        <button
+          onClick={() => onViewDetails && onViewDetails(project.id)}
+          className="flex-1 bg-[#0c0c0e] hover:bg-[#1a1a22] border border-[#23232a] text-white py-[8px] rounded-[6px] text-[0.78rem] font-semibold flex items-center justify-center gap-[6px] cursor-pointer transition-colors"
+        >
+          <Eye size={13} /> View Details
+        </button>
+        <button
+          onClick={() => onTrackProgress && onTrackProgress(project.id)}
+          className="flex-1 bg-[#70d64d] hover:bg-[#8ee67b] text-black border-none py-[8px] rounded-[6px] text-[0.78rem] font-bold flex items-center justify-center gap-[6px] cursor-pointer transition-colors"
+        >
+          <TrendingUp size={13} /> Track Progress
+        </button>
+      </div>
+
     </div>
   );
 };
