@@ -1,14 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Plus, FileText } from 'lucide-react';
+import { useAuthStore } from '../../store/useAuthStore';
+import { UploadDocumentModal } from './UploadDocumentModal';
 
 export const DocumentsList = ({ isFreelancer, resumeUrl, verifications }) => {
+  const user = useAuthStore((state) => state.user) || {};
+
+  const userName = user?.fullName || user?.full_name || "User";
+  const role = user?.role || "freelancer";
+
+
+  // const [files, setFiles] = useState(null);
+
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  // const [selectedRole, setSelectedRole] = useState('freelancer');
+  // console.log("userRole",role)
+
+  const handleUpload = () => {
+
+    setIsUploadOpen(true);
+    // setSelectedRole('freelancer');
+
+  };
   return (
+
     <div className="pane-content-card">
       <div className="card-header-flex-row">
         <h3>{isFreelancer ? 'Verified Documents' : 'Agency Documents'}</h3>
-        <button className="add-document-action-trigger">
-          <Plus size={14} /> Add
-        </button>
+        {/* hide Add Button for Admin */}
+        {role !== 'admin' && (
+
+          <button onClick={() => handleUpload()} className="add-document-action-trigger">
+            <Plus size={14} /> Add
+          </button>
+        )
+
+        }
+
+
+
       </div>
 
       {isFreelancer && resumeUrl ? (
@@ -41,6 +71,10 @@ export const DocumentsList = ({ isFreelancer, resumeUrl, verifications }) => {
           </p>
         </div>
       )}
+
+
+      {isUploadOpen && <UploadDocumentModal onClose={() => setIsUploadOpen(false)} />}
+
     </div>
   );
 };

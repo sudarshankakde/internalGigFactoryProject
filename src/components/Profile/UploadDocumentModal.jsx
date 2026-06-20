@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Upload } from 'lucide-react';
 
-export const UploadDocumentModal = ({ onClose, onSave }) => {
+export const UploadDocumentModal = ({ onClose }) => {
   const [name, setName] = useState('');
   const [file, setFile] = useState(null);
 
@@ -26,6 +26,7 @@ export const UploadDocumentModal = ({ onClose, onSave }) => {
             <input
               type="text"
               value={name}
+
               onChange={(e) => setName(e.target.value)}
               placeholder="Resume, PAN, Certification..."
               required

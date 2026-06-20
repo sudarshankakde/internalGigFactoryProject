@@ -41,6 +41,8 @@ export const Profile = () => {
   const [formData, setFormData] = useState({});
   const [activeTab, setActiveTab] = useState('basic');
 
+
+
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
@@ -233,10 +235,12 @@ export const Profile = () => {
   const skills = isFreelancer 
     ? (profile?.freelancer_skills || [])
     : (profile?.service_details?.selectedServices || []).map(code => ({ skill_name: SERVICE_LABELS[code] || code }));
-
+  
   return (
+
     <div className="profile-workspace-view animate-fade-in">
       <ProfileHeader
+        
         isFreelancer={isFreelancer}
         name={name}
         avatar={avatar}
@@ -282,7 +286,8 @@ export const Profile = () => {
 
           <ServiceSpecs serviceDetails={profile?.service_details} />
 
-          <DocumentsList
+          <DocumentsList 
+         
             isFreelancer={isFreelancer}
             resumeUrl={profile?.resume_url}
             verifications={profile?.verifications}

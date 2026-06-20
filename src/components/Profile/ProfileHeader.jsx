@@ -2,6 +2,7 @@ import React from 'react';
 import { Mail, MapPin, Phone, Globe, Calendar, Edit2 } from 'lucide-react';
 
 export const ProfileHeader = ({
+  role,
   isFreelancer,
   name,
   avatar,
@@ -16,7 +17,9 @@ export const ProfileHeader = ({
   handleEditClick,
   hideEditButton
 }) => {
+  
   return (
+    
     <header className="profile-identity-banner">
       <div className="profile-identity-main">
         <div className="profile-large-avatar p-0 overflow-hidden">
