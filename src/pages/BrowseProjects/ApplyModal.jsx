@@ -46,6 +46,28 @@ export default function ApplyModal({ project, onClose, defaultRole = 'freelancer
     }
   };
 
+  const [isDragActive, setIsDragActive] = useState(false);
+  const fileInputRef = React.useRef(null);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setIsDragActive(true);
+    } else if (e.type === "dragleave") {
+      setIsDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setFile(e.dataTransfer.files[0]);
+    }
+  };
+
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
@@ -223,16 +245,29 @@ export default function ApplyModal({ project, onClose, defaultRole = 'freelancer
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-bold text-gray-400">Supporting Attachment (Optional)</label>
             {!file ? (
-              <label className="flex flex-col items-center justify-center border border-dashed border-[#23232a] bg-[#121214] hover:bg-[#1a1a20] rounded-[6px] p-6 cursor-pointer gap-2 transition-all duration-150">
-                <Upload size={20} className="text-[#70d64d]" />
-                <span className="text-xs text-gray-400">Click to upload PDF/Zip (Max 25MB)</span>
+              <div 
+                className={`dropzone-container border border-dashed rounded-[6px] p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center min-h-[110px] ${
+                  isDragActive ? 'border-[#70d64d] bg-[#70d64d]/5' : 'border-[#23232a] bg-[#121214] hover:border-white/20'
+                }`}
+                onDragEnter={handleDrag}
+                onDragOver={handleDrag}
+                onDragLeave={handleDrag}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current && fileInputRef.current.click()}
+              >
                 <input 
                   type="file" 
+                  ref={fileInputRef}
                   onChange={handleFileChange}
                   accept=".pdf,.zip,.rar,.tar,.doc,.docx"
                   className="hidden"
                 />
-              </label>
+                <Upload size={20} className="text-[#70d64d] mb-1" />
+                <span className="text-xs text-gray-400">
+                  Drag &amp; drop file here, or <span className="text-[#70d64d] font-semibold hover:underline">browse</span>
+                </span>
+                <span className="text-[10px] text-gray-500 mt-1">PDF, Word, or Zip up to 25MB</span>
+              </div>
             ) : (
               <div className="bg-[#121214] border border-[#1e1e24] rounded-[6px] p-3 flex items-center justify-between">
                 <div className="flex items-center gap-2 min-w-0 pr-4">

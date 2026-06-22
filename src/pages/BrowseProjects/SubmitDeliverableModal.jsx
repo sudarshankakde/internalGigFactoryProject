@@ -37,6 +37,29 @@ export default function SubmitDeliverableModal({ milestone, deliverableToEdit, o
     }
   };
 
+  const [isDragActive, setIsDragActive] = useState(false);
+  const fileInputRef = React.useRef(null);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setIsDragActive(true);
+    } else if (e.type === "dragleave") {
+      setIsDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const newFiles = Array.from(e.dataTransfer.files);
+      setFiles(prev => [...prev, ...newFiles]);
+    }
+  };
+
   const handleFileChange = (e) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
@@ -222,16 +245,29 @@ export default function SubmitDeliverableModal({ milestone, deliverableToEdit, o
             <label className="text-xs font-bold text-gray-400">
               {deliverableToEdit ? 'Attach New Files (Optional)' : 'Deliverable Files (Optional)'}
             </label>
-            <label className="flex flex-col items-center justify-center border border-dashed border-[#23232a] bg-[#121214] hover:bg-[#1a1a20] rounded-[6px] p-6 cursor-pointer gap-2 transition-all duration-150">
-              <Upload size={20} className="text-[#70d64d]" />
-              <span className="text-xs text-gray-400">Click to select files to attach</span>
+            <div 
+              className={`dropzone-container border border-dashed rounded-[6px] p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center min-h-[110px] ${
+                isDragActive ? 'border-[#70d64d] bg-[#70d64d]/5' : 'border-[#23232a] bg-[#121214] hover:border-white/20'
+              }`}
+              onDragEnter={handleDrag}
+              onDragOver={handleDrag}
+              onDragLeave={handleDrag}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current && fileInputRef.current.click()}
+            >
               <input 
                 type="file" 
+                ref={fileInputRef}
                 onChange={handleFileChange}
                 multiple
                 className="hidden"
               />
-            </label>
+              <Upload size={20} className="text-[#70d64d] mb-1" />
+              <span className="text-xs text-gray-400">
+                Drag &amp; drop files here, or <span className="text-[#70d64d] font-semibold hover:underline">browse</span>
+              </span>
+              <span className="text-[10px] text-gray-500 mt-1">Select one or more deliverable files</span>
+            </div>
 
             {/* List of files selected */}
             {files.length > 0 && (

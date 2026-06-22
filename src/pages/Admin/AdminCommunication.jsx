@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   Mail,
@@ -44,6 +44,27 @@ export default function AdminCommunication() {
 
   // Attachment state
   const [attachment, setAttachment] = useState(null);
+  const [isDragActive, setIsDragActive] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setIsDragActive(true);
+    } else if (e.type === "dragleave") {
+      setIsDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setAttachment(e.dataTransfer.files[0]);
+    }
+  };
 
   // History states
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -377,32 +398,51 @@ export default function AdminCommunication() {
             {/* File Attachment Selector */}
             <div className="flex flex-col gap-[6px]">
               <label className="text-gray-400 text-[0.78rem] font-bold uppercase">Attachment (Optional)</label>
-              <div className="flex items-center gap-[12px] bg-[#0c0c0e] border border-[#23232a] rounded-[8px] p-[10px] hover:border-[#2f2f38] transition-colors">
+              <div 
+                className={`dropzone-container border border-dashed rounded-[8px] p-5 text-center cursor-pointer transition-all flex flex-col items-center justify-center min-h-[120px] ${
+                  isDragActive ? 'border-[#b5ff14] bg-[#b5ff14]/5' : 'border-[#23232a] bg-[#0c0c0e] hover:border-[#2f2f38]'
+                }`}
+                onDragEnter={handleDrag}
+                onDragOver={handleDrag}
+                onDragLeave={handleDrag}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current && fileInputRef.current.click()}
+              >
                 <input
                   type="file"
                   onChange={(e) => setAttachment(e.target.files[0] || null)}
                   className="hidden"
-                  id="email-file-attachment"
+                  ref={fileInputRef}
                   disabled={isSending}
                 />
-                <label
-                  htmlFor="email-file-attachment"
-                  className="bg-[#23232a] hover:bg-[#2d2d37] text-white px-[12px] py-[8px] rounded-[6px] font-bold text-[0.78rem] cursor-pointer transition-all flex items-center gap-[6px] shrink-0"
-                >
-                  <Upload size={14} />
-                  Choose File
-                </label>
-                <span className="text-gray-400 text-[0.8rem] truncate flex-1 pl-[4px]">
-                  {attachment ? `${attachment.name} (${(attachment.size / 1024 / 1024).toFixed(2)} MB)` : 'No file selected (max 20MB)'}
-                </span>
-                {attachment && (
-                  <button
-                    type="button"
-                    onClick={() => setAttachment(null)}
-                    className="text-gray-500 hover:text-white p-[4px] transition-colors"
-                  >
-                    <X size={16} />
-                  </button>
+                
+                {attachment ? (
+                  <div className="flex flex-col items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                    <Paperclip size={24} className="text-[#b5ff14]" />
+                    <span className="text-[0.8rem] font-bold text-white max-w-[280px] truncate">
+                      {attachment.name}
+                    </span>
+                    <span className="text-[0.7rem] text-gray-500">
+                      ({(attachment.size / 1024 / 1024).toFixed(2)} MB)
+                    </span>
+                    <button 
+                      type="button" 
+                      onClick={() => setAttachment(null)}
+                      className="mt-1 text-[0.75rem] text-[#ef4444] hover:underline bg-transparent border-none cursor-pointer font-bold"
+                    >
+                      Remove File
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-1.5 text-gray-400">
+                    <Upload size={24} className="text-gray-500" />
+                    <span className="text-[0.8rem] font-medium text-white">
+                      Drag &amp; drop file here, or <span className="text-[#b5ff14] font-semibold hover:underline">browse</span>
+                    </span>
+                    <span className="text-[0.7rem] text-gray-500">
+                      Supports any file up to 20MB
+                    </span>
+                  </div>
                 )}
               </div>
             </div>

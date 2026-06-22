@@ -386,6 +386,8 @@ export const AdminUserProfile = () => {
                 isFreelancer={isFreelancer}
                 resumeUrl={isFreelancer ? fp.resume_url : undefined}
                 verifications={user.verifications}
+                documents={data?.profileDocuments || []}
+                isAdmin={true}
               />
             </div>
           </div>

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Paperclip, Upload } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Plus, Trash2, Paperclip, Upload, UploadCloud } from 'lucide-react';
 import { api } from '../../utils/api';
 import { RichTextEditor, MultiAutocomplete, SingleAutocomplete } from '../AdminShared';
 import { toast } from 'react-toastify';
@@ -223,6 +223,27 @@ export default function ProjectFormModal({ project, onClose, onCreate, onSave })
   // ── File state ────────────────────────────────────────────────────────────
   const [existingFiles, setExistingFiles] = useState(project?.files || []);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [isDragActive, setIsDragActive] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setIsDragActive(true);
+    } else if (e.type === "dragleave") {
+      setIsDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      setSelectedFiles(prev => [...prev, ...Array.from(e.dataTransfer.files)]);
+    }
+  };
 
   // ── UI state ──────────────────────────────────────────────────────────────
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -607,17 +628,39 @@ export default function ProjectFormModal({ project, onClose, onCreate, onSave })
 
           {/* Supporting Documents */}
           <div className="space-y-3 border border-[#23232a] rounded-[8px] p-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h4 className="text-white text-sm font-semibold m-0">Supporting Documents</h4>
-                <p className="text-gray-500 text-xs m-0">
-                  {isEdit ? 'Manage existing or upload new files.' : 'Upload documents and assets for this project.'}
-                </p>
+            <div>
+              <h4 className="text-white text-sm font-semibold m-0">Supporting Documents</h4>
+              <p className="text-gray-500 text-xs m-0 mb-3">
+                {isEdit ? 'Manage existing or upload new files.' : 'Upload documents and assets for this project.'}
+              </p>
+            </div>
+            
+            <div 
+              className={`dropzone-container border-2 border-dashed rounded-lg p-5 text-center cursor-pointer transition-all flex flex-col items-center justify-center min-h-[120px] ${
+                isDragActive ? 'border-[#b5ff14] bg-[#b5ff14]/5' : 'border-[#23232a] bg-[#121215] hover:border-white/20'
+              }`}
+              onDragEnter={handleDrag}
+              onDragOver={handleDrag}
+              onDragLeave={handleDrag}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current && fileInputRef.current.click()}
+            >
+              <input 
+                type="file" 
+                multiple 
+                ref={fileInputRef}
+                className="hidden" 
+                onChange={handleFileChange} 
+              />
+              <div className="flex flex-col items-center gap-1.5 text-gray-400">
+                <UploadCloud size={24} className="text-gray-500" />
+                <span className="text-[0.8rem] font-medium text-white">
+                  Drag &amp; drop files here, or <span className="text-[#b5ff14] font-semibold hover:underline">browse</span>
+                </span>
+                <span className="text-[0.7rem] text-gray-500">
+                  Multiple files supported
+                </span>
               </div>
-              <label className="bg-[#1e293b] border border-[#23232a] text-gray-300 hover:text-white font-bold rounded-[6px] px-[12px] py-[6px] text-[0.72rem] cursor-pointer transition-colors flex items-center gap-2">
-                <Upload size={12} /> {isEdit ? 'Add Files' : 'Select Files'}
-                <input type="file" multiple className="hidden" onChange={handleFileChange} />
-              </label>
             </div>
 
             {/* Existing files (edit mode) */}

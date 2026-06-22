@@ -1,45 +1,459 @@
-import React from 'react';
-import { Plus, FileText } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { Plus, FileText, Edit2, Trash2, Download, ExternalLink, X, Loader2 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
-export const DocumentsList = ({ isFreelancer, resumeUrl, verifications }) => {
+export const DocumentsList = ({
+  isFreelancer,
+  resumeUrl,
+  verifications,
+  documents = [],
+  onUpload,
+  onDelete,
+  onRename,
+  isAdmin = false
+}) => {
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showRenameModal, setShowRenameModal] = useState(false);
+
+  useEffect(() => {
+    if (showUploadModal || showRenameModal) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [showUploadModal, showRenameModal]);
+  
+  // Upload form state
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [docName, setDocName] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [isDragActive, setIsDragActive] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setIsDragActive(true);
+    } else if (e.type === "dragleave") {
+      setIsDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      setSelectedFile(file);
+      const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+      setDocName(nameWithoutExt);
+    }
+  };
+
+  // Rename form state
+  const [renamingDoc, setRenamingDoc] = useState(null);
+  const [newDocName, setNewDocName] = useState('');
+  const [isRenaming, setIsRenaming] = useState(false);
+
+  // Helper to format file size
+  const formatFileSize = (bytes) => {
+    if (!bytes) return 'N/A';
+    const numBytes = Number(bytes);
+    if (isNaN(numBytes)) return 'N/A';
+    if (numBytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(numBytes) / Math.log(k));
+    return parseFloat((numBytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+      setDocName(nameWithoutExt);
+    }
+  };
+
+  const handleUploadSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedFile) {
+      toast.error('Please select a file to upload.');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('documentName', docName.trim());
+
+      const success = await onUpload(formData);
+      if (success) {
+        setShowUploadModal(false);
+        setSelectedFile(null);
+        setDocName('');
+      }
+    } catch (err) {
+      toast.error(err.message || 'Failed to upload document.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleRenameClick = (doc) => {
+    setRenamingDoc(doc);
+    setNewDocName(doc.file_name);
+    setShowRenameModal(true);
+  };
+
+  const handleRenameSubmit = async (e) => {
+    e.preventDefault();
+    if (!newDocName.trim()) {
+      toast.error('Document name cannot be empty.');
+      return;
+    }
+
+    setIsRenaming(true);
+    try {
+      const success = await onRename(renamingDoc.id, newDocName.trim());
+      if (success) {
+        setShowRenameModal(false);
+        setRenamingDoc(null);
+        setNewDocName('');
+      }
+    } catch (err) {
+      toast.error(err.message || 'Failed to rename document.');
+    } finally {
+      setIsRenaming(false);
+    }
+  };
+
+  const handleDeleteClick = async (doc) => {
+    if (window.confirm(`Are you sure you want to delete the document "${doc.file_name}"?`)) {
+      try {
+        await onDelete(doc.id);
+      } catch (err) {
+        toast.error(err.message || 'Failed to delete document.');
+      }
+    }
+  };
+
   return (
     <div className="pane-content-card">
       <div className="card-header-flex-row">
-        <h3>{isFreelancer ? 'Verified Documents' : 'Agency Documents'}</h3>
-        <button className="add-document-action-trigger">
-          <Plus size={14} /> Add
-        </button>
+        <h3>{isAdmin ? 'Profile Documents' : (isFreelancer ? 'Profile Documents' : 'Agency Documents')}</h3>
+        {!isAdmin && (
+          <button 
+            type="button" 
+            onClick={() => setShowUploadModal(true)} 
+            className="add-document-action-trigger"
+          >
+            <Plus size={14} /> Add
+          </button>
+        )}
       </div>
 
-      {isFreelancer && resumeUrl ? (
-        <div className="empty-documents-status-placeholder text-left flex flex-col gap-2">
-          <p className="primary-empty-msg flex items-center gap-2">
-            <FileText size={16} color="#70d64d" /> Resume Document
-          </p>
-          <a href={resumeUrl} target="_blank" rel="noreferrer" className="text-[0.85rem] text-[#70d64d] underline font-semibold">
-            View Resume / CV
-          </a>
-        </div>
-      ) : !isFreelancer && verifications && verifications.length > 0 ? (
-        <div className="empty-documents-status-placeholder text-left flex flex-col gap-2">
-          {verifications.map((v) => (
-            <div key={v.id} className="flex justify-between border-b border-white/5 pb-1.5">
-              <span className="text-[0.85rem] text-white">{v.document_type}</span>
-              <span className={`text-[0.75rem] ${v.verification_status === 'verified' ? 'text-[#70d64d]' : 'text-[#f59e0b]'}`}>
-                {v.verification_status.toUpperCase()}
+      {/* Main Documents List */}
+      <div className="flex flex-col gap-4 mt-4">
+        {/* Legacy Resume/CV display for Freelancer */}
+        {!isAdmin && isFreelancer && resumeUrl && (
+          <div className="border-b border-white/5 pb-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[0.85rem] text-[#70d64d] font-semibold flex items-center gap-2">
+                <FileText size={16} /> Resume Document (Primary)
               </span>
+              <a 
+                href={resumeUrl} 
+                target="_blank" 
+                rel="noreferrer" 
+                className="text-[0.78rem] text-white hover:text-[#70d64d] flex items-center gap-1 bg-[#1c1c22] border border-[#23232a] px-2 py-1 rounded"
+              >
+                <Download size={12} /> View CV
+              </a>
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="empty-documents-status-placeholder">
-          <p className="primary-empty-msg">
-            {isFreelancer ? 'No documents uploaded yet' : 'No legal documents uploaded yet'}
-          </p>
-          <p className="secondary-empty-msg">
-            {isFreelancer ? 'Upload resumes, certifications, or identity documentation files.' : 'Upload verification NDAs, MSAs, or W9 tax files here.'}
-          </p>
-        </div>
+          </div>
+        )}
+
+        {/* Custom Uploaded Documents */}
+        {documents.length > 0 ? (
+          <div className="flex flex-col gap-3">
+            {documents.map((doc) => (
+              <div 
+                key={doc.id} 
+                className="flex items-center justify-between bg-[#0c0c0e] border border-[#23232a] rounded p-3 transition-colors hover:border-white/10"
+              >
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="bg-[#1c1c22] p-2 rounded text-[#70d64d] flex-shrink-0">
+                    <FileText size={18} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[0.85rem] font-semibold text-white truncate m-0 mb-0.5">
+                      {doc.file_name}
+                    </p>
+                    <p className="text-[0.7rem] text-[#6c727f] m-0">
+                      {formatFileSize(doc.file_size)} • {new Date(doc.created_at || doc.uploaded_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 ml-3">
+                  <a
+                    href={doc.file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-1.5 text-[#8a8f98] hover:text-white bg-transparent border-none cursor-pointer transition-colors"
+                    title="Open in new tab"
+                  >
+                    <ExternalLink size={14} />
+                  </a>
+                  <a
+                    href={doc.file_url}
+                    download
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-1.5 text-[#8a8f98] hover:text-white bg-transparent border-none cursor-pointer transition-colors"
+                    title="Download Document"
+                  >
+                    <Download size={14} />
+                  </a>
+
+                  {!isAdmin && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleRenameClick(doc)}
+                        className="p-1.5 text-[#8a8f98] hover:text-[#b5ff14] bg-transparent border-none cursor-pointer transition-colors"
+                        title="Rename Document"
+                      >
+                        <Edit2 size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteClick(doc)}
+                        className="p-1.5 text-[#8a8f98] hover:text-[#ef4444] bg-transparent border-none cursor-pointer transition-colors"
+                        title="Delete Document"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          !isFreelancer && verifications && verifications.length > 0 ? (
+            <div className="empty-documents-status-placeholder text-left flex flex-col gap-2">
+              {verifications.map((v) => (
+                <div key={v.id} className="flex justify-between border-b border-white/5 pb-1.5">
+                  <span className="text-[0.85rem] text-white">{v.document_type}</span>
+                  <span className={`text-[0.75rem] ${v.verification_status === 'verified' ? 'text-[#70d64d]' : 'text-[#f59e0b]'}`}>
+                    {v.verification_status.toUpperCase()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-documents-status-placeholder">
+              <p className="primary-empty-msg">
+                No documents uploaded yet
+              </p>
+              <p className="secondary-empty-msg text-gray-500">
+                {isAdmin 
+                  ? 'No additional documents have been uploaded to this profile.'
+                  : (isFreelancer 
+                      ? 'Upload certifications, ID proofs, or project reports files.' 
+                      : 'Upload verification NDAs, MSAs, or W9 tax files here.')}
+              </p>
+            </div>
+          )
+        )}
+      </div>
+
+      {/* Upload Document Modal */}
+      {showUploadModal && createPortal(
+        <div className="profile-modal-overlay">
+          <div className="profile-modal-card max-w-[450px]" style={{ height: '80vh' }}>
+            <div className="profile-modal-header">
+              <h2>Upload Profile Document</h2>
+              <button 
+                type="button" 
+                onClick={() => {
+                  setShowUploadModal(false);
+                  setSelectedFile(null);
+                  setDocName('');
+                }} 
+                className="profile-modal-close-btn"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <form onSubmit={handleUploadSubmit} className="profile-modal-form">
+              <div className="profile-modal-scroll-area">
+                <div className="form-group">
+                  <label>Select Document File</label>
+                  <div 
+                    className={`dropzone-container border-2 border-dashed rounded-lg p-5 text-center cursor-pointer transition-all flex flex-col items-center justify-center min-h-[140px] ${
+                      isDragActive ? 'border-[#b5ff14] bg-[#b5ff14]/5' : 'border-[#23232a] bg-[#1c1c22] hover:border-white/20'
+                    }`}
+                    onDragEnter={handleDrag}
+                    onDragOver={handleDrag}
+                    onDragLeave={handleDrag}
+                    onDrop={handleDrop}
+                    onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                  >
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                    
+                    {selectedFile ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <FileText size={32} className="text-[#b5ff14]" />
+                        <span className="text-[0.85rem] font-bold text-white max-w-[280px] truncate">
+                          {selectedFile.name}
+                        </span>
+                        <span className="text-[0.7rem] text-[#6c727f]">
+                          {formatFileSize(selectedFile.size)}
+                        </span>
+                        <button 
+                          type="button" 
+                          className="mt-2 text-[0.75rem] text-[#b5ff14] hover:underline bg-transparent border-none cursor-pointer font-bold"
+                        >
+                          Click to replace file
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2 text-[#8a8f98]">
+                        <Plus size={32} strokeWidth={1.5} />
+                        <span className="text-[0.85rem] font-medium text-white">
+                          Drag &amp; drop your file here, or <span className="text-[#b5ff14] font-semibold hover:underline">browse</span>
+                        </span>
+                        <span className="text-[0.7rem] text-gray-500">
+                          Supported: PDF, Word, Images, Zip, Excel up to 20MB.
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Document Display Name</label>
+                  <input
+                    type="text"
+                    value={docName}
+                    onChange={(e) => setDocName(e.target.value)}
+                    placeholder="e.g. Identity Proof, ISO Certification"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="profile-modal-footer">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowUploadModal(false);
+                    setSelectedFile(null);
+                    setDocName('');
+                  }}
+                  className="btn-cancel"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUploading}
+                  className="btn-save flex items-center gap-1.5"
+                >
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="animate-spin" size={16} /> Uploading...
+                    </>
+                  ) : (
+                    'Upload Document'
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Rename Document Modal */}
+      {showRenameModal && createPortal(
+        <div className="profile-modal-overlay">
+          <div className="profile-modal-card max-w-[450px]" style={{ height: '80vh' }}>
+            <div className="profile-modal-header">
+              <h2>Rename Document</h2>
+              <button 
+                type="button" 
+                onClick={() => {
+                  setShowRenameModal(false);
+                  setRenamingDoc(null);
+                  setNewDocName('');
+                }} 
+                className="profile-modal-close-btn"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <form onSubmit={handleRenameSubmit} className="profile-modal-form">
+              <div className="profile-modal-scroll-area">
+                <div className="form-group">
+                  <label>Document Name</label>
+                  <input
+                    type="text"
+                    value={newDocName}
+                    onChange={(e) => setNewDocName(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="profile-modal-footer">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowRenameModal(false);
+                    setRenamingDoc(null);
+                    setNewDocName('');
+                  }}
+                  className="btn-cancel"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isRenaming}
+                  className="btn-save flex items-center gap-1.5"
+                >
+                  {isRenaming ? (
+                    <>
+                      <Loader2 className="animate-spin" size={16} /> Saving...
+                    </>
+                  ) : (
+                    'Save Changes'
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   );

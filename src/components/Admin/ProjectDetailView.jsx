@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { 
   ArrowLeft, Clock, Wallet, Check, X, Plus, Users, Award, Edit, Trash2,
@@ -209,6 +209,48 @@ export default function ProjectDetailView() {
   // Document upload state
   const [isUploadingDoc, setIsUploadingDoc] = useState(false);
   const [docFile, setDocFile] = useState(null);
+
+  const [isDocDragActive, setIsDocDragActive] = useState(false);
+  const [isProofDragActive, setIsProofDragActive] = useState(false);
+  const docFileInputRef = useRef(null);
+
+  const handleDocDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setIsDocDragActive(true);
+    } else if (e.type === "dragleave") {
+      setIsDocDragActive(false);
+    }
+  };
+
+  const handleDocDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDocDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setDocFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleProofDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setIsProofDragActive(true);
+    } else if (e.type === "dragleave") {
+      setIsProofDragActive(false);
+    }
+  };
+
+  const handleProofDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsProofDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setProofFile(e.dataTransfer.files[0]);
+    }
+  };
 
   const handleUploadDocument = async (e) => {
     e.preventDefault();
@@ -714,42 +756,6 @@ export default function ProjectDetailView() {
                   <Folder className="text-[#70d64d]" size={18} />
                   <h3 className="text-white font-bold text-[1rem] m-0">Supporting Documents</h3>
                 </div>
-                
-                {/* Upload Form */}
-                <form onSubmit={handleUploadDocument} className="flex items-center gap-2">
-                  <input 
-                    type="file" 
-                    id="doc-upload" 
-                    className="hidden" 
-                    onChange={(e) => setDocFile(e.target.files[0])}
-                  />
-                  {docFile ? (
-                    <div className="flex items-center gap-2">
-                      <span className="text-[0.75rem] text-gray-300 truncate max-w-[120px]">{docFile.name}</span>
-                      <button 
-                        type="submit" 
-                        disabled={isUploadingDoc}
-                        className="bg-[#70d64d] text-black border-none font-bold rounded-[4px] px-[8px] py-[4px] text-[0.7rem] cursor-pointer hover:bg-[#8ee67b] transition-colors"
-                      >
-                        {isUploadingDoc ? 'Uploading...' : 'Save'}
-                      </button>
-                      <button 
-                        type="button" 
-                        onClick={() => setDocFile(null)}
-                        className="text-red-400 border-none bg-transparent cursor-pointer flex items-center justify-center"
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
-                  ) : (
-                    <label 
-                      htmlFor="doc-upload"
-                      className="bg-[#0c0c0e] border border-[#23232a] text-gray-300 hover:text-white font-bold rounded-[6px] px-[10px] py-[5px] text-[0.72rem] cursor-pointer transition-colors"
-                    >
-                      + Add File
-                    </label>
-                  )}
-                </form>
               </div>
               
               {(!project.files || project.files.length === 0) ? (
@@ -780,6 +786,58 @@ export default function ProjectDetailView() {
                   ))}
                 </div>
               )}
+
+              {/* Inline Drag and Drop Zone */}
+              <form onSubmit={handleUploadDocument} className="mt-4 pt-4 border-t border-[#23232a]/50">
+                <div 
+                  className={`dropzone-container border border-dashed rounded-[8px] p-4 text-center cursor-pointer transition-all flex flex-col items-center justify-center min-h-[100px] ${
+                    isDocDragActive ? 'border-[#b5ff14] bg-[#b5ff14]/5' : 'border-[#23232a] bg-[#0c0c0e] hover:border-[#2f2f38]'
+                  }`}
+                  onDragEnter={handleDocDrag}
+                  onDragOver={handleDocDrag}
+                  onDragLeave={handleDocDrag}
+                  onDrop={handleDocDrop}
+                  onClick={() => docFileInputRef.current && docFileInputRef.current.click()}
+                >
+                  <input 
+                    type="file" 
+                    ref={docFileInputRef}
+                    className="hidden" 
+                    onChange={(e) => setDocFile(e.target.files[0] || null)}
+                  />
+                  {docFile ? (
+                    <div className="flex flex-col items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                      <FileText size={20} className="text-[#b5ff14]" />
+                      <span className="text-[0.78rem] font-bold text-white max-w-[240px] truncate">{docFile.name}</span>
+                      <span className="text-[0.68rem] text-gray-500">({(docFile.size / 1024).toFixed(1)} KB)</span>
+                      <div className="flex gap-2 mt-1">
+                        <button 
+                          type="submit" 
+                          disabled={isUploadingDoc}
+                          className="bg-[#70d64d] text-black border-none font-bold rounded-[4px] px-[12px] py-[5px] text-[0.7rem] cursor-pointer hover:bg-[#8ee67b] transition-colors"
+                        >
+                          {isUploadingDoc ? 'Uploading...' : 'Save File'}
+                        </button>
+                        <button 
+                          type="button" 
+                          onClick={() => setDocFile(null)}
+                          className="bg-transparent border border-[#ef444433] text-[#ef4444] font-bold rounded-[4px] px-[10px] py-[5px] text-[0.7rem] cursor-pointer hover:bg-[#ef444411] transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-1 text-gray-400">
+                      <Plus size={20} className="text-gray-500" />
+                      <span className="text-[0.78rem] font-semibold text-white">
+                        Drag &amp; drop document, or <span className="text-[#b5ff14] hover:underline font-bold">browse</span>
+                      </span>
+                      <span className="text-[0.68rem] text-gray-500">Add pdf, doc, dwg, or image</span>
+                    </div>
+                  )}
+                </div>
+              </form>
             </div>
 
             {/* Project Milestones Card */}
@@ -1320,10 +1378,18 @@ export default function ProjectDetailView() {
 
                 <div className="flex flex-col gap-1">
                   <label className="text-gray-400 text-[0.78rem] font-semibold">Payment Proof / Receipt <span className="text-gray-600 font-normal">(Optional)</span></label>
-                  <label className="flex items-center justify-center flex-col gap-2 bg-[#0c0c0e] border border-dashed border-[#23232a] hover:border-[#70d64d]/40 rounded-[8px] p-5 cursor-pointer transition-colors group">
+                  <label 
+                    className={`flex items-center justify-center flex-col gap-2 border border-dashed rounded-[8px] p-5 cursor-pointer transition-colors group ${
+                      isProofDragActive ? 'border-[#b5ff14] bg-[#b5ff14]/5' : 'bg-[#0c0c0e] border-[#23232a] hover:border-[#70d64d]/40'
+                    }`}
+                    onDragEnter={handleProofDrag}
+                    onDragOver={handleProofDrag}
+                    onDragLeave={handleProofDrag}
+                    onDrop={handleProofDrop}
+                  >
                     <input
                       type="file"
-                      onChange={(e) => setProofFile(e.target.files[0])}
+                      onChange={(e) => setProofFile(e.target.files[0] || null)}
                       className="hidden"
                     />
                     {proofFile ? (
@@ -1451,10 +1517,18 @@ export default function ProjectDetailView() {
 
                 <div className="flex flex-col gap-1">
                   <label className="text-gray-400 text-[0.78rem] font-semibold">Payment Proof / Receipt <span className="text-gray-600 font-normal">(Optional)</span></label>
-                  <label className="flex items-center justify-center flex-col gap-2 bg-[#0c0c0e] border border-dashed border-[#23232a] hover:border-[#70d64d]/40 rounded-[8px] p-5 cursor-pointer transition-colors group">
+                  <label 
+                    className={`flex items-center justify-center flex-col gap-2 border border-dashed rounded-[8px] p-5 cursor-pointer transition-colors group ${
+                      isProofDragActive ? 'border-[#b5ff14] bg-[#b5ff14]/5' : 'bg-[#0c0c0e] border-[#23232a] hover:border-[#70d64d]/40'
+                    }`}
+                    onDragEnter={handleProofDrag}
+                    onDragOver={handleProofDrag}
+                    onDragLeave={handleProofDrag}
+                    onDrop={handleProofDrop}
+                  >
                     <input
                       type="file"
-                      onChange={(e) => setProofFile(e.target.files[0])}
+                      onChange={(e) => setProofFile(e.target.files[0] || null)}
                       className="hidden"
                     />
                     {proofFile ? (

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useAuthStore } from '../../store/useAuthStore';
 import './Profile.css';
+import { api } from '../../utils/api';
 
 // Import subcomponents
 import { ProfileSkeleton } from '../../components/Profile/ProfileSkeleton';
@@ -40,9 +41,67 @@ export const Profile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({});
   const [activeTab, setActiveTab] = useState('basic');
+  const [documents, setDocuments] = useState([]);
+
+  const fetchDocuments = async () => {
+    try {
+      const res = await api.get('/profiles/documents');
+      if (res && res.success) {
+        setDocuments(res.documents || []);
+      }
+    } catch (err) {
+      console.error('Failed to load profile documents:', err);
+    }
+  };
+
+  const handleUploadDocument = async (formData) => {
+    try {
+      const res = await api.postFile('/profiles/documents', formData);
+      if (res && res.success) {
+        toast.success('Document uploaded successfully!');
+        fetchDocuments();
+        return true;
+      }
+      return false;
+    } catch (err) {
+      toast.error(err.message || 'Failed to upload document.');
+      return false;
+    }
+  };
+
+  const handleRenameDocument = async (id, newName) => {
+    try {
+      const res = await api.put(`/profiles/documents/${id}`, { documentName: newName });
+      if (res && res.success) {
+        toast.success('Document renamed successfully!');
+        fetchDocuments();
+        return true;
+      }
+      return false;
+    } catch (err) {
+      toast.error(err.message || 'Failed to rename document.');
+      return false;
+    }
+  };
+
+  const handleDeleteDocument = async (id) => {
+    try {
+      const res = await api.delete(`/profiles/documents/${id}`);
+      if (res && res.success) {
+        toast.success('Document deleted successfully!');
+        fetchDocuments();
+        return true;
+      }
+      return false;
+    } catch (err) {
+      toast.error(err.message || 'Failed to delete document.');
+      return false;
+    }
+  };
 
   useEffect(() => {
     fetchProfile();
+    fetchDocuments();
   }, [fetchProfile]);
 
   useEffect(() => {
@@ -286,6 +345,11 @@ export const Profile = () => {
             isFreelancer={isFreelancer}
             resumeUrl={profile?.resume_url}
             verifications={profile?.verifications}
+            documents={documents}
+            onUpload={handleUploadDocument}
+            onRename={handleRenameDocument}
+            onDelete={handleDeleteDocument}
+            isAdmin={false}
           />
         </div>
       </div>

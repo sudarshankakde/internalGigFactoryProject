@@ -93,7 +93,7 @@ export const ActiveProjects = () => {
 
       {/* CONDITIONAL INTERFACE BRANCH SWITCH */}
       {projects.length === 0 ? (
-        <EmptyProjectsState />
+        <EmptyProjectsState applications={dashboardData?.applications || []} />
       ) : (
         <div className="projects-content-split-layout">
           <ActiveProjectsList projects={projects} />
