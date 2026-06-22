@@ -214,6 +214,12 @@ export default function ProjectDetail() {
                 {renderWithTbdTooltip(formattedStartDate, "To Be Decided / Determined by client")}
               </span>
             </div>
+
+
+
+
+
+
           </div>
           {/* Est. Hours */}
           <div className="flex items-start gap-3 min-w-0">
@@ -243,6 +249,34 @@ export default function ProjectDetail() {
               <span className="text-white font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block truncate">
                 {project.applications_count || 0} Users
               </span>
+
+
+
+
+            <div className="bg-[#0b0b0d] border border-[#23232a] rounded-[20px] p-6">
+              <div className="mb-4">
+                <h2 className="text-white text-lg font-semibold">Apply</h2>
+                <p className="text-gray-500 text-sm">Submit your request to admin.</p>
+              </div>
+              <div className="grid gap-3">
+                <button
+                  onClick={() => handleApply('freelancer')}
+                  className="w-full bg-lime-400 text-black py-3 rounded-xl font-semibold"
+                >
+                  Apply 
+                </button>
+                {/* <button
+                  onClick={() => handleApply('agency')}
+                  className="w-full border border-[#23232a] text-white py-3 rounded-xl hover:bg-white/5 transition"
+                >
+                  Apply 
+                </button> */}
+              </div>
+
+
+
+
+
             </div>
           </div>
         </div>
@@ -305,7 +339,9 @@ export default function ProjectDetail() {
               </div>
             </section>
           )}
-  {/* Project Documents/Files card */}
+
+
+      {/* Project Documents/Files card */}
           {files.length > 0 && (
             <section className="bg-[#121215] border border-[#23232a] rounded-[10px] p-6 md:p-8">
               <div className="flex items-center gap-[10px] mb-4 border-b border-[#23232a] pb-3">
