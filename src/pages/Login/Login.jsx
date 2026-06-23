@@ -27,7 +27,13 @@ const Login = () => {
 
   useEffect(() => {
     if (token && user) {
-      if (user.role === 'admin') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const redirectPath = searchParams.get('redirect');
+      const safeRedirect = redirectPath && redirectPath.startsWith('/') && !redirectPath.startsWith('//') ? redirectPath : null;
+
+      if (safeRedirect) {
+        navigate(safeRedirect);
+      } else if (user.role === 'admin') {
         navigate('/admin/dashboard');
       } else {
         navigate('/dashboard');
@@ -42,6 +48,15 @@ const Login = () => {
   // Register Modal states
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [reapplyModalData, setReapplyModalData] = useState(null);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get('register') === 'true') {
+      setTimeout(() => {
+        setIsRegisterModalOpen(true);
+      }, 0);
+    }
+  }, []);
 
 
   // Handle countdown for OTP timeout
@@ -106,7 +121,17 @@ const Login = () => {
       toast.success('Login successful!');
       setAuth(loginQuery.data.token, loginQuery.data.refreshToken, loginQuery.data.user);
       
-      navigate('/dashboard');
+      const searchParams = new URLSearchParams(window.location.search);
+      const redirectPath = searchParams.get('redirect');
+      const safeRedirect = redirectPath && redirectPath.startsWith('/') && !redirectPath.startsWith('//') ? redirectPath : null;
+
+      if (safeRedirect) {
+        navigate(safeRedirect);
+      } else if (loginQuery.data.user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
       setLoginParams(null);
     }
   }, [loginQuery.data, navigate, setAuth]);
@@ -139,7 +164,16 @@ const Login = () => {
     if (verifyOtpQuery.data) {
       toast.success('OTP verified & login successful!');
       setAuth(verifyOtpQuery.data.token, verifyOtpQuery.data.refreshToken, verifyOtpQuery.data.user);
-      navigate('/dashboard');
+      
+      const searchParams = new URLSearchParams(window.location.search);
+      const redirectPath = searchParams.get('redirect');
+      const safeRedirect = redirectPath && redirectPath.startsWith('/') && !redirectPath.startsWith('//') ? redirectPath : null;
+
+      if (safeRedirect) {
+        navigate(safeRedirect);
+      } else {
+        navigate('/dashboard');
+      }
       setVerifyOtpParams(null);
     }
   }, [verifyOtpQuery.data, navigate, setAuth]);

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Edit2, Trash2, Eye, TrendingUp, Users, MoreVertical } from 'lucide-react';
+import { useState } from 'react';
+import { Edit2, Trash2, Eye, TrendingUp, Users, MoreVertical, Share2 } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { CompletionBar } from '../AdminShared';
 import { ProjectStatusBadge } from './ProjectTable';
 
@@ -12,13 +13,10 @@ export const ProjectCard = ({
   onDelete, 
   onViewDetails, 
   onTrackProgress, 
-  onMilestones, 
   onApplications, 
-  onSimApply 
 }) => {
   const [showMenu, setShowMenu] = useState(false);
-  const assignedUser = project.assignments?.[0]?.assigned_to;
-  const avatarSeed = encodeURIComponent(assignedUser?.full_name || 'Unassigned');
+
   
   const isNewProject = project.status === 'open' || project.status === 'NOT STARTED';
 
@@ -135,6 +133,25 @@ export const ProjectCard = ({
 
       {/* Action Buttons */}
       <div className="border-t border-[#1a1a22] pt-[12px] mt-auto flex gap-[8px]">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            const publicUrl = `${window.location.origin}/projects/public/${project.id}`;
+            navigator.clipboard.writeText(publicUrl)
+              .then(() => {
+                toast.success('Public project link copied to clipboard!');
+              })
+              .catch(() => {
+                toast.error('Failed to copy link.');
+              });
+          }}
+          className="bg-[#0c0c0e] hover:bg-[#1a1a22] border border-[#23232a] text-gray-400 hover:text-white p-[8px] rounded-[6px] text-[0.78rem] font-semibold flex items-center justify-center cursor-pointer transition-colors"
+          title="Share Public Link"
+        >
+          <Share2 size={13} />
+        </button>
+
         <button
           onClick={() => onViewDetails && onViewDetails(project.id)}
           className="flex-1 bg-[#0c0c0e] hover:bg-[#1a1a22] border border-[#23232a] text-white py-[8px] rounded-[6px] text-[0.78rem] font-semibold flex items-center justify-center gap-[6px] cursor-pointer transition-colors"

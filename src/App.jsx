@@ -2,7 +2,7 @@ import './App.css';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useAuthStore } from './store/useAuthStore';
 
 /* ── Public pages ── */
@@ -11,6 +11,7 @@ import ForgotPassword from './pages/ForgotPassword/ForgotPassword.jsx';
 import ResetPassword  from './pages/ForgotPassword/ResetPassword.jsx';
 import AdminLogin     from './pages/Admin/AdminLogin.jsx';
 import NotFound       from './pages/NotFound/NotFound.jsx';
+import PublicProjectDetail from './pages/BrowseProjects/PublicProjectDetail.jsx';
 
 /* ── Authenticated pages ── */
 import { Dashboard }    from './pages/Dashboard/Dashboard.jsx';
@@ -119,6 +120,7 @@ function App() {
         <Route path="/"               element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password"  element={<ResetPassword />} />
+        <Route path="/projects/public/:id" element={<PublicProjectDetail />} />
 
         {/* ── Admin login (separate branded page) ── */}
         <Route path="/admin" element={<AdminLogin />} />

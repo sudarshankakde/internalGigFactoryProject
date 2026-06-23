@@ -37,9 +37,7 @@ export default function ApplyModal({ project, onClose, defaultRole = 'freelancer
   };
 
   const handleProposalBlur = () => {
-    if (!proposal) {
-      setErrors(prev => ({ ...prev, proposal: 'Proposal strategy is required.' }));
-    } else if (proposal.trim().length < 20) {
+    if (proposal && proposal.trim().length < 20) {
       setErrors(prev => ({ ...prev, proposal: 'Proposal must be at least 20 characters long.' }));
     } else {
       setErrors(prev => ({ ...prev, proposal: '' }));
@@ -101,10 +99,7 @@ export default function ApplyModal({ project, onClose, defaultRole = 'freelancer
       hasErrors = true;
     }
 
-    if (!proposal) {
-      currentErrors.proposal = 'Proposal is required.';
-      hasErrors = true;
-    } else if (proposal.trim().length < 20) {
+    if (proposal && proposal.trim().length < 20) {
       currentErrors.proposal = 'Proposal must be at least 20 characters long.';
       hasErrors = true;
     }
@@ -208,7 +203,7 @@ export default function ApplyModal({ project, onClose, defaultRole = 'freelancer
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="proposal" className="text-xs font-bold text-gray-400">Execution Proposal &amp; Strategy *</label>
+            <label htmlFor="proposal" className="text-xs font-bold text-gray-400">Execution Proposal &amp; Strategy (Optional)</label>
             <textarea 
               id="proposal"
               rows={4}
@@ -220,12 +215,11 @@ export default function ApplyModal({ project, onClose, defaultRole = 'freelancer
               onBlur={handleProposalBlur}
               placeholder="Describe your step-by-step approach, references, and relevant experience..."
               className={`w-full bg-[#121214] border ${errors.proposal ? 'border-red-500/80 focus:border-red-500' : 'border-[#23232a] focus:border-[#70d64d]'} text-white rounded-[6px] py-3 px-4 text-sm outline-none focus:ring-2 focus:ring-[#70d64d]/10 transition-all duration-150 resize-none`}
-              required
             />
             {errors.proposal ? (
               <span className="text-red-400 text-[10px] font-semibold mt-0.5">{errors.proposal}</span>
             ) : (
-              <span className="text-[10px] text-gray-500">Min 20 characters. Explain why you are the best fit.</span>
+              <span className="text-[10px] text-gray-500">Min 20 characters if provided. Explain why you are the best fit.</span>
             )}
           </div>
 

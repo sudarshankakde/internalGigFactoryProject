@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Briefcase, Calendar, Clock, Users, ArrowLeft, Paperclip, ClipboardList, CheckCircle, Tag, Wallet } from 'lucide-react';
+import { Briefcase, Calendar, Clock, Users, ArrowLeft, Paperclip, ClipboardList, CheckCircle, Tag, Wallet, Share2, X, Award, Check, Download } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { api } from '../../utils/api';
 import { useAuthStore } from '../../store/useAuthStore';
 import ApplyModal from './ApplyModal';
@@ -43,12 +44,119 @@ const ProgressBar = ({ value, label }) => (
 export default function ProjectDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  const handleShare = () => {
+    const publicUrl = `${window.location.origin}/projects/public/${id}`;
+    navigator.clipboard.writeText(publicUrl)
+      .then(() => {
+        toast.success('Public project link copied to clipboard!');
+      })
+      .catch((err) => {
+        console.error('Failed to copy: ', err);
+        toast.error('Failed to copy link.');
+      });
+  };
+
   const [isApplyOpen, setIsApplyOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState('freelancer');
   const [selectedMilestoneForDeliverable, setSelectedMilestoneForDeliverable] = useState(null);
   const [selectedMilestoneForReceipt, setSelectedMilestoneForReceipt] = useState(null);
   const [selectedPaymentForReceipt, setSelectedPaymentForReceipt] = useState(null);
   const [selectedDeliverableForEdit, setSelectedDeliverableForEdit] = useState(null);
+
+  // Completion certificate states
+  const [isCertOpen, setIsCertOpen] = useState(false);
+  const [certificateData, setCertificateData] = useState(null);
+  const [freelancerRemarks, setFreelancerRemarks] = useState('');
+  const [isFetchingCert, setIsFetchingCert] = useState(false);
+  const [isSigningCert, setIsSigningCert] = useState(false);
+
+  const handleViewCertificate = async () => {
+    setIsFetchingCert(true);
+    try {
+      const response = await api.get(`/projects/${id}/completion-certificate`);
+      setCertificateData(response.certificate);
+      setIsCertOpen(true);
+    } catch (err) {
+      toast.error(err.message || 'Failed to load completion certificate.');
+    } finally {
+      setIsFetchingCert(false);
+    }
+  };
+
+  const handleDownload = () => {
+    const printContent = document.getElementById('completion-certificate-print');
+    if (!printContent) return;
+    const windowUrl = 'about:blank';
+    const uniqueName = new Date().getTime();
+    const windowName = 'Print' + uniqueName;
+    const printWindow = window.open(windowUrl, windowName, 'left=50000,top=50000,width=800,height=600');
+    
+    let stylesHtml = '';
+    for (const node of document.querySelectorAll('link[rel="stylesheet"], style')) {
+      stylesHtml += node.outerHTML;
+    }
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>GigFactory - Completion Certificate</title>
+          \${stylesHtml}
+          <style>
+            body {
+              background-color: #0c0c0e !important;
+              color: white !important;
+              padding: 40px;
+              font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              min-height: 100vh;
+            }
+            .border-2 {
+              border-width: 2px !important;
+            }
+            .border-dashed {
+              border-style: dashed !important;
+            }
+            .border-\\\\[\\\\#70d64d\\\\]\\\\/30 {
+              border-color: rgba(112, 214, 77, 0.3) !important;
+            }
+            .bg-\\\\[\\\\#0c0c0e\\\\] {
+              background-color: #0c0c0e !important;
+            }
+            .text-\\\\[\\\\#70d64d\\\\] {
+              color: #70d64d !important;
+            }
+            .text-white {
+              color: white !important;
+            }
+            .max-w-\\\\[650px\\\\] {
+              max-w: 650px !important;
+              width: 100% !important;
+            }
+            @page {
+              size: auto;
+              margin: 0mm;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="dark" style="width: 100%; max-w: 650px;">
+            \${printContent.innerHTML}
+          </div>
+          <script>
+            window.onload = function() {
+              window.focus();
+              window.print();
+              setTimeout(function() { window.close(); }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
 
   // Get active user info from store to auto-detect role name
   const user = useAuthStore((state) => state.user) || {};
@@ -116,9 +224,7 @@ export default function ProjectDetail() {
     ? new Date(project.end_date).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })
     : 'TBD';
 
-  const formattedPosted = project.created_at 
-    ? new Date(project.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })
-    : 'TBD';
+
 
   const handleApplyTrigger = (role) => {
     setSelectedRole(role);
@@ -128,13 +234,20 @@ export default function ProjectDetail() {
   return (
     <div className="mx-auto flex flex-col gap-6">
       
-      {/* Back navigation */}
-      <div>
+      {/* Back navigation and Share */}
+      <div className="flex justify-between items-center">
         <button
           onClick={() => navigate('/projects')}
           className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition duration-150 bg-transparent border-none cursor-pointer font-semibold"
         >
           <ArrowLeft size={14} /> Back to Projects
+        </button>
+
+        <button
+          onClick={handleShare}
+          className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#70d64d] transition duration-150 bg-transparent border-none cursor-pointer font-semibold"
+        >
+          <Share2 size={14} /> Share Project
         </button>
       </div>
 
@@ -181,14 +294,16 @@ export default function ProjectDetail() {
             <span className={`inline-flex items-center gap-[6px] uppercase font-bold text-[0.7rem] px-[12px] py-[6px] rounded-[6px] border ${
               project.status === 'completed'
                 ? 'bg-[#182318] text-[#70d64d] border-[#70d64d]/30'
-                : project.status === 'assigned'
-                  ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-                  : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                : project.status === 'pending_completion'
+                  ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                  : project.status === 'assigned'
+                    ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                    : 'bg-gray-500/10 text-gray-400 border-[#23232a]'
             }`}>
               <span className={`w-2 h-2 rounded-full ${
-                project.status === 'completed' ? 'bg-[#70d64d]' : project.status === 'assigned' ? 'bg-blue-400' : 'bg-amber-400'
+                project.status === 'completed' ? 'bg-[#70d64d]' : project.status === 'pending_completion' ? 'bg-amber-400' : project.status === 'assigned' ? 'bg-blue-400' : 'bg-gray-400'
               }`} />
-              {project.status === 'completed' ? 'Completed' : project.status === 'assigned' ? 'In Progress' : 'Not Started'}
+              {project.status === 'completed' ? 'Completed' : project.status === 'pending_completion' ? 'Pending Signature' : project.status === 'assigned' ? 'In Progress' : 'Not Started'}
             </span>
           </div>
         </div>
@@ -249,38 +364,40 @@ export default function ProjectDetail() {
               <span className="text-white font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block truncate">
                 {project.applications_count || 0} Users
               </span>
-
-
-
-
-            <div className="bg-[#0b0b0d] border border-[#23232a] rounded-[20px] p-6">
-              <div className="mb-4">
-                <h2 className="text-white text-lg font-semibold">Apply</h2>
-                <p className="text-gray-500 text-sm">Submit your request to admin.</p>
-              </div>
-              <div className="grid gap-3">
-                <button
-                  onClick={() => handleApply('freelancer')}
-                  className="w-full bg-lime-400 text-black py-3 rounded-xl font-semibold"
-                >
-                  Apply 
-                </button>
-                {/* <button
-                  onClick={() => handleApply('agency')}
-                  className="w-full border border-[#23232a] text-white py-3 rounded-xl hover:bg-white/5 transition"
-                >
-                  Apply 
-                </button> */}
-              </div>
-
-
-
-
-
             </div>
           </div>
-        </div>
       </div>
+</div>
+      {/* Project Completion Banners */}
+      {isAssigned && project.status === 'pending_completion' && (
+        <div className="bg-[#121215] border border-amber-500/30 rounded-[10px] p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex flex-col gap-1 min-w-0">
+            <h4 className="text-white font-extrabold text-[0.95rem]">Action Required: Completion Sign-off Pending 📋</h4>
+            <p className="text-[#a1a1aa] text-[0.78rem] m-0">The administrator has initiated project completion. Please review the settlement amount and sign the completion certificate.</p>
+          </div>
+          <button
+            onClick={handleViewCertificate}
+            className="bg-amber-500 hover:bg-amber-600 text-black font-extrabold rounded-[6px] px-4 py-2.5 text-[0.78rem] cursor-pointer transition border-none shrink-0"
+          >
+            Review & Sign Certificate
+          </button>
+        </div>
+      )}
+
+      {isAssigned && project.status === 'completed' && (
+        <div className="bg-[#121215] border border-[#70d64d]/30 rounded-[10px] p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex flex-col gap-1 min-w-0">
+            <h4 className="text-[#70d64d] font-extrabold text-[0.95rem]">Project Successfully Completed 🎉</h4>
+            <p className="text-[#a1a1aa] text-[0.78rem] m-0">This project has been officially settled and marked as completed. You can view the signed completion certificate at any time.</p>
+          </div>
+          <button
+            onClick={handleViewCertificate}
+            className="bg-[#1a1a20] hover:bg-[#252530] border border-[#2d2d38] text-gray-300 hover:text-white font-extrabold rounded-[6px] px-4 py-2.5 text-[0.78rem] cursor-pointer transition shrink-0"
+          >
+            View Completion Certificate
+          </button>
+        </div>
+      )}
 
       {/* Details Grid layout */}
       <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_0.9fr] gap-[20px] items-start">
@@ -729,6 +846,183 @@ export default function ProjectDetail() {
             setSelectedPaymentForReceipt(null);
           }}
         />
+      )}
+
+      {isCertOpen && certificateData && (
+        <>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]" onClick={() => setIsCertOpen(false)} />
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[650px] bg-[#121215] border border-[#23232a] rounded-[10px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-[101] overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="flex justify-between items-center p-5 border-b border-[#23232a] bg-[#0c0c0e]">
+              <h3 className="text-white font-extrabold text-[1.1rem] flex items-center gap-2">
+                <Award size={18} className="text-[#70d64d]" /> Completion Certificate
+              </h3>
+              <button onClick={() => setIsCertOpen(false)} className="bg-transparent border-none text-gray-500 hover:text-white cursor-pointer">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="p-6 flex-1 min-h-0 overflow-y-auto flex flex-col gap-6">
+              
+              {/* Premium Certificate Layout */}
+              <div id="completion-certificate-print" className="border-2 border-dashed border-[#70d64d]/30 bg-[#0c0c0e] rounded-[8px] p-6 relative overflow-hidden flex flex-col gap-6">
+                {/* Watermark/Logo */}
+                <div className="absolute -right-12 -bottom-12 w-48 h-48 rounded-full border-8 border-[#70d64d]/5 flex items-center justify-center rotate-[30deg] pointer-events-none select-none">
+                  <span className="text-[#70d64d]/5 font-extrabold text-[1.5rem]">COMPLETED</span>
+                </div>
+
+                <div className="text-center border-b border-[#23232a] pb-4 flex flex-col gap-1.5">
+                  <span className="text-[#70d64d] text-[0.65rem] font-bold uppercase tracking-widest">Certificate of Settlement</span>
+                  <h2 className="text-white text-xl font-extrabold tracking-tight">GIGFACTORY</h2>
+                  <p className="text-gray-500 text-[0.7rem]">This document certifies the bilateral project closure and financial settlement between the platform administration and the assigned freelancer/agency.</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-[0.8rem]">
+                  <div>
+                    <span className="text-gray-500 font-bold uppercase text-[0.62rem] block">Project Title</span>
+                    <span className="text-white font-semibold block truncate">{project.title}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 font-bold uppercase text-[0.62rem] block">Project Code</span>
+                    <span className="text-white font-semibold block">{project.project_code || 'N/A'}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 font-bold uppercase text-[0.62rem] block">Platform Admin</span>
+                    <span className="text-white font-semibold block">{certificateData.admin_name}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 font-bold uppercase text-[0.62rem] block">Assigned Executor</span>
+                    <span className="text-white font-semibold block">{certificateData.assignee_name}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 font-bold uppercase text-[0.62rem] block">Original Project Budget</span>
+                    <span className="text-white font-semibold block">₹{Number(project.budget || 0).toLocaleString('en-IN')}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 font-bold uppercase text-[0.62rem] block">Final Settled Amount</span>
+                    <span className="text-[#70d64d] font-bold text-[0.95rem] block">₹{Number(certificateData.final_settled_amount).toLocaleString('en-IN')}</span>
+                  </div>
+                </div>
+
+                <div className="border-t border-[#23232a] pt-4 flex flex-col gap-3">
+                  {certificateData.admin_remarks && (
+                    <div className="bg-[#121215] border border-[#23232a] rounded-[6px] p-3 text-[0.78rem]">
+                      <span className="text-gray-400 font-bold uppercase text-[0.62rem] block mb-1">Admin Remarks</span>
+                      <p className="text-gray-300 m-0 leading-relaxed italic">"{certificateData.admin_remarks}"</p>
+                    </div>
+                  )}
+
+                  {certificateData.freelancer_remarks && (
+                    <div className="bg-[#121215] border border-[#23232a] rounded-[6px] p-3 text-[0.78rem]">
+                      <span className="text-gray-400 font-bold uppercase text-[0.62rem] block mb-1">Executor Remarks</span>
+                      <p className="text-gray-300 m-0 leading-relaxed italic">"{certificateData.freelancer_remarks}"</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Signatures */}
+                <div className="grid grid-cols-2 gap-6 mt-4 pt-4 border-t border-[#23232a]">
+                  <div className="flex flex-col gap-2">
+                    <span className="text-gray-500 font-bold uppercase text-[0.62rem]">Admin Signature</span>
+                    <div className="bg-[#121215] border border-[#23232a] rounded-[6px] p-3 text-center min-h-[50px] flex flex-col justify-center gap-1 relative overflow-hidden">
+                      <span className="text-[#70d64d] font-bold text-[0.75rem] italic">Signed electronically</span>
+                      <span className="text-gray-500 text-[0.65rem]">{new Date(certificateData.admin_signed_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                      <div className="absolute right-1 bottom-1 border border-[#70d64d]/20 text-[#70d64d]/20 rounded-full px-1 text-[0.5rem] uppercase font-bold tracking-wider rotate-[-15deg] select-none pointer-events-none">GF Admin</div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <span className="text-gray-500 font-bold uppercase text-[0.62rem]">Executor Signature</span>
+                    {certificateData.freelancer_signed_at ? (
+                      <div className="bg-[#121215] border border-[#23232a] rounded-[6px] p-3 text-center min-h-[50px] flex flex-col justify-center gap-1 relative overflow-hidden">
+                        <span className="text-[#70d64d] font-bold text-[0.75rem] italic">Signed electronically</span>
+                        <span className="text-gray-500 text-[0.65rem]">{new Date(certificateData.freelancer_signed_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                        <div className="absolute right-1 bottom-1 border border-[#70d64d]/20 text-[#70d64d]/20 rounded-full px-1 text-[0.5rem] uppercase font-bold tracking-wider rotate-[-15deg] select-none pointer-events-none">GF Executor</div>
+                      </div>
+                    ) : (
+                      <div className="bg-[#121215] border border-dashed border-[#ef444433] rounded-[6px] p-3 text-center min-h-[50px] flex flex-col justify-center relative">
+                        <span className="text-[#ef4444] font-bold text-[0.75rem] uppercase tracking-wider">Awaiting Signature</span>
+                        <span className="text-gray-500 text-[0.65rem] mt-0.5">Pending your acceptance</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Form Input for Signature (only if status is pending and user is the assignee) */}
+              {!certificateData.freelancer_signed_at && project.status === 'pending_completion' && (
+                <div className="bg-[#0c0c0e] border border-[#23232a] rounded-[8px] p-5 flex flex-col gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-gray-400 font-bold text-[0.7rem] uppercase tracking-wider">Your Remarks / Signature Comments (Optional)</label>
+                    <textarea
+                      rows={3}
+                      value={freelancerRemarks}
+                      onChange={(e) => setFreelancerRemarks(e.target.value)}
+                      placeholder="Enter remarks to be recorded on the certificate..."
+                      className="bg-[#121215] border border-[#23232a] rounded-[6px] px-3.5 py-2.5 text-white text-[0.85rem] focus:outline-none focus:border-[#70d64d] w-full resize-none"
+                    />
+                  </div>
+
+                  <div className="flex items-start gap-2.5 mt-2">
+                    <input
+                      type="checkbox"
+                      id="acceptSignCheckbox"
+                      className="accent-[#70d64d] cursor-pointer mt-1"
+                      required
+                    />
+                    <label htmlFor="acceptSignCheckbox" className="text-gray-300 text-[0.8rem] leading-snug cursor-pointer font-medium select-none">
+                      I agree that the project work is complete, and all financial settlements and payments are agreed, cleared, and closed. I accept electronic signing of this document.
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-end gap-3 pt-2 border-t border-[#23232a]/50">
+                <button
+                  type="button"
+                  onClick={handleDownload}
+                  className="bg-[#70d64d] hover:bg-[#8ee67b] text-black font-bold rounded-[6px] px-5 py-2 text-[0.78rem] cursor-pointer transition-colors flex items-center gap-1.5 border-none"
+                >
+                  <Download size={14} /> Download PDF
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsCertOpen(false)}
+                  className="bg-[#202024] hover:bg-[#2d2d34] border border-[#2d2d34] text-gray-300 hover:text-white rounded-[6px] px-5 py-2 text-[0.78rem] font-bold cursor-pointer transition-colors"
+                >
+                  Close
+                </button>
+                {!certificateData.freelancer_signed_at && project.status === 'pending_completion' && (
+                  <button
+                    onClick={async () => {
+                      const chk = document.getElementById('acceptSignCheckbox');
+                      if (!chk || !chk.checked) {
+                        toast.error('Please accept the declaration to sign.');
+                        return;
+                      }
+                      setIsSigningCert(true);
+                      try {
+                        await api.post(`/projects/${id}/sign-completion`, {
+                          freelancer_remarks: freelancerRemarks
+                        });
+                        toast.success('Certificate signed successfully. Project is completed!');
+                        setIsCertOpen(false);
+                        setFreelancerRemarks('');
+                        refetch();
+                      } catch (err) {
+                        toast.error(err.message || 'Failed to sign certificate.');
+                      } finally {
+                        setIsSigningCert(false);
+                      }
+                    }}
+                    disabled={isSigningCert}
+                    className="bg-[#70d64d] hover:bg-[#8ee67b] text-black rounded-[6px] px-5 py-2 text-[0.78rem] font-bold cursor-pointer transition-colors border-none disabled:opacity-50"
+                  >
+                    {isSigningCert ? 'Signing...' : 'Sign & Complete Project'}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

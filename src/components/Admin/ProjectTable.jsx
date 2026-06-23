@@ -1,5 +1,6 @@
-import React from 'react';
-import { Eye, Edit2, Trash2, TrendingUp, Users, Calendar, AlertCircle } from 'lucide-react';
+/* eslint-disable react-refresh/only-export-components */
+import { Eye, Edit2, Trash2, TrendingUp, Users, Share2 } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { CompletionBar } from '../AdminShared';
 
 const fmtDate = (d) =>
@@ -58,7 +59,6 @@ export function ProjectTable({ projects, isLoading, onViewDetails, onEdit, onDel
                 </td>
               </tr>
             ) : projects.map(p => {
-              const assignedUser = p.assignments?.[0]?.assigned_to;
               return (
                 <tr 
                   key={p.id}
@@ -131,6 +131,24 @@ export function ProjectTable({ projects, isLoading, onViewDetails, onEdit, onDel
                   {/* Actions */}
                   <td className="p-[16px] border-b border-[#1a1a22] align-middle">
                     <div className="flex items-center gap-[8px]">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const publicUrl = `${window.location.origin}/projects/public/${p.id}`;
+                          navigator.clipboard.writeText(publicUrl)
+                            .then(() => {
+                              toast.success('Public project link copied to clipboard!');
+                            })
+                            .catch(() => {
+                              toast.error('Failed to copy link.');
+                            });
+                        }}
+                        className="bg-[#0c0c0e] border border-[#23232a] text-[#8a8a8a] hover:text-[#70d64d] p-[6px] rounded-[4px] cursor-pointer transition-colors"
+                        title="Share Public Link"
+                      >
+                        <Share2 size={14} />
+                      </button>
+
                       <button
                         onClick={() => onViewDetails && onViewDetails(p.id)}
                         className="bg-[#0c0c0e] border border-[#23232a] text-[#8a8a8a] hover:text-white p-[6px] rounded-[4px] cursor-pointer transition-colors"

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Search, Briefcase, ArrowRight, Filter, SortAsc, RefreshCw, ClipboardList, Check } from 'lucide-react';
+import { Search, Briefcase, ArrowRight, Filter, SortAsc, RefreshCw, Check, Share2 } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { api } from '../../utils/api';
 import { Pagination, PageSizeSelector } from '../../components/AdminShared';
 
@@ -25,6 +26,18 @@ const renderWithTbdTooltip = (val, tooltipText) => {
 export default function BrowseProjects() {
   const navigate = useNavigate();
 
+  const handleShare = (projectId) => {
+    const publicUrl = `${window.location.origin}/projects/public/${projectId}`;
+    navigator.clipboard.writeText(publicUrl)
+      .then(() => {
+        toast.success('Public project link copied to clipboard!');
+      })
+      .catch((err) => {
+        console.error('Failed to copy: ', err);
+        toast.error('Failed to copy link.');
+      });
+  };
+
   // Search & Filter & Pagination states
   const [searchTerm, setSearchTerm] = useState('');
   const [dSearch, setDSearch] = useState('');
@@ -46,9 +59,10 @@ export default function BrowseProjects() {
     localStorage.setItem('browse_projects_limit', limit);
   }, [limit]);
 
-  // Reset page to 1 when search query, category, sorting, or limit changes
   useEffect(() => {
-    setPage(1);
+    setTimeout(() => {
+      setPage(1);
+    }, 0);
   }, [dSearch, selectedCategory, sortBy, limit]);
 
   // Fetch backend projects with pagination, sorting, search, category
@@ -210,7 +224,6 @@ export default function BrowseProjects() {
             {projects.map((project) => {
               const skillsList = project.project_skills || [];
               const tagsList = project.project_tags || [];
-              const milestonesList = project.milestones || [];
               
               const formattedBudget = project.budget 
                 ? `₹${Number(project.budget).toLocaleString('en-IN')}` 
@@ -359,6 +372,17 @@ export default function BrowseProjects() {
 
                   {/* Bottom Action Row */}
                   <footer className="flex justify-end items-center gap-3">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleShare(project.id);
+                      }}
+                      className="bg-[#0c0c0e] hover:bg-[#1a1a22] border border-[#23232a] text-gray-400 hover:text-white p-[8px] rounded-[6px] text-[0.78rem] font-semibold flex items-center justify-center cursor-pointer transition-colors duration-150"
+                      title="Share Public Link"
+                    >
+                      <Share2 size={13} />
+                    </button>
+
                     <button
                       onClick={() => navigate(`/projects/${project.id}`)}
                       className="bg-[#0c0c0e] hover:bg-[#1a1a22] border border-[#23232a] text-white py-[8px] px-[16px] rounded-[6px] text-[0.78rem] font-semibold transition-colors duration-150"

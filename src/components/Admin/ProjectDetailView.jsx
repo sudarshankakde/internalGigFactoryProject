@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { 
   ArrowLeft, Clock, Wallet, Check, X, Plus, Users, Award, Edit, Trash2,
   Briefcase, Calendar, Paperclip, Folder, FileText, Tag, ExternalLink,
-  UploadCloud, AlertTriangle
+  UploadCloud, AlertTriangle, Share2, Download
 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../utils/api';
@@ -18,6 +18,18 @@ const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day: 'numer
 export default function ProjectDetailView() {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  const handleShare = () => {
+    const publicUrl = `${window.location.origin}/projects/public/${id}`;
+    navigator.clipboard.writeText(publicUrl)
+      .then(() => {
+        toast.success('Public project link copied to clipboard!');
+      })
+      .catch((err) => {
+        console.error('Failed to copy: ', err);
+        toast.error('Failed to copy link.');
+      });
+  };
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(() => searchParams.get('tab') || 'overview');
   const comming_from = searchParams.get('from') || 'all+projects';
@@ -186,9 +198,104 @@ export default function ProjectDetailView() {
   const [editingPayment, setEditingPayment] = useState(null);
   const [paymentAmount, setPaymentAmount] = useState('');
 
+  // Completion certificate states
+  const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
+  const [isCertModalOpen, setIsCertModalOpen] = useState(false);
+  const [completionRemarks, setCompletionRemarks] = useState('');
+  const [finalSettledAmount, setFinalSettledAmount] = useState('');
+  const [certificateData, setCertificateData] = useState(null);
+  const [isFetchingCert, setIsFetchingCert] = useState(false);
+
+  const handleViewCertificate = async () => {
+    setIsFetchingCert(true);
+    try {
+      const response = await api.get(`/projects/${id}/completion-certificate`);
+      setCertificateData(response.certificate);
+      setIsCertModalOpen(true);
+    } catch (err) {
+      toast.error(err.message || 'Failed to fetch completion certificate.');
+    } finally {
+      setIsFetchingCert(false);
+    }
+  };
+
+  const handleDownload = () => {
+    const printContent = document.getElementById('completion-certificate-print');
+    if (!printContent) return;
+    const windowUrl = 'about:blank';
+    const uniqueName = new Date().getTime();
+    const windowName = 'Print' + uniqueName;
+    const printWindow = window.open(windowUrl, windowName, 'left=50000,top=50000,width=800,height=600');
+    
+    let stylesHtml = '';
+    for (const node of document.querySelectorAll('link[rel="stylesheet"], style')) {
+      stylesHtml += node.outerHTML;
+    }
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>GigFactory - Completion Certificate</title>
+          \${stylesHtml}
+          <style>
+            body {
+              background-color: #0c0c0e !important;
+              color: white !important;
+              padding: 40px;
+              font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              min-height: 100vh;
+            }
+            .border-2 {
+              border-width: 2px !important;
+            }
+            .border-dashed {
+              border-style: dashed !important;
+            }
+            .border-\\\\[\\\\#70d64d\\\\]\\\\/30 {
+              border-color: rgba(112, 214, 77, 0.3) !important;
+            }
+            .bg-\\\\[\\\\#0c0c0e\\\\] {
+              background-color: #0c0c0e !important;
+            }
+            .text-\\\\[\\\\#70d64d\\\\] {
+              color: #70d64d !important;
+            }
+            .text-white {
+              color: white !important;
+            }
+            .max-w-\\\\[650px\\\\] {
+              max-w: 650px !important;
+              width: 100% !important;
+            }
+            @page {
+              size: auto;
+              margin: 0mm;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="dark" style="width: 100%; max-w: 650px;">
+            \${printContent.innerHTML}
+          </div>
+          <script>
+            window.onload = function() {
+              window.focus();
+              window.print();
+              setTimeout(function() { window.close(); }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
   // Disable background scrolling when any modal is open
   useEffect(() => {
-    const isAnyModalOpen = isEditProjectOpen || isMilestoneModalOpen || isPaymentModalOpen || isViewPaymentModalOpen || isEditPaymentModalOpen || !!selectedBidForProposal;
+    const isAnyModalOpen = isEditProjectOpen || isMilestoneModalOpen || isPaymentModalOpen || isViewPaymentModalOpen || isEditPaymentModalOpen || !!selectedBidForProposal || isCompletionModalOpen || isCertModalOpen;
     if (isAnyModalOpen) {
       document.body.classList.add('overflow-hidden');
     } else {
@@ -197,7 +304,7 @@ export default function ProjectDetailView() {
     return () => {
       document.body.classList.remove('overflow-hidden');
     };
-  }, [isEditProjectOpen, isMilestoneModalOpen, isPaymentModalOpen, isViewPaymentModalOpen, isEditPaymentModalOpen, selectedBidForProposal]);
+  }, [isEditProjectOpen, isMilestoneModalOpen, isPaymentModalOpen, isViewPaymentModalOpen, isEditPaymentModalOpen, selectedBidForProposal, isCompletionModalOpen, isCertModalOpen]);
 
 
   // Payment form state
@@ -573,6 +680,9 @@ export default function ProjectDetailView() {
   const assignedAmount = activeAssignment ? Number(activeAssignment.assigned_amount) : null;
   const totalPaid = project.milestone_payments?.filter(p => p.status === 'paid').reduce((sum, p) => sum + Number(p.amount), 0) || 0;
   const remainingBidBalance = assignedAmount !== null ? assignedAmount - totalPaid : null;
+  const totalMilestonesBudget = milestones.reduce((sum, m) => sum + Number(m.budget || 0), 0);
+  const projectBudget = Number(project.budget) || 0;
+  const budgetOverrun = totalMilestonesBudget > projectBudget ? totalMilestonesBudget - projectBudget : 0;
 
   return (
     <div className="flex flex-col gap-[20px]">
@@ -587,6 +697,33 @@ export default function ProjectDetailView() {
           </button>
           
           <div className="flex gap-2.5">
+            {project.status === 'assigned' && (
+              <button
+                onClick={() => {
+                  const defaultAmount = assignedAmount !== null ? assignedAmount : (Number(project.budget) || 0);
+                  setFinalSettledAmount(defaultAmount.toString());
+                  setIsCompletionModalOpen(true);
+                }}
+                className="bg-[#70d64d] hover:bg-[#8ee67b] text-black font-bold rounded-[6px] px-3.5 py-2 text-[0.78rem] cursor-pointer flex items-center gap-1.5 transition-colors border-none"
+              >
+                <Check size={14} /> Complete Project
+              </button>
+            )}
+            {(project.status === 'pending_completion' || project.status === 'completed') && (
+              <button
+                disabled={isFetchingCert}
+                onClick={handleViewCertificate}
+                className="bg-[#1a1a20] hover:bg-[#252530] border border-[#2d2d38] text-gray-300 hover:text-white font-bold rounded-[6px] px-3.5 py-2 text-[0.78rem] cursor-pointer flex items-center gap-1.5 transition-colors border-none"
+              >
+                <Award size={14} className="text-[#70d64d]" /> {isFetchingCert ? 'Loading...' : 'View Certificate'}
+              </button>
+            )}
+            <button
+              onClick={handleShare}
+              className="bg-[#1a1a20] hover:bg-[#252530] border border-[#2d2d38] text-gray-300 hover:text-white font-bold rounded-[6px] px-3.5 py-2 text-[0.78rem] cursor-pointer flex items-center gap-1.5 transition-colors border-none"
+            >
+              <Share2 size={14} className="text-[#70d64d]" /> Share Project
+            </button>
             <button
               onClick={() => setIsEditProjectOpen(true)}
               className="bg-[#1a1a20] hover:bg-[#252530] border border-[#2d2d38] text-gray-300 hover:text-white font-bold rounded-[6px] px-3.5 py-2 text-[0.78rem] cursor-pointer flex items-center gap-1.5 transition-colors border-none"
@@ -636,14 +773,16 @@ export default function ProjectDetailView() {
               <span className={`inline-flex items-center gap-[6px] uppercase font-bold text-[0.7rem] px-[12px] py-[6px] rounded-[6px] border ${
                 project.status === 'completed'
                   ? 'bg-[#182318] text-[#70d64d] border-[#70d64d]/30'
-                  : project.status === 'assigned'
-                    ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-                    : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                  : project.status === 'pending_completion'
+                    ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                    : project.status === 'assigned'
+                      ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                      : 'bg-gray-500/10 text-gray-400 border-[#23232a]'
               }`}>
                 <span className={`w-2 h-2 rounded-full ${
-                  project.status === 'completed' ? 'bg-[#70d64d]' : project.status === 'assigned' ? 'bg-blue-400' : 'bg-amber-400'
+                  project.status === 'completed' ? 'bg-[#70d64d]' : project.status === 'pending_completion' ? 'bg-amber-400' : project.status === 'assigned' ? 'bg-blue-400' : 'bg-gray-400'
                 }`} />
-                {project.status === 'completed' ? 'Completed' : project.status === 'assigned' ? 'In Progress' : 'Not Started'}
+                {project.status === 'completed' ? 'Completed' : project.status === 'pending_completion' ? 'Pending Signature' : project.status === 'assigned' ? 'In Progress' : 'Not Started'}
               </span>
             </div>
           </div>
@@ -658,6 +797,11 @@ export default function ProjectDetailView() {
                 <span className="text-white font-extrabold text-[1.2rem] mt-1 block">
                   {project.budget ? `₹${Number(project.budget).toLocaleString('en-IN')}` : '₹0'}
                 </span>
+                {budgetOverrun > 0 && (
+                  <span className="text-red-400 text-[0.65rem] font-bold bg-red-500/10 px-1.5 py-0.5 rounded mt-1.5 inline-block border border-red-500/20">
+                    Overrun: +₹{budgetOverrun.toLocaleString('en-IN')}
+                  </span>
+                )}
               </div>
             </div>
             {/* Deadline */}
@@ -1889,6 +2033,218 @@ export default function ProjectDetailView() {
                   </button>
                 </div>
 
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Initiate Completion Modal */}
+        {isCompletionModalOpen && (
+          <>
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]" onClick={() => setIsCompletionModalOpen(false)} />
+            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[500px] bg-[#121215] border border-[#23232a] rounded-[10px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-[101] overflow-hidden flex flex-col">
+              <div className="flex justify-between items-center p-5 border-b border-[#23232a] bg-[#0c0c0e]">
+                <h3 className="text-white font-extrabold text-[1.1rem] flex items-center gap-2">
+                  <Award size={18} className="text-[#70d64d]" /> Initiate Project Completion
+                </h3>
+                <button onClick={() => setIsCompletionModalOpen(false)} className="bg-transparent border-none text-gray-500 hover:text-white cursor-pointer">
+                  <X size={18} />
+                </button>
+              </div>
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                if (!finalSettledAmount || isNaN(parseFloat(finalSettledAmount))) {
+                  toast.error('Please enter a valid final settled amount.');
+                  return;
+                }
+                try {
+                  await api.post(`/projects/${id}/initiate-completion`, {
+                    admin_remarks: completionRemarks,
+                    final_settled_amount: finalSettledAmount
+                  });
+                  toast.success('Project completion certificate generated successfully!');
+                  setIsCompletionModalOpen(false);
+                  setCompletionRemarks('');
+                  setFinalSettledAmount('');
+                  refetch();
+                  queryClient.invalidateQueries({ queryKey: ['admin-project-detail', id] });
+                  queryClient.invalidateQueries({ queryKey: ['admin-projects'] });
+                } catch (err) {
+                  toast.error(err.message || 'Failed to initiate project completion.');
+                }
+              }} className="p-5 flex flex-col gap-4">
+                <div className="bg-[#0c0c0e] border border-[#23232a] p-4 rounded-[6px] text-[0.8rem] text-gray-400 flex flex-col gap-2">
+                  <div className="flex justify-between">
+                    <span>Original Project Budget:</span>
+                    <span className="text-white font-bold">₹{Number(project.budget || 0).toLocaleString('en-IN')}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Active Assignee Bid Amount:</span>
+                    <span className="text-white font-bold">₹{Number(assignedAmount || 0).toLocaleString('en-IN')}</span>
+                  </div>
+                  <div className="flex justify-between border-t border-[#23232a] pt-2 mt-1">
+                    <span>Milestones Paid Amount:</span>
+                    <span className="text-[#70d64d] font-bold">₹{totalPaid.toLocaleString('en-IN')}</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-gray-400 font-bold text-[0.7rem] uppercase tracking-wider">Final Settled Amount (₹)</label>
+                  <input
+                    type="number"
+                    value={finalSettledAmount}
+                    onChange={(e) => setFinalSettledAmount(e.target.value)}
+                    placeholder="Enter final settled amount..."
+                    className="bg-[#0c0c0e] border border-[#23232a] rounded-[6px] px-3.5 py-2.5 text-white text-[0.85rem] focus:outline-none focus:border-[#70d64d] w-full"
+                    required
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-gray-400 font-bold text-[0.7rem] uppercase tracking-wider">Admin Remarks / Sign-off Comments</label>
+                  <textarea
+                    rows={4}
+                    value={completionRemarks}
+                    onChange={(e) => setCompletionRemarks(e.target.value)}
+                    placeholder="Enter final remarks regarding project quality, delivery, and settlement..."
+                    className="bg-[#0c0c0e] border border-[#23232a] rounded-[6px] px-3.5 py-2.5 text-white text-[0.85rem] focus:outline-none focus:border-[#70d64d] w-full resize-none"
+                  />
+                </div>
+
+                <div className="flex gap-3 justify-end mt-2 pt-4 border-t border-[#23232a]/50">
+                  <button
+                    type="button"
+                    onClick={() => setIsCompletionModalOpen(false)}
+                    className="bg-[#202024] hover:bg-[#2d2d34] border border-[#2d2d34] text-gray-300 hover:text-white rounded-[6px] px-4 py-2 text-[0.78rem] font-bold cursor-pointer transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-[#70d64d] hover:bg-[#8ee67b] text-black rounded-[6px] px-4 py-2 text-[0.78rem] font-bold cursor-pointer transition-colors border-none"
+                  >
+                    Sign & Initiate Completion
+                  </button>
+                </div>
+              </form>
+            </div>
+          </>
+        )}
+
+        {/* View Certificate Modal */}
+        {isCertModalOpen && certificateData && (
+          <>
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]" onClick={() => setIsCertModalOpen(false)} />
+            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[650px] bg-[#121215] border border-[#23232a] rounded-[10px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-[101] overflow-hidden flex flex-col max-h-[90vh]">
+              <div className="flex justify-between items-center p-5 border-b border-[#23232a] bg-[#0c0c0e]">
+                <h3 className="text-white font-extrabold text-[1.1rem] flex items-center gap-2">
+                  <Award size={18} className="text-[#70d64d]" /> Completion Certificate
+                </h3>
+                <button onClick={() => setIsCertModalOpen(false)} className="bg-transparent border-none text-gray-500 hover:text-white cursor-pointer">
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="p-6 flex-1 min-h-0 overflow-y-auto flex flex-col gap-6">
+                {/* Premium Certificate Layout */}
+                <div id="completion-certificate-print" className="border-2 border-dashed border-[#70d64d]/30 bg-[#0c0c0e] rounded-[8px] p-6 relative overflow-hidden flex flex-col gap-6">
+                  {/* Watermark/Logo */}
+                  <div className="absolute -right-12 -bottom-12 w-48 h-48 rounded-full border-8 border-[#70d64d]/5 flex items-center justify-center rotate-[30deg] pointer-events-none select-none">
+                    <span className="text-[#70d64d]/5 font-extrabold text-[1.5rem]">COMPLETED</span>
+                  </div>
+
+                  <div className="text-center border-b border-[#23232a] pb-4 flex flex-col gap-1.5">
+                    <span className="text-[#70d64d] text-[0.65rem] font-bold uppercase tracking-widest">Certificate of Settlement</span>
+                    <h2 className="text-white text-xl font-extrabold tracking-tight">GIGFACTORY</h2>
+                    <p className="text-gray-500 text-[0.7rem]">This document certifies the bilateral project closure and financial settlement between the platform administration and the assigned freelancer/agency.</p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-[0.8rem]">
+                    <div>
+                      <span className="text-gray-500 font-bold uppercase text-[0.62rem] block">Project Title</span>
+                      <span className="text-white font-semibold block truncate">{project.title}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 font-bold uppercase text-[0.62rem] block">Project Code</span>
+                      <span className="text-white font-semibold block">{project.project_code || 'N/A'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 font-bold uppercase text-[0.62rem] block">Platform Admin</span>
+                      <span className="text-white font-semibold block">{certificateData.admin_name}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 font-bold uppercase text-[0.62rem] block">Assigned Executor</span>
+                      <span className="text-white font-semibold block">{certificateData.assignee_name}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 font-bold uppercase text-[0.62rem] block">Original Project Budget</span>
+                      <span className="text-white font-semibold block">₹{Number(project.budget || 0).toLocaleString('en-IN')}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 font-bold uppercase text-[0.62rem] block">Final Settled Amount</span>
+                      <span className="text-[#70d64d] font-bold text-[0.95rem] block">₹{Number(certificateData.final_settled_amount).toLocaleString('en-IN')}</span>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-[#23232a] pt-4 flex flex-col gap-3">
+                    {certificateData.admin_remarks && (
+                      <div className="bg-[#121215] border border-[#23232a] rounded-[6px] p-3 text-[0.78rem]">
+                        <span className="text-gray-400 font-bold uppercase text-[0.62rem] block mb-1">Admin Remarks</span>
+                        <p className="text-gray-300 m-0 leading-relaxed italic">"{certificateData.admin_remarks}"</p>
+                      </div>
+                    )}
+
+                    {certificateData.freelancer_remarks && (
+                      <div className="bg-[#121215] border border-[#23232a] rounded-[6px] p-3 text-[0.78rem]">
+                        <span className="text-gray-400 font-bold uppercase text-[0.62rem] block mb-1">Executor Remarks</span>
+                        <p className="text-gray-300 m-0 leading-relaxed italic">"{certificateData.freelancer_remarks}"</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Signatures */}
+                  <div className="grid grid-cols-2 gap-6 mt-4 pt-4 border-t border-[#23232a]">
+                    <div className="flex flex-col gap-2">
+                      <span className="text-gray-500 font-bold uppercase text-[0.62rem]">Admin Signature</span>
+                      <div className="bg-[#121215] border border-[#23232a] rounded-[6px] p-3 text-center min-h-[50px] flex flex-col justify-center gap-1 relative overflow-hidden">
+                        <span className="text-[#70d64d] font-bold text-[0.75rem] italic">Signed electronically</span>
+                        <span className="text-gray-500 text-[0.65rem]">{fmtDate(certificateData.admin_signed_at)}</span>
+                        {/* Stamp overlay */}
+                        <div className="absolute right-1 bottom-1 border border-[#70d64d]/20 text-[#70d64d]/20 rounded-full px-1 text-[0.5rem] uppercase font-bold tracking-wider rotate-[-15deg] select-none pointer-events-none">GF Admin</div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <span className="text-gray-500 font-bold uppercase text-[0.62rem]">Executor Signature</span>
+                      {certificateData.freelancer_signed_at ? (
+                        <div className="bg-[#121215] border border-[#23232a] rounded-[6px] p-3 text-center min-h-[50px] flex flex-col justify-center gap-1 relative overflow-hidden">
+                          <span className="text-[#70d64d] font-bold text-[0.75rem] italic">Signed electronically</span>
+                          <span className="text-gray-500 text-[0.65rem]">{fmtDate(certificateData.freelancer_signed_at)}</span>
+                          <div className="absolute right-1 bottom-1 border border-[#70d64d]/20 text-[#70d64d]/20 rounded-full px-1 text-[0.5rem] uppercase font-bold tracking-wider rotate-[-15deg] select-none pointer-events-none">GF Executor</div>
+                        </div>
+                      ) : (
+                        <div className="bg-[#121215] border border-dashed border-[#ef444433] rounded-[6px] p-3 text-center min-h-[50px] flex flex-col justify-center relative">
+                          <span className="text-[#ef4444] font-bold text-[0.75rem] uppercase tracking-wider">Awaiting Signature</span>
+                          <span className="text-gray-500 text-[0.65rem] mt-0.5">Pending user acceptance</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-2 border-t border-[#23232a]/50">
+                  <button
+                    onClick={handleDownload}
+                    className="bg-[#70d64d] hover:bg-[#8ee67b] text-black font-bold rounded-[6px] px-5 py-2 text-[0.78rem] cursor-pointer transition-colors flex items-center gap-1.5 border-none"
+                  >
+                    <Download size={14} /> Download PDF
+                  </button>
+                  <button
+                    onClick={() => setIsCertModalOpen(false)}
+                    className="bg-[#202024] hover:bg-[#2d2d34] border border-[#2d2d34] text-gray-300 hover:text-white rounded-[6px] px-5 py-2 text-[0.78rem] font-bold cursor-pointer transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
           </>
