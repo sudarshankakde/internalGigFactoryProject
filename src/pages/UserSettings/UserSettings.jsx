@@ -163,7 +163,7 @@ export default function UserSettings() {
   }
 
   return (
-    <div className="settings-shell">
+    <div className="settings-user">
       {/* Sidebar tabs */}
       <aside className="settings-sidebar">
         <div className="settings-sidebar-header">
