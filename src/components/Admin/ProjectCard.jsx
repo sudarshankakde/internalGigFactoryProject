@@ -22,6 +22,15 @@ export const ProjectCard = ({
   
   const isNewProject = project.status === 'open' || project.status === 'NOT STARTED';
 
+  console.log(project.status,"projectstatus");
+
+  const showTrackProgress=   project.status?.toLowerCase() === 'completed' ||   project.status?.toLowerCase() === 'open' ||   project.status?.toLowerCase() === 'NOT STARTED' ;
+  // const showTrackProgress =
+  // [
+    
+  //   'in_progress'
+  // ].includes(project.status);
+
   return (
     <div className="bg-[#121215] border border-[#23232a] rounded-[10px] p-[20px] flex flex-col gap-[14px] relative cursor-pointer transition-all duration-200 hover:-translate-y-[2px] hover:border-[#70d64d]">
       
@@ -134,19 +143,23 @@ export const ProjectCard = ({
       </div>
 
       {/* Action Buttons */}
+      
       <div className="border-t border-[#1a1a22] pt-[12px] mt-auto flex gap-[8px]">
+        {showTrackProgress ? (
         <button
           onClick={() => onViewDetails && onViewDetails(project.id)}
           className="flex-1 bg-[#0c0c0e] hover:bg-[#1a1a22] border border-[#23232a] text-white py-[8px] rounded-[6px] text-[0.78rem] font-semibold flex items-center justify-center gap-[6px] cursor-pointer transition-colors"
         >
           <Eye size={13} /> View Details
         </button>
+        ):(
         <button
           onClick={() => onTrackProgress && onTrackProgress(project.id)}
           className="flex-1 bg-[#70d64d] hover:bg-[#8ee67b] text-black border-none py-[8px] rounded-[6px] text-[0.78rem] font-bold flex items-center justify-center gap-[6px] cursor-pointer transition-colors"
         >
           <TrendingUp size={13} /> Track Progress
         </button>
+        )}
       </div>
 
     </div>

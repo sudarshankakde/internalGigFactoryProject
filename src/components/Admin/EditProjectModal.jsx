@@ -474,8 +474,7 @@ export default function ProjectFormModal({ project, onClose, onCreate, onSave })
                 className={`mt-2 w-full rounded-[6px] border ${errors.title ? 'border-red-500/80' : 'border-[#23232a] focus:border-[#70d64d]'} bg-[#0c0c0e] px-4 py-3 text-white text-[0.85rem] outline-none transition-colors`}
                 placeholder="e.g. Industrial MEP HVAC Layout Drafting"
                 required
-              />
-              {errors.title && <span className="text-red-400 text-xs mt-1 block">{errors.title}</span>}
+              /> {errors.title && <span className="text-red-400 text-xs mt-1 block">{errors.title}</span>}
             </div>
             <div className="mt-2">
               <SingleAutocomplete
