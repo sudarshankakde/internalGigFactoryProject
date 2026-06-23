@@ -141,6 +141,7 @@ export default function AdminSettings() {
     sec_session_timeout_mins:  60,
     sec_max_failed_logins:     5,
     sec_lockout_duration_mins: 15,
+    sec_inactivity_threshold_days: 30,
   });
 
   const [system, setSystem] = useState({
@@ -559,6 +560,18 @@ export default function AdminSettings() {
                     value={security.sec_session_timeout_mins}
                     onChange={e => setSecurity(s => ({ ...s, sec_session_timeout_mins: Number(e.target.value) }))} />
                   <span className="settings-unit">minutes</span>
+                </div>
+              </FormRow>
+            </Section>
+
+            <Section title="User Activity Policy">
+              <FormRow label="Inactivity Threshold" id="sec-inactivity-threshold"
+                hint="Days of inactivity after which a user is considered inactive for filtering">
+                <div className="settings-input-unit-wrap">
+                  <input id="sec-inactivity-threshold" type="number" min={1} max={365} className="settings-input"
+                    value={security.sec_inactivity_threshold_days || 30}
+                    onChange={e => setSecurity(s => ({ ...s, sec_inactivity_threshold_days: Number(e.target.value) }))} />
+                  <span className="settings-unit">days</span>
                 </div>
               </FormRow>
             </Section>

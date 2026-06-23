@@ -24,7 +24,7 @@ function Avatar({ name, photo, size = 40 }) {
   );
 }
 
-export const FreelancerTable = ({ freelancers, isLoading, onSelectFreelancer }) => {
+export const FreelancerTable = ({ freelancers, isLoading, onSelectFreelancer, status }) => {
   return (
     <div className="bg-[#121215] border border-[#23232a] rounded-[10px] overflow-hidden">
       <div className="overflow-x-auto">
@@ -122,7 +122,10 @@ export const FreelancerTable = ({ freelancers, isLoading, onSelectFreelancer }) 
                   </td>
                   {/* Joined */}
                   <td className="p-[16px] border-b border-[#1a1a22] text-gray-500 text-[0.75rem] align-middle whitespace-nowrap">
-                    {fmtDate(f.created_at)}
+                    <div>Reg: {fmtDate(f.created_at)}</div>
+                    {status === 'inactive' && (
+                      <div className="text-gray-400 mt-[4px]">Login: {fmtDate(f.last_login)}</div>
+                    )}
                   </td>
                 </tr>
               );

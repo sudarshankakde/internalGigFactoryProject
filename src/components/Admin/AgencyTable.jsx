@@ -24,7 +24,7 @@ function AgencyLogo({ name, logo, size = 42 }) {
   );
 }
 
-export const AgencyTable = ({ agencies, isLoading, onSelectAgency }) => {
+export const AgencyTable = ({ agencies, isLoading, onSelectAgency, status }) => {
   return (
     <div className="bg-[#121215] border border-[#23232a] rounded-[10px] overflow-hidden">
       <div className="overflow-x-auto">
@@ -132,7 +132,10 @@ export const AgencyTable = ({ agencies, isLoading, onSelectAgency }) => {
                   </td>
                   {/* Joined */}
                   <td className="p-[16px] border-b border-[#1a1a22] text-gray-500 text-[0.75rem] align-middle whitespace-nowrap">
-                    {fmtDate(a.created_at)}
+                    <div>Reg: {fmtDate(a.created_at)}</div>
+                    {status === 'inactive' && (
+                      <div className="text-gray-400 mt-[4px]">Login: {fmtDate(a.last_login)}</div>
+                    )}
                   </td>
                 </tr>
               );

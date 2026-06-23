@@ -24,7 +24,7 @@ function Avatar({ name, photo, size = 40 }) {
   );
 }
 
-export const FreelancerCard = ({ freelancers, isLoading, onSelectFreelancer }) => {
+export const FreelancerCard = ({ freelancers, isLoading, onSelectFreelancer, status }) => {
   if (isLoading) {
     return (
       <div className="grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-[16px]">
@@ -137,8 +137,11 @@ export const FreelancerCard = ({ freelancers, isLoading, onSelectFreelancer }) =
                 <Phone size={12} color="#6b7280" className="shrink-0" />
                 <span>{f.mobile || '—'}</span>
               </div>
-              <div className="flex justify-between items-center border-t border-[#1a1a22] pt-[8px] mt-[4px] text-[0.7rem] text-[#5b5b67]">
+              <div className="flex justify-between items-center border-t border-[#1a1a22] pt-[8px] mt-[4px] text-[0.7rem] text-[#5b5b67] flex-wrap gap-1">
                 <span>Registered: {fmtDate(f.created_at)}</span>
+                {status === 'inactive' && (
+                  <span>Last Login: {fmtDate(f.last_login)}</span>
+                )}
               </div>
             </div>
           </div>

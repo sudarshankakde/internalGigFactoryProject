@@ -222,10 +222,17 @@
   gap: 20px;
 }
 
-@media (max-width: 768px) {
+.col-span-2 {
+  grid-column: span 2;
+}
+
+@media (max-width: 850px) {
   .form-grid-2 {
     grid-template-columns: 1fr;
     gap: 15px;
+  }
+  .col-span-2 {
+    grid-column: span 1 !important;
   }
 }
 
@@ -291,6 +298,13 @@
 
 .validation-error {
   color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.validation-warning {
+  color: #fbbf24;
   font-size: 0.75rem;
   margin-top: 4px;
   font-weight: 500;

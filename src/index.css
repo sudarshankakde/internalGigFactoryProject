@@ -290,3 +290,38 @@ input[type="date"]::-moz-calendar-picker-indicator {
 .ql-editor-display em {
   font-style: italic;
 }
+
+/* ─── Rich Text Display Overflow Prevention ──────────────────────────────── */
+.ql-editor-display,
+.rich-text-content {
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.ql-editor-display img,
+.rich-text-content img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+.ql-editor-display pre,
+.rich-text-content pre {
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+}
+
+.ql-editor-display table,
+.rich-text-content table {
+  max-width: 100% !important;
+  display: block !important;
+  overflow-x: auto !important;
+}
+
+.ql-editor-display iframe,
+.rich-text-content iframe {
+  max-width: 100% !important;
+}

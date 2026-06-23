@@ -377,6 +377,7 @@ export const FreelancerModal = ({ freelancer, onClose }) => {
                     isFreelancer={true}
                     resumeUrl={fp.resume_url}
                     verifications={freelancer.verifications}
+                    isAdmin={true}
                   />
                 </div>
               </div>

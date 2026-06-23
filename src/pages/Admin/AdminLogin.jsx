@@ -15,6 +15,38 @@ const AdminLogin = () => {
   const token                   = useAuthStore((state) => state.token);
   const user                    = useAuthStore((state) => state.user);
 
+  const [geoInfo, setGeoInfo] = useState({ ip: '', location: '' });
+
+  useEffect(() => {
+    const fetchGeo = async () => {
+      try {
+        const res = await fetch('https://ipapi.co/json/');
+        if (!res.ok) throw new Error('API response error');
+        const data = await res.json();
+        const locStr = [data.city, data.region, data.country_name].filter(Boolean).join(', ');
+        setGeoInfo({
+          ip: data.ip || '',
+          location: locStr || ''
+        });
+      } catch (err) {
+        try {
+          const res2 = await fetch('https://ip-api.com/json/');
+          const data2 = await res2.json();
+          if (data2 && data2.status === 'success') {
+            const locStr2 = [data2.city, data2.regionName, data2.country].filter(Boolean).join(', ');
+            setGeoInfo({
+              ip: data2.query || '',
+              location: locStr2 || ''
+            });
+          }
+        } catch (err2) {
+          console.warn('All GeoIP services failed:', err2);
+        }
+      }
+    };
+    fetchGeo();
+  }, []);
+
   useEffect(() => {
     if (token && user && user.role === 'admin') {
       navigate('/admin/dashboard');
@@ -24,7 +56,12 @@ const AdminLogin = () => {
   const [loginParams, setLoginParams] = useState(null);
   const loginQuery = useQuery({
     queryKey: ['admin-login', loginParams],
-    queryFn: () => api.post('/auth/login', { email: loginParams.email, password: loginParams.password }),
+    queryFn: () => api.post('/auth/login', { 
+      email: loginParams.email, 
+      password: loginParams.password,
+      clientIp: geoInfo.ip,
+      clientLocation: geoInfo.location
+    }),
     enabled: !!loginParams,
     retry: false,
     staleTime: 0,

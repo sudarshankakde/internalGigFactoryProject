@@ -147,7 +147,6 @@ export const DocumentsList = ({
   };
 
   return (
-
     <div className="pane-content-card">
       <div className="card-header-flex-row">
         <h3>{isAdmin ? 'Profile Documents' : (isFreelancer ? 'Profile Documents' : 'Agency Documents')}</h3>

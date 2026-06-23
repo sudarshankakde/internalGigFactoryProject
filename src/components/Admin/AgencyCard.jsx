@@ -24,7 +24,7 @@ function AgencyLogo({ name, logo, size = 42 }) {
   );
 }
 
-export const AgencyCard = ({ agencies, isLoading, onSelectAgency }) => {
+export const AgencyCard = ({ agencies, isLoading, onSelectAgency, status }) => {
   if (isLoading) {
     return (
       <div className="grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-[16px]">
@@ -152,8 +152,11 @@ export const AgencyCard = ({ agencies, isLoading, onSelectAgency }) => {
                 <Phone size={12} color="#6b7280" className="shrink-0" />
                 <span>{a.mobile || '—'}</span>
               </div>
-              <div className="flex justify-between items-center border-t border-[#1a1a22] pt-[8px] mt-[4px] text-[0.7rem] text-[#5b5b67]">
+              <div className="flex justify-between items-center border-t border-[#1a1a22] pt-[8px] mt-[4px] text-[0.7rem] text-[#5b5b67] flex-wrap gap-1">
                 <span>Registered: {fmtDate(a.created_at)}</span>
+                {status === 'inactive' && (
+                  <span>Last Login: {fmtDate(a.last_login)}</span>
+                )}
               </div>
             </div>
           </div>

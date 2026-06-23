@@ -693,23 +693,23 @@ export default function ProjectDetailView() {
           </div>
         </div>
 
-        {/* Main Grid Layout */}
-        <div className="grid gap-[20px] lg:grid-cols-[1.6fr_0.9fr] items-start">
-          
-          {/* Left Column content */}
-          <div className="flex flex-col gap-[20px]">
-            
-            {/* Project Description Card */}
-            <div className="bg-[#121215] border border-[#23232a] rounded-[10px] p-[24px]">
-              <div className="flex items-center gap-[10px] mb-4 border-b border-[#23232a] pb-3">
-                <FileText className="text-[#70d64d]" size={18} />
-                <h3 className="text-white font-bold text-[1rem] m-0">Project Description</h3>
-              </div>
-              <div 
-                className="text-[#8a8a8a] text-[0.85rem] m-0 leading-relaxed whitespace-pre-wrap rich-text-content"
-                dangerouslySetInnerHTML={{ __html: project.description || 'No description available for this project.' }}
-              />
+      {/* Main Grid Layout */}
+      <div className="grid gap-[20px] lg:grid-cols-[1.6fr_0.9fr] items-start">
+
+        {/* Left Column content */}
+        <div className="flex flex-col gap-[20px]">
+
+          {/* Project Description Card */}
+          <div className="bg-[#121215] border border-[#23232a] rounded-[10px] p-[24px]">
+            <div className="flex items-center gap-[10px] mb-4 border-b border-[#23232a] pb-3">
+              <FileText className="text-[#70d64d]" size={18} />
+              <h3 className="text-white font-bold text-[1rem] m-0">Project Description</h3>
             </div>
+            <div
+              className="text-[#8a8a8a] text-[0.85rem] m-0 leading-relaxed whitespace-pre-wrap rich-text-content ql-editor-display break-words max-w-full overflow-x-auto"
+              dangerouslySetInnerHTML={{ __html: project.description || 'No description available for this project.' }}
+            />
+          </div>
 
             {/* Required Skills & Expertise Card */}
             <div className="bg-[#121215] border border-[#23232a] rounded-[10px] p-[24px]">
@@ -883,14 +883,14 @@ export default function ProjectDetailView() {
                           </div>
                         </div>
 
-                        {ms.description ? (
-                          <div 
-                            className="ql-editor-display text-[#8a8a8a] text-[0.78rem] m-0 leading-relaxed" 
-                            dangerouslySetInnerHTML={{ __html: ms.description }} 
-                          />
-                        ) : (
-                          <p className="text-[#8a8a8a] text-[0.78rem] m-0 leading-relaxed">No milestone description provided.</p>
-                        )}
+                      {ms.description ? (
+                        <div
+                          className="ql-editor-display text-[#8a8a8a] text-[0.78rem] m-0 leading-relaxed break-words max-w-full overflow-x-auto"
+                          dangerouslySetInnerHTML={{ __html: ms.description }}
+                        />
+                      ) : (
+                        <p className="text-[#8a8a8a] text-[0.78rem] m-0 leading-relaxed">No milestone description provided.</p>
+                      )}
 
                         {/* Deliverables review block if there is deliverable */}
                         {ms.deliverables && ms.deliverables.length > 0 && (

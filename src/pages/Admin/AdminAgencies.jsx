@@ -146,12 +146,14 @@ export default function AdminAgencies() {
           agencies={agencies}
           isLoading={isLoading}
           onSelectAgency={(agency) => navigate(`/admin/users/${agency.id}/profile`)}
+          status={status}
         />
       ) : (
         <AgencyCard
           agencies={agencies}
           isLoading={isLoading}
           onSelectAgency={(agency) => navigate(`/admin/users/${agency.id}/profile`)}
+          status={status}
         />
       )}
 

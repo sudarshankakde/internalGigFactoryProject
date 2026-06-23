@@ -404,6 +404,7 @@ export const AgencyModal = ({ agency, onClose }) => {
                   <DocumentsList
                     isFreelancer={false}
                     verifications={agency.verifications}
+                    isAdmin={true}
                   />
                 </div>
               </div>

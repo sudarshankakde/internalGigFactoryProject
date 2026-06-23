@@ -70,6 +70,7 @@ const locationSuggestions = [
 const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubmitSuccess }) => {
   const [role, setRole] = useState('freelancer');
   const [errors, setErrors] = useState({});
+  const [warnings, setWarnings] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
   // Location Autocomplete States
@@ -128,6 +129,53 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
     try {
       const currentFormData = { ...formDataRef.current, [name]: value };
       await schema.validateAt(name, currentFormData);
+
+      // Clear existing warning for this field
+      setWarnings((prev) => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+
+      // If schema validation passes, check availability on the backend
+      if (name === 'email' && value) {
+        try {
+          const check = await api.post('/auth/check-availability', { email: value });
+          if (!check.available) {
+            let msg = check.message;
+            if (check.status === 'rejected_cooldown') {
+              const formattedDate = new Date(check.canReapplyAt).toLocaleDateString('en-IN');
+              msg = `Your registration request is under cooldown until ${formattedDate}. Reason: ${check.rejectionReason}`;
+            }
+            setErrors((prev) => ({ ...prev, email: msg }));
+            return;
+          } else if (check.status === 'approved') {
+            setWarnings((prev) => ({ ...prev, email: check.message }));
+          }
+        } catch (apiErr) {
+          console.warn('Availability check failed:', apiErr);
+        }
+      }
+
+      if (name === 'mobile' && value) {
+        try {
+          const check = await api.post('/auth/check-availability', { mobile: value, currentEmail: currentFormData.email });
+          if (!check.available) {
+            let msg = check.message;
+            if (check.status === 'rejected_cooldown') {
+              const formattedDate = new Date(check.canReapplyAt).toLocaleDateString('en-IN');
+              msg = `A registration request with this mobile is under cooldown until ${formattedDate}. Reason: ${check.rejectionReason}`;
+            }
+            setErrors((prev) => ({ ...prev, mobile: msg }));
+            return;
+          } else if (check.status === 'approved') {
+            setWarnings((prev) => ({ ...prev, mobile: check.message }));
+          }
+        } catch (apiErr) {
+          console.warn('Availability check failed:', apiErr);
+        }
+      }
+
       setErrors((prev) => {
         if (!prev[name]) return prev;
         const next = { ...prev };
@@ -135,6 +183,11 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
         return next;
       });
     } catch (err) {
+      setWarnings((prev) => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
       setErrors((prev) => {
         if (prev[name] === err.message) return prev;
         return {
@@ -166,6 +219,18 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
       }));
     }
   }, [reapplyData, email]);
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -462,6 +527,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                   />
                 </div>
                 {errors.email && <span className="validation-error">{errors.email}</span>}
+                {warnings.email && <span className="validation-warning">{warnings.email}</span>}
               </div>
 
               <div className="input-group">
@@ -479,6 +545,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                   />
                 </div>
                 {errors.mobile && <span className="validation-error">{errors.mobile}</span>}
+                {warnings.mobile && <span className="validation-warning">{warnings.mobile}</span>}
               </div>
 
               <div className="input-group relative">

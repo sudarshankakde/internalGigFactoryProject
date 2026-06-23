@@ -147,12 +147,14 @@ export default function AdminFreelancers() {
           freelancers={freelancers}
           isLoading={isLoading}
           onSelectFreelancer={(freelancer) => navigate(`/admin/users/${freelancer.id}/profile?from=Freelancers+Listing`)}
+          status={status}
         />
       ) : (
         <FreelancerCard
           freelancers={freelancers}
           isLoading={isLoading}
           onSelectFreelancer={(freelancer) => navigate(`/admin/users/${freelancer.id}/profile?from=Freelancers+Listing`)}
+          status={status}
         />
       )}
 
