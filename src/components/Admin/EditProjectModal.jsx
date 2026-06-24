@@ -121,6 +121,7 @@ const defaultMilestone = (no = 1) => ({
 //   onSave?   — called after successful update (receives updated project data)
 export default function ProjectFormModal({ project, onClose, onCreate, onSave }) {
   const isEdit = Boolean(project?.id);
+  const isProjectCompleted = isEdit && project?.status === 'completed';
 
   const [confirmConfig, setConfirmConfig] = useState({
     isOpen: false,
@@ -474,10 +475,11 @@ export default function ProjectFormModal({ project, onClose, onCreate, onSave })
                 className={`mt-2 w-full rounded-[6px] border ${errors.title ? 'border-red-500/80' : 'border-[#23232a] focus:border-[#70d64d]'} bg-[#0c0c0e] px-4 py-3 text-white text-[0.85rem] outline-none transition-colors`}
                 placeholder="e.g. Industrial MEP HVAC Layout Drafting"
                 required
+                disabled={isProjectCompleted}
               />
               {errors.title && <span className="text-red-400 text-xs mt-1 block">{errors.title}</span>}
             </div>
-            <div className="mt-2">
+            <div className={`mt-2 ${isProjectCompleted ? 'pointer-events-none opacity-60' : ''}`}>
               <SingleAutocomplete
                 label="Category"
                 value={category}
@@ -511,6 +513,7 @@ export default function ProjectFormModal({ project, onClose, onCreate, onSave })
                 onChange={e => setProjectType(e.target.value)}
                 onBlur={() => handleBlur('projectType', projectType)}
                 className="mt-2 w-full rounded-[6px] border border-[#23232a] bg-[#0c0c0e] px-4 py-3 text-white text-[0.85rem] outline-none focus:border-[#70d64d] transition-colors cursor-pointer"
+                disabled={isProjectCompleted}
               >
                 <option value="fixed">Fixed</option>
                 <option value="hourly">Hourly</option>
@@ -527,6 +530,7 @@ export default function ProjectFormModal({ project, onClose, onCreate, onSave })
                 onChange={e => setPriority(e.target.value)}
                 onBlur={() => handleBlur('priority', priority)}
                 className="mt-2 w-full rounded-[6px] border border-[#23232a] bg-[#0c0c0e] px-4 py-3 text-white text-[0.85rem] outline-none focus:border-[#70d64d] transition-colors cursor-pointer"
+                disabled={isProjectCompleted}
               >
                 <option value="high">High</option>
                 <option value="medium">Medium</option>
@@ -543,6 +547,7 @@ export default function ProjectFormModal({ project, onClose, onCreate, onSave })
                 type="number"
                 placeholder="e.g. 30000"
                 required
+                disabled={isProjectCompleted}
               />
               {errors.budget && <span className="text-red-400 text-xs mt-1 block">{errors.budget}</span>}
             </div>
@@ -559,6 +564,7 @@ export default function ProjectFormModal({ project, onClose, onCreate, onSave })
                 className={`mt-2 w-full rounded-[6px] border ${errors.estimatedHours ? 'border-red-500/80' : 'border-[#23232a] focus:border-[#70d64d]'} bg-[#0c0c0e] px-4 py-3 text-white text-[0.85rem] outline-none transition-colors`}
                 type="number"
                 placeholder="e.g. 80"
+                disabled={isProjectCompleted}
               />
               {errors.estimatedHours && <span className="text-red-400 text-xs mt-1 block">{errors.estimatedHours}</span>}
             </div>
@@ -570,6 +576,7 @@ export default function ProjectFormModal({ project, onClose, onCreate, onSave })
                 onChange={e => setStartDate(e.target.value)}
                 onBlur={() => handleBlur('startDate', startDate)}
                 className={`mt-2 w-full rounded-[6px] border ${errors.startDate ? 'border-red-500/80' : 'border-[#23232a] focus:border-[#70d64d]'} bg-[#0c0c0e] px-4 py-3 text-white text-[0.85rem] outline-none transition-colors`}
+                disabled={isProjectCompleted}
               />
               {errors.startDate && <span className="text-red-400 text-xs mt-1 block">{errors.startDate}</span>}
             </div>
@@ -581,6 +588,7 @@ export default function ProjectFormModal({ project, onClose, onCreate, onSave })
                 onChange={e => setEndDate(e.target.value)}
                 onBlur={() => handleBlur('endDate', endDate)}
                 className={`mt-2 w-full rounded-[6px] border ${errors.endDate ? 'border-red-500/80' : 'border-[#23232a] focus:border-[#70d64d]'} bg-[#0c0c0e] px-4 py-3 text-white text-[0.85rem] outline-none transition-colors`}
+                disabled={isProjectCompleted}
               />
               {errors.endDate && <span className="text-red-400 text-xs mt-1 block">{errors.endDate}</span>}
             </div>
@@ -591,7 +599,7 @@ export default function ProjectFormModal({ project, onClose, onCreate, onSave })
             <label className="text-gray-300 text-xs font-semibold uppercase tracking-wider block">
               Project Description * <span className="text-gray-600 normal-case font-normal">(Rich Text)</span>
             </label>
-            <div className={`rounded-[8px] border ${errors.description ? 'border-red-500/80' : 'border-transparent'}`}>
+            <div className={`rounded-[8px] border ${errors.description ? 'border-red-500/80' : 'border-transparent'} ${isProjectCompleted ? 'pointer-events-none opacity-60' : ''}`}>
               <RichTextEditor
                 value={description}
                 onChange={val => {
@@ -609,7 +617,7 @@ export default function ProjectFormModal({ project, onClose, onCreate, onSave })
           </div>
 
           {/* Skills + Deliverables Autocomplete */}
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className={`grid gap-4 lg:grid-cols-2 ${isProjectCompleted ? 'pointer-events-none opacity-60' : ''}`}>
             <MultiAutocomplete
               label="Required Skills & Expertise"
               value={skills}
@@ -627,7 +635,7 @@ export default function ProjectFormModal({ project, onClose, onCreate, onSave })
           </div>
 
           {/* Supporting Documents */}
-          <div className="space-y-3 border border-[#23232a] rounded-[8px] p-4">
+          <div className={`space-y-3 border border-[#23232a] rounded-[8px] p-4 ${isProjectCompleted ? 'pointer-events-none opacity-60' : ''}`}>
             <div>
               <h4 className="text-white text-sm font-semibold m-0">Supporting Documents</h4>
               <p className="text-gray-500 text-xs m-0 mb-3">
@@ -723,10 +731,12 @@ export default function ProjectFormModal({ project, onClose, onCreate, onSave })
                   {isEdit ? 'Manage milestone tasks.' : 'Add milestone details and release budgets.'}
                 </p>
               </div>
-              <button type="button" onClick={addMilestone}
-                className="inline-flex items-center gap-2 rounded-[6px] bg-[#70d64d] px-4 py-2 text-black font-extrabold text-[0.8rem] border-none cursor-pointer hover:bg-[#8ee67b] transition-colors">
-                <Plus size={14} /> Add Milestone
-              </button>
+              {!isProjectCompleted && (
+                <button type="button" onClick={addMilestone}
+                  className="inline-flex items-center gap-2 rounded-[6px] bg-[#70d64d] px-4 py-2 text-black font-extrabold text-[0.8rem] border-none cursor-pointer hover:bg-[#8ee67b] transition-colors">
+                  <Plus size={14} /> Add Milestone
+                </button>
+              )}
             </div>
 
             {errors.milestones && (
@@ -742,14 +752,14 @@ export default function ProjectFormModal({ project, onClose, onCreate, onSave })
                     <h4 className="text-white font-bold text-sm m-0">Milestone #{milestone.milestone_no}</h4>
                     <p className="text-gray-500 text-xs mt-1">Define the work package and release amount.</p>
                   </div>
-                  {milestones.length > 1 && (
+                  {milestones.length > 1 && !isProjectCompleted && (
                     <button type="button" onClick={() => removeMilestone(index)}
                       className="text-red-400 hover:text-red-300 border-none bg-transparent cursor-pointer">
                       <Trash2 size={16} />
                     </button>
                   )}
                 </div>
-                <div className="grid gap-4 lg:grid-cols-2 mt-4">
+                <div className={`grid gap-4 lg:grid-cols-2 mt-4 ${isProjectCompleted ? 'pointer-events-none opacity-60' : ''}`}>
                   <div>
                     <label className="text-gray-300 text-xs">Title *</label>
                     <input

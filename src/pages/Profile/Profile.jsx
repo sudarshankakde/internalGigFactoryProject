@@ -228,6 +228,54 @@ export const Profile = () => {
     const isFreelancerRole = user?.role === 'freelancer';
     let payload = { ...formData };
     
+    // Validate required fields
+    if (isFreelancerRole) {
+      if (!formData.legalNamePan || !formData.legalNamePan.trim()) {
+        toast.error('Legal Name (as on PAN) is required.');
+        setActiveTab('legal');
+        setIsSaving(false);
+        return;
+      }
+      const pan = (formData.personalPan || '').trim().toUpperCase();
+      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+      if (!pan) {
+        toast.error('Personal PAN Card is required.');
+        setActiveTab('legal');
+        setIsSaving(false);
+        return;
+      }
+      if (!panRegex.test(pan)) {
+        toast.error('Invalid Personal PAN Card format. Must be 10 characters (e.g. ABCDE1234F).');
+        setActiveTab('legal');
+        setIsSaving(false);
+        return;
+      }
+      payload.personalPan = pan;
+      payload.legalNamePan = formData.legalNamePan.trim();
+    } else {
+      if (!formData.agencyName || !formData.agencyName.trim()) {
+        toast.error('Agency Name is required.');
+        setActiveTab('basic');
+        setIsSaving(false);
+        return;
+      }
+      const pan = (formData.companyPan || '').trim().toUpperCase();
+      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+      if (!pan) {
+        toast.error('Company PAN Card is required.');
+        setActiveTab('legal');
+        setIsSaving(false);
+        return;
+      }
+      if (!panRegex.test(pan)) {
+        toast.error('Invalid Company PAN Card format. Must be 10 characters (e.g. BBBBB2222B).');
+        setActiveTab('legal');
+        setIsSaving(false);
+        return;
+      }
+      payload.companyPan = pan;
+    }
+
     const serviceDetails = {
       selectedServices: formData.selectedServices || [],
       bimDetails: formData.bimDetails || { softwareStack: [], maxLod: '', cdeExperience: '' },

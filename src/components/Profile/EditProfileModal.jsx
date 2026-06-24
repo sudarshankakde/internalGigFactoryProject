@@ -510,7 +510,7 @@ export const EditProfileModal = ({
                 <>
                   <div className="form-row-2">
                     <div className="form-group">
-                      <label>Legal Name (as on PAN)</label>
+                      <label>Legal Name (as on PAN) *</label>
                       <input
                         type="text"
                         value={formData.legalNamePan || ''}
@@ -519,7 +519,7 @@ export const EditProfileModal = ({
                       />
                     </div>
                     <div className="form-group">
-                      <label>Personal PAN Card</label>
+                      <label>Personal PAN Card *</label>
                       <input
                         type="text"
                         value={formData.personalPan || ''}
@@ -543,7 +543,7 @@ export const EditProfileModal = ({
                 <>
                   <div className="form-row-2">
                     <div className="form-group">
-                      <label>Company PAN Card</label>
+                      <label>Company PAN Card *</label>
                       <input
                         type="text"
                         value={formData.companyPan || ''}
