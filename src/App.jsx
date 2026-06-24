@@ -12,6 +12,9 @@ import ResetPassword  from './pages/ForgotPassword/ResetPassword.jsx';
 import AdminLogin     from './pages/Admin/AdminLogin.jsx';
 import NotFound       from './pages/NotFound/NotFound.jsx';
 
+
+
+
 /* ── Authenticated pages ── */
 import { Dashboard }    from './pages/Dashboard/Dashboard.jsx';
 import { Profile }      from './pages/Profile/Profile.jsx';
@@ -39,6 +42,7 @@ import ProjectDetailView      from './components/Admin/ProjectDetailView.jsx';
 import AppLayout from './components/Layout/AppLayout.jsx';
 import Maintenance from './pages/Maintenance/Maintenance.jsx';
 import AdminProjects from './pages/Admin/AdminProjects.jsx';
+import PublicProject from './pages/publicProject/PublicProject.jsx';
 
 /* ─────────────────────────────────────────────────────────────── */
 /* Route guards                                                     */
@@ -116,10 +120,11 @@ function App() {
       <Routes>
 
         {/* ── Public auth routes ── */}
-        <Route path="/"               element={<Login />} />
+        <Route path="/"     element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password"  element={<ResetPassword />} />
 
+        <Route path="/public-project" element={<PublicProject />} />
         {/* ── Admin login (separate branded page) ── */}
         <Route path="/admin" element={<AdminLogin />} />
 
@@ -243,6 +248,7 @@ function App() {
 
         {/* ── Catch-all ── */}
         <Route path="*" element={<NotFound />} />
+
 
       </Routes>
       <ToastContainer position="bottom-right" theme="dark" />
