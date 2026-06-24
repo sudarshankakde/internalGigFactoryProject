@@ -1,5 +1,6 @@
 import React from "react";
 import { FileText, Paperclip, UploadCloud, Eye } from "lucide-react";
+import { resolveAttachmentUrl } from "../../../utils/api";
 
 export default function NoDuesCard({
   isAssigned,
@@ -160,7 +161,7 @@ export default function NoDuesCard({
                 {useSavedSignature && (
                   <div className="flex flex-col items-center gap-1.5 p-2 bg-white rounded-[6px] max-w-[160px] h-[55px] mx-auto justify-center border border-gray-200 mt-1">
                     <img
-                      src={noDues.saved_signature_url}
+                      src={resolveAttachmentUrl(noDues.saved_signature_url)}
                       alt="Saved Signature"
                       className="max-w-full max-h-full object-contain"
                     />

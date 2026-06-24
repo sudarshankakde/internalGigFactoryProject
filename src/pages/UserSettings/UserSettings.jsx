@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { User, Lock, Bell, Save, Eye, EyeOff, Loader } from 'lucide-react';
-import { api } from '../../utils/api';
+import { api, resolveAttachmentUrl } from '../../utils/api';
+import { useAuthStore } from '../../store/useAuthStore';
 import './UserSettings.css';
 
 const TABS = [
@@ -73,6 +74,7 @@ function NotifRow({ label, desc, inApp, email, onInApp, onEmail, id }) {
 export default function UserSettings() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('account');
+  const updateStoreUser = useAuthStore(state => state.updateUser);
 
   // Fetch settings
   const { data: settingsData, isLoading: settingsLoading } = useQuery({
@@ -83,7 +85,7 @@ export default function UserSettings() {
   const settings = settingsData?.settings || {};
 
   // Form states
-  const [account, setAccount] = useState({ full_name: '', email: '', mobile: '' });
+  const [account, setAccount] = useState({ full_name: '', email: '', mobile: '', saved_signature_url: '' });
   const [password, setPassword] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [showPwd, setShowPwd] = useState({ current: false, new: false, confirm: false });
   const [notif, setNotif] = useState({
@@ -100,6 +102,7 @@ export default function UserSettings() {
         full_name: settings.profile.full_name || '',
         email: settings.profile.email || '',
         mobile: settings.profile.mobile || '',
+        saved_signature_url: settings.profile.saved_signature_url || '',
       });
     }
     if (settings.notifications) {
@@ -110,9 +113,17 @@ export default function UserSettings() {
   // Mutation
   const saveMutation = useMutation({
     mutationFn: ({ section, data }) => api.put('/settings', { section, data }),
-    onSuccess: () => {
+    onSuccess: (res, variables) => {
       toast.success('Settings saved successfully.');
       queryClient.invalidateQueries({ queryKey: ['user-settings'] });
+      if (variables.section === 'profile') {
+        updateStoreUser({
+          full_name: variables.data.full_name,
+          fullName: variables.data.full_name,
+          email: variables.data.email,
+          mobile: variables.data.mobile,
+        });
+      }
     },
     onError: (err) => toast.error(err?.message || 'Failed to save settings.'),
   });
@@ -139,6 +150,50 @@ export default function UserSettings() {
     });
   };
 
+  const handleUploadSignature = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const allowed = ['image/png', 'image/jpeg', 'image/jpg'];
+    if (!allowed.includes(file.type)) {
+      return toast.error('Only PNG, JPG, and JPEG files are allowed.');
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      return toast.error('File size must be less than 5MB.');
+    }
+
+    const formData = new FormData();
+    formData.append('signature', file);
+
+    try {
+      const res = await api.putFile('/settings/signature', formData);
+      if (res.success) {
+        toast.success('Signature uploaded successfully.');
+        queryClient.invalidateQueries({ queryKey: ['user-settings'] });
+      } else {
+        toast.error(res.message || 'Failed to upload signature.');
+      }
+    } catch (err) {
+      toast.error(err?.message || 'Failed to upload signature.');
+    }
+  };
+
+  const handleDeleteSignature = async () => {
+    if (!window.confirm('Are you sure you want to remove your saved signature?')) return;
+    try {
+      const res = await api.delete('/settings/signature');
+      if (res.success) {
+        toast.success('Signature removed successfully.');
+        queryClient.invalidateQueries({ queryKey: ['user-settings'] });
+      } else {
+        toast.error(res.message || 'Failed to remove signature.');
+      }
+    } catch (err) {
+      toast.error(err?.message || 'Failed to remove signature.');
+    }
+  };
+
+
   const isSaving = saveMutation.isPending || passwordMutation.isPending;
 
   const SaveBtn = ({ onClick, label = 'Save Changes', loading }) => (
@@ -164,24 +219,19 @@ export default function UserSettings() {
 
   return (
     <div className="settings-shell">
-      {/* Sidebar tabs */}
-      <aside className="settings-sidebar">
-        <div className="settings-sidebar-header">
-          <h2>Settings</h2>
-        </div>
-        <nav className="settings-tab-nav">
-          {TABS.map(tab => (
-            <button
-              key={tab.id}
-              className={`settings-tab-btn ${activeTab === tab.id ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              <tab.icon size={16} />
-              <span>{tab.label}</span>
-            </button>
-          ))}
-        </nav>
-      </aside>
+      {/* Horizontal Navigation Tabs */}
+      <nav className="settings-tab-nav-horizontal">
+        {TABS.map(tab => (
+          <button
+            key={tab.id}
+            className={`settings-tab-btn-horizontal ${activeTab === tab.id ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            <tab.icon size={16} />
+            <span>{tab.label}</span>
+          </button>
+        ))}
+      </nav>
 
       {/* Content area */}
       <div className="settings-content">
@@ -208,6 +258,55 @@ export default function UserSettings() {
               </FormRow>
               <div className="settings-row-actions">
                 <SaveBtn onClick={handleSaveAccount} loading={saveMutation.isPending} />
+              </div>
+            </Section>
+
+            <Section title="Saved Signature" description="Securely store your signature for fast document signing. Only PNG, JPG, and JPEG files are allowed.">
+              <div className="settings-form-row settings-signature-row">
+                <div className="settings-label-col">
+                  <span className="settings-label">Your Signature</span>
+                  <span className="settings-hint">Used for signing certificates and project approvals.</span>
+                </div>
+                <div className="settings-input-col">
+                  {account.saved_signature_url ? (
+                    <div className="settings-signature-container">
+                      <div className="settings-signature-preview-wrap">
+                        <img 
+                          src={resolveAttachmentUrl(account.saved_signature_url)} 
+                          alt="Saved Signature" 
+                          className="settings-signature-preview"
+                        />
+                      </div>
+                      <button 
+                        type="button" 
+                        className="settings-signature-delete-btn"
+                        onClick={handleDeleteSignature}
+                        disabled={isSaving}
+                      >
+                        Remove Signature
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="settings-signature-upload-wrap">
+                      <input
+                        type="file"
+                        id="signature-file-upload"
+                        accept=".png,.jpg,.jpeg"
+                        style={{ display: 'none' }}
+                        onChange={handleUploadSignature}
+                      />
+                      <button
+                        type="button"
+                        className="settings-signature-upload-btn"
+                        onClick={() => document.getElementById('signature-file-upload').click()}
+                        disabled={isSaving}
+                      >
+                        Upload Signature Image
+                      </button>
+                      <span className="settings-hint mt-2">Recommended: PNG transparent background, max 5MB.</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </Section>
 

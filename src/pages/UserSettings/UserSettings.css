@@ -2,80 +2,65 @@
 /* Shell, sidebar, tabs, sections are styled exactly like AdminSettings.css */
 
 .settings-shell {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  min-height: calc(100vh - 64px);
-  background: #0a0a0d;
-  gap: 0;
-}
-
-.settings-sidebar {
-  background: #0f0f13;
-  border-right: 1px solid #1e1e26;
   display: flex;
   flex-direction: column;
-  position: sticky;
-  top: 0;
-  height: calc(100vh - 64px);
-  overflow-y: auto;
+  gap: 24px;
+  background: transparent;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 12px 0 40px;
 }
 
-.settings-sidebar-header {
-  padding: 24px 20px 16px;
-  border-bottom: 1px solid #1e1e26;
-}
-
-.settings-sidebar-header h2 {
-  color: #fff;
-  font-size: 0.9rem;
-  font-weight: 800;
-  letter-spacing: 0.3px;
-  margin: 0;
-}
-
-.settings-tab-nav {
+.settings-tab-nav-horizontal {
   display: flex;
-  flex-direction: column;
-  padding: 10px 10px;
-  gap: 2px;
+  gap: 24px;
+  border-bottom: 1px solid #23232a;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none; /* Firefox */
 }
 
-.settings-tab-btn {
+.settings-tab-nav-horizontal::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.settings-tab-btn-horizontal {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: 8px;
+  padding: 12px 4px;
   background: transparent;
   border: none;
-  border-radius: 8px;
+  border-bottom: 2px solid transparent;
   color: #6b7280;
-  font-size: 0.83rem;
-  font-weight: 500;
+  font-size: 0.85rem;
+  font-weight: 700;
   cursor: pointer;
-  text-align: left;
-  width: 100%;
-  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  transition: all 0.15s;
+  outline: none;
 }
 
-.settings-tab-btn:hover {
-  background: #1a1a22;
+.settings-tab-btn-horizontal:hover {
   color: #d1d5db;
 }
 
-.settings-tab-btn.active {
-  background: rgba(112, 214, 77, 0.1);
+.settings-tab-btn-horizontal.active {
+  border-bottom-color: #70d64d;
   color: #70d64d;
-  font-weight: 700;
+}
+
+.settings-tab-btn-horizontal svg {
+  flex-shrink: 0;
 }
 
 .settings-content {
-  overflow-y: auto;
-  height: calc(100vh - 64px);
+  /* Let content flow naturally within shell */
 }
 
 .settings-pane {
-  max-width: 760px;
-  padding: 36px 40px;
+  max-width: 100%;
+  padding: 12px 0;
 }
 
 .settings-pane-header {
@@ -425,4 +410,75 @@
   .settings-label-col {
     padding-top: 0;
   }
+}
+
+/* Signature UI styles */
+.settings-signature-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.settings-signature-preview-wrap {
+  width: 100%;
+  max-width: 320px;
+  height: 120px;
+  background: #ffffff; /* High contrast white background for signature ink */
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 12px;
+}
+
+.settings-signature-preview {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.settings-signature-delete-btn {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.settings-signature-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.settings-signature-upload-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.settings-signature-upload-btn {
+  background: transparent;
+  color: #70d64d;
+  border: 1px dashed #70d64d;
+  border-radius: 8px;
+  padding: 14px 28px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.settings-signature-upload-btn:hover {
+  background: rgba(112, 214, 77, 0.05);
+}
+
+.settings-signature-row {
+  align-items: center;
 }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { X, FileText, UploadCloud } from "lucide-react";
-import { api } from "../../../utils/api";
+import { api, resolveAttachmentUrl } from "../../../utils/api";
 import { toast } from "react-toastify";
 
 export default function InitiateNoDuesModal({
@@ -195,7 +195,7 @@ export default function InitiateNoDuesModal({
                 {form.use_saved_signature && (
                   <div className="flex flex-col items-center gap-1.5 p-2 bg-white rounded-[6px] max-w-[160px] h-[55px] mx-auto justify-center border border-gray-200 mt-1">
                     <img
-                      src={noDues.saved_signature_url}
+                      src={resolveAttachmentUrl(noDues.saved_signature_url)}
                       alt="Saved Signature"
                       className="max-w-full max-h-full object-contain"
                     />

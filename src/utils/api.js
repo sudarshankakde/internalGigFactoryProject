@@ -118,4 +118,40 @@ export const api = {
   postFile: (endpoint, formData) => uploadFile(endpoint, formData),
   putFile: (endpoint, formData) => uploadFilePut(endpoint, formData),
 };
+export const getBackendUrl = () => {
+  let resolvedUrl = '';
+  if (API_BASE_URL.startsWith('http://') || API_BASE_URL.startsWith('https://')) {
+    try {
+      const parsed = new URL(API_BASE_URL);
+      const port = parsed.port || '5000';
+      resolvedUrl = `${window.location.protocol}//${window.location.hostname}:${port}`;
+    } catch (e) {
+      resolvedUrl = API_BASE_URL.replace('/api', '');
+    }
+  } else {
+    // Relative API_BASE_URL, default to current host on port 5000
+    resolvedUrl = `${window.location.protocol}//${window.location.hostname}:5000`;
+  }
+  console.log('getBackendUrl dynamically resolved to:', resolvedUrl, 'from API_BASE_URL:', API_BASE_URL);
+  return resolvedUrl;
+};
+
+export const resolveAttachmentUrl = (url) => {
+  console.log('resolveAttachmentUrl input:', url);
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    try {
+      const parsedUrl = new URL(url);
+      const res = `${getBackendUrl()}${parsedUrl.pathname}`;
+      console.log('resolveAttachmentUrl output (absolute input):', res);
+      return res;
+    } catch (e) {
+      console.log('resolveAttachmentUrl output (absolute parse error):', url);
+      return url;
+    }
+  }
+  const res = `${getBackendUrl()}${url}`;
+  console.log('resolveAttachmentUrl output (relative input):', res);
+  return res;
+};
 

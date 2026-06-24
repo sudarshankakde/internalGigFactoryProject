@@ -58,6 +58,14 @@ export const useAuthStore = create(
         localStorage.removeItem('user');
       },
 
+      updateUser: (userData) => {
+        const currentUser = get().user;
+        if (!currentUser) return;
+        const updatedUser = { ...currentUser, ...userData };
+        set({ user: updatedUser });
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      },
+
       setProfile: (profile) => {
         set({ profile });
       },
