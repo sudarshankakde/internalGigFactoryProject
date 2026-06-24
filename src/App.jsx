@@ -11,6 +11,10 @@ import ForgotPassword from './pages/ForgotPassword/ForgotPassword.jsx';
 import ResetPassword  from './pages/ForgotPassword/ResetPassword.jsx';
 import AdminLogin     from './pages/Admin/AdminLogin.jsx';
 import NotFound       from './pages/NotFound/NotFound.jsx';
+import PublicBrowseProjects from './pages/BrowseProjects/PublicBrowseProjects.jsx';
+import PublicProjectDetail  from './pages/BrowseProjects/PublicProjectDetail.jsx';
+import PublicLayout         from './components/Layout/PublicLayout.jsx';
+
 
 /* ── Authenticated pages ── */
 import { Dashboard }    from './pages/Dashboard/Dashboard.jsx';
@@ -119,6 +123,18 @@ function App() {
         <Route path="/"               element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password"  element={<ResetPassword />} />
+
+        {/* ── Public catalog & detail routes ── */}
+        <Route path="/public-projects" element={
+          <PublicLayout>
+            <PublicBrowseProjects />
+          </PublicLayout>
+        } />
+        <Route path="/public-projects/:id" element={
+          <PublicLayout>
+            <PublicProjectDetail />
+          </PublicLayout>
+        } />
 
         {/* ── Admin login (separate branded page) ── */}
         <Route path="/admin" element={<AdminLogin />} />

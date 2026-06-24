@@ -1,5 +1,7 @@
 import React from "react";
-import { Briefcase, Calendar, Clock, Users, Wallet } from "lucide-react";
+import { Briefcase, Calendar, Clock, Users, Wallet, Share2, Check, Loader2, X } from "lucide-react";
+import { toast } from "react-toastify";
+import { ShareButton } from "react-share-utilities";
 
 const renderWithTbdTooltip = (val, tooltipText) => {
   if (val === "TBD") {
@@ -62,34 +64,57 @@ export default function ProjectHeader({
         </div>
 
         {/* Status indicator */}
-        <div className="text-left md:text-right shrink-0 mt-4 md:mt-0">
-          <span className="text-gray-500 text-[0.68rem] font-bold uppercase tracking-wider block mb-2">
-            Project Status
-          </span>
-          <span
-            className={`inline-flex items-center gap-[6px] uppercase font-bold text-[0.7rem] px-[12px] py-[6px] rounded-[6px] border ${
-              project.status === "completed"
-                ? "bg-[#182318] text-[#70d64d] border-[#70d64d]/30"
-                : project.status === "assigned"
-                  ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                  : "bg-amber-500/10 text-amber-400 border-amber-500/20"
-            }`}
-          >
+        <div className="text-left md:text-right shrink-0 mt-4 md:mt-0 flex flex-col items-start md:items-end gap-2">
+          <div>
+            <span className="text-gray-500 text-[0.68rem] font-bold uppercase tracking-wider block mb-2">
+              Project Status
+            </span>
             <span
-              className={`w-2 h-2 rounded-full ${
+              className={`inline-flex items-center gap-[6px] uppercase font-bold text-[0.7rem] px-[12px] py-[6px] rounded-[6px] border ${
                 project.status === "completed"
-                  ? "bg-[#70d64d]"
+                  ? "bg-[#182318] text-[#70d64d] border-[#70d64d]/30"
                   : project.status === "assigned"
-                    ? "bg-blue-400"
-                    : "bg-amber-400"
+                    ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                    : "bg-amber-500/10 text-amber-400 border-amber-500/20"
               }`}
-            />
-            {project.status === "completed"
-              ? "Completed"
-              : project.status === "assigned"
-                ? "In Progress"
-                : "Not Started"}
-          </span>
+            >
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  project.status === "completed"
+                    ? "bg-[#70d64d]"
+                    : project.status === "assigned"
+                      ? "bg-blue-400"
+                      : "bg-amber-400"
+                }`}
+              />
+              {project.status === "completed"
+                ? "Completed"
+                : project.status === "assigned"
+                  ? "In Progress"
+                  : "Not Started"}
+            </span>
+          </div>
+          <ShareButton
+            variant="custom"
+            className="bg-[#0c0c0e] hover:bg-[#1a1a22] border border-[#23232a] text-white py-[6px] px-[12px] rounded-[6px] text-[0.78rem] font-semibold flex items-center gap-[6px] transition-colors cursor-pointer mt-1"
+            data={{ url: `${window.location.origin}/public-projects/${project.id}` }}
+            options={{ preferNative: false, fallback: 'clipboard' }}
+            customLabelIcons={{
+              default: <Share2 size={13} />,
+              success: <Check size={13} />,
+              busy: <Loader2 size={13} />,
+              error: <X size={13} />
+            }}
+            label="Share Project"
+            successLabel="Copied!"
+            busyLabel="Copying..."
+            onSuccess={() => {
+              toast.success('Public project link copied to clipboard!');
+            }}
+            onError={() => {
+              toast.error('Failed to copy project link.');
+            }}
+          />
         </div>
       </div>
 

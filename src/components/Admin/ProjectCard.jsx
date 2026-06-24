@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Edit2, Trash2, Eye, TrendingUp, Users, MoreVertical } from 'lucide-react';
+import { Edit2, Trash2, Eye, TrendingUp, Users, MoreVertical, Share2, Check, Loader2, X } from 'lucide-react';
+import { toast } from 'react-toastify';
+import { ShareButton } from 'react-share-utilities';
 import { CompletionBar } from '../AdminShared';
 import { ProjectStatusBadge } from './ProjectTable';
 
@@ -135,18 +137,45 @@ export const ProjectCard = ({
 
       {/* Action Buttons */}
       <div className="border-t border-[#1a1a22] pt-[12px] mt-auto flex gap-[8px]">
-        <button
-          onClick={() => onViewDetails && onViewDetails(project.id)}
-          className="flex-1 bg-[#0c0c0e] hover:bg-[#1a1a22] border border-[#23232a] text-white py-[8px] rounded-[6px] text-[0.78rem] font-semibold flex items-center justify-center gap-[6px] cursor-pointer transition-colors"
-        >
-          <Eye size={13} /> View Details
-        </button>
-        <button
-          onClick={() => onTrackProgress && onTrackProgress(project.id)}
-          className="flex-1 bg-[#70d64d] hover:bg-[#8ee67b] text-black border-none py-[8px] rounded-[6px] text-[0.78rem] font-bold flex items-center justify-center gap-[6px] cursor-pointer transition-colors"
-        >
-          <TrendingUp size={13} /> Track Progress
-        </button>
+        <span onClick={(e) => e.stopPropagation()}>
+          <ShareButton
+            variant="custom"
+            className="bg-[#0c0c0e] hover:bg-[#1a1a22] border border-[#23232a] text-white p-[8px] rounded-[6px] text-[0.78rem] font-semibold flex items-center justify-center cursor-pointer transition-colors"
+            data={{ url: `${window.location.origin}/public-projects/${project.id}` }}
+            options={{ preferNative: false, fallback: 'clipboard' }}
+            customLabelIcons={{
+              default: <Share2 size={13} />,
+              success: <Check size={13} />,
+              busy: <Loader2 size={13} />,
+              error: <X size={13} />
+            }}
+            label=""
+            successLabel=""
+            busyLabel=""
+            onSuccess={() => {
+              toast.success('Public project link copied to clipboard!');
+            }}
+            onError={() => {
+              toast.error('Failed to copy project link.');
+            }}
+            title="Share Project Link"
+          />
+        </span>
+        {isNewProject ? (
+          <button
+            onClick={() => onViewDetails && onViewDetails(project.id)}
+            className="flex-1 bg-[#0c0c0e] hover:bg-[#1a1a22] border border-[#23232a] text-white py-[8px] rounded-[6px] text-[0.78rem] font-semibold flex items-center justify-center gap-[6px] cursor-pointer transition-colors"
+          >
+            <Eye size={13} /> View Details
+          </button>
+        ) : (
+          <button
+            onClick={() => onTrackProgress && onTrackProgress(project.id)}
+            className="flex-1 bg-[#70d64d] hover:bg-[#8ee67b] text-black border-none py-[8px] rounded-[6px] text-[0.78rem] font-bold flex items-center justify-center gap-[6px] cursor-pointer transition-colors"
+          >
+            <TrendingUp size={13} /> Track Progress
+          </button>
+        )}
       </div>
 
     </div>

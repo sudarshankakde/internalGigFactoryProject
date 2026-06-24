@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Mail, Lock, KeyRound, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../../utils/api';
 import { useAuthStore } from '../../store/useAuthStore';
 import './Login.css';
@@ -21,6 +21,8 @@ const Login = () => {
   const [timer, setTimer] = useState(0);
 
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectUrl = searchParams.get('redirect');
   const setAuth = useAuthStore((state) => state.setAuth);
   const token = useAuthStore((state) => state.token);
   const user = useAuthStore((state) => state.user);
@@ -59,13 +61,15 @@ const Login = () => {
 
   useEffect(() => {
     if (token && user) {
-      if (user.role === 'admin') {
+      if (redirectUrl) {
+        navigate(redirectUrl);
+      } else if (user.role === 'admin') {
         navigate('/admin/dashboard');
       } else {
         navigate('/dashboard');
       }
     }
-  }, [token, user, navigate]);
+  }, [token, user, navigate, redirectUrl]);
 
   // Modal states for registration status error handling
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -143,10 +147,17 @@ const Login = () => {
       toast.success('Login successful!');
       setAuth(loginQuery.data.token, loginQuery.data.refreshToken, loginQuery.data.user);
       
-      navigate('/dashboard');
+      const userRole = loginQuery.data.user?.role;
+      if (redirectUrl) {
+        navigate(redirectUrl);
+      } else if (userRole === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
       setLoginParams(null);
     }
-  }, [loginQuery.data, navigate, setAuth]);
+  }, [loginQuery.data, navigate, setAuth, redirectUrl]);
 
   useEffect(() => {
     if (loginQuery.error) {
@@ -181,10 +192,17 @@ const Login = () => {
     if (verifyOtpQuery.data) {
       toast.success('OTP verified & login successful!');
       setAuth(verifyOtpQuery.data.token, verifyOtpQuery.data.refreshToken, verifyOtpQuery.data.user);
-      navigate('/dashboard');
+      const userRole = verifyOtpQuery.data.user?.role;
+      if (redirectUrl) {
+        navigate(redirectUrl);
+      } else if (userRole === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
       setVerifyOtpParams(null);
     }
-  }, [verifyOtpQuery.data, navigate, setAuth]);
+  }, [verifyOtpQuery.data, navigate, setAuth, redirectUrl]);
 
   useEffect(() => {
     if (verifyOtpQuery.error) {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Search, Briefcase, ArrowRight, Filter, SortAsc, RefreshCw, ClipboardList, Check, Share2, Loader2, X } from 'lucide-react';
+import { Search, Briefcase, ArrowRight, Filter, SortAsc, RefreshCw, Share2, Check, Loader2, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { ShareButton } from 'react-share-utilities';
 import { api } from '../../utils/api';
@@ -24,7 +24,7 @@ const renderWithTbdTooltip = (val, tooltipText) => {
   return val;
 };
 
-export default function BrowseProjects() {
+export default function PublicBrowseProjects() {
   const navigate = useNavigate();
 
   // Search & Filter & Pagination states
@@ -33,7 +33,7 @@ export default function BrowseProjects() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(() => Number(localStorage.getItem('browse_projects_limit')) || 10);
+  const [limit, setLimit] = useState(() => Number(localStorage.getItem('public_projects_limit')) || 10);
 
   // Debounce search term (750ms)
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function BrowseProjects() {
 
   // Persist limit in localStorage
   useEffect(() => {
-    localStorage.setItem('browse_projects_limit', limit);
+    localStorage.setItem('public_projects_limit', limit);
   }, [limit]);
 
   // Reset page to 1 when search query, category, sorting, or limit changes
@@ -53,9 +53,9 @@ export default function BrowseProjects() {
     setPage(1);
   }, [dSearch, selectedCategory, sortBy, limit]);
 
-  // Fetch backend projects with pagination, sorting, search, category
+  // Fetch backend public projects with pagination, sorting, search, category
   const { data: projectsData, isLoading, error, refetch, isFetching } = useQuery({
-    queryKey: ['browse-projects', page, limit, dSearch, selectedCategory, sortBy],
+    queryKey: ['public-browse-projects', page, limit, dSearch, selectedCategory, sortBy],
     queryFn: () => {
       const params = new URLSearchParams({ page, limit, sort: sortBy });
       if (dSearch) {
@@ -64,23 +64,18 @@ export default function BrowseProjects() {
       if (selectedCategory) {
         params.set('category', selectedCategory);
       }
-      return api.get(`/projects?${params}`);
+      return api.get(`/projects/public?${params}`);
     },
     keepPreviousData: true,
   });
 
   // Fetch dynamic categories suggestions list from metadata
   const { data: categoriesData } = useQuery({
-    queryKey: ['browse-projects-categories'],
-    queryFn: () => api.get('/projects/meta/categories'),
+    queryKey: ['public-projects-categories'],
+    queryFn: () => api.get('/projects/public-meta/categories').catch(() => ({ categories: [] })),
   });
 
-  // Filter out any already assigned projects or projects with assignments
-  const projects = (projectsData?.projects || []).filter(project => {
-    const isAssigned = project.assignments && project.assignments.length > 0;
-    return project.status === 'open' && !isAssigned;
-  });
-
+  const projects = projectsData?.projects || [];
   const total = projectsData?.total || 0;
   const totalPages = projectsData?.totalPages || 1;
   const categoriesList = categoriesData?.categories || [];
@@ -91,21 +86,26 @@ export default function BrowseProjects() {
     setSortBy('newest');
   };
 
+  const handleApplyRedirect = (projectId, e) => {
+    e.stopPropagation();
+    navigate(`/?redirect=/projects/${projectId}`);
+  };
+
   return (
-    <div className=" mx-auto flex flex-col gap-6">
+    <div className="mx-auto flex flex-col gap-6">
       
       {/* Header Block */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="space-y-1">
-          <h2 className="text-white font-extrabold text-[1.4rem] m-0">Available Projects</h2>
-          <p className="text-gray-500 text-[0.82rem] m-0">Browse and apply to projects that match your skills</p>
+          <h2 className="text-white font-extrabold text-[1.6rem] m-0">Open Opportunities</h2>
+          <p className="text-gray-500 text-[0.85rem] m-0">Discover projects and apply to start collaborating with GigFactory clients.</p>
         </div>
         
         <div className="flex items-center gap-[10px]">
           <button 
             onClick={() => refetch()} 
             disabled={isFetching} 
-            className="bg-[#0c0c0e] border border-[#23232a] text-gray-500 rounded-[6px] px-[14px] py-[7px] text-[0.8rem] cursor-pointer transition-colors duration-100 flex items-center gap-[6px] hover:text-white hover:border-white/10 disabled:opacity-50"
+            className="bg-[#0c0c0e] border border-[#23232a] text-gray-400 rounded-[6px] px-[14px] py-[7px] text-[0.8rem] cursor-pointer transition-colors duration-100 flex items-center gap-[6px] hover:text-white hover:border-white/10 disabled:opacity-50"
           >
             <RefreshCw size={13} className={isFetching ? 'animate-spin' : ''} /> Refresh
           </button>
@@ -190,7 +190,7 @@ export default function BrowseProjects() {
           </div>
         ) : error ? (
           <div className="bg-[#121215] border border-[#23232a] rounded-[10px] p-12 text-center">
-            <p className="text-red-500 font-semibold text-sm">Failed to fetch available projects. Please check your connection.</p>
+            <p className="text-red-500 font-semibold text-sm">Failed to fetch open projects. Please check your connection.</p>
           </div>
         ) : projects.length === 0 ? (
           <div className="bg-[#121215] border border-[#23232a] rounded-[10px] p-12 text-center flex flex-col items-center justify-center">
@@ -198,7 +198,7 @@ export default function BrowseProjects() {
               <Briefcase size={28} />
             </div>
             <h3 className="text-lg font-bold text-white mb-2">No Projects Found</h3>
-            <p className="text-gray-500 text-sm max-w-sm mb-5 leading-relaxed">We couldn't find any open projects matching your search criteria.</p>
+            <p className="text-gray-500 text-sm max-w-sm mb-5 leading-relaxed">We couldn't find any public open projects matching your search criteria.</p>
             <button 
               onClick={handleClearFilters}
               className="bg-transparent border border-[#70d64d] text-[#70d64d] hover:bg-[#70d64d]/5 px-[14px] py-[7px] rounded-[6px] text-xs font-semibold transition-all duration-200"
@@ -207,12 +207,10 @@ export default function BrowseProjects() {
             </button>
           </div>
         ) : (
-          // Stretched long cards list
           <div className="space-y-4">
             {projects.map((project) => {
               const skillsList = project.project_skills || [];
               const tagsList = project.project_tags || [];
-              const milestonesList = project.milestones || [];
               
               const formattedBudget = project.budget 
                 ? `₹${Number(project.budget).toLocaleString('en-IN')}` 
@@ -235,13 +233,13 @@ export default function BrowseProjects() {
                   key={project.id} 
                   className="bg-[#121215] border border-[#23232a] rounded-[10px] p-6 hover:border-[#70d64d] hover:shadow-[0_4px_20px_rgba(112,214,77,0.08)] hover:-translate-y-[2px] transition-all duration-200 flex flex-col relative"
                 >
-                                   {/* Header Row */}
+                  {/* Header Row */}
                   <header className="flex flex-col sm:flex-row justify-between items-start gap-3 mb-3 min-w-0 w-full">
                     <div className="space-y-1.5 min-w-0 flex-1 w-full">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 min-w-0">
                         <h2 
                           className="text-lg font-bold text-white cursor-pointer hover:text-[#70d64d] transition-all duration-150 break-words line-clamp-2"
-                          onClick={() => navigate(`/projects/${project.id}`)}
+                          onClick={() => navigate(`/public-projects/${project.id}`)}
                         >
                           {project.title}
                         </h2>
@@ -301,9 +299,8 @@ export default function BrowseProjects() {
                     )}
                   </div>
 
-
                   {/* Horizontal Details Panel */}
-                  <div className="bg-[#0c0c0e] border border-[#23232a] rounded-[6px] p-4 grid grid-cols-1 min-[375px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-4 w-full">
+                  <div className="bg-[#0c0c0e] border border-[#23232a] rounded-[6px] p-4 grid grid-cols-1 min-[375px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-4 w-full">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-9 h-9 bg-[#121215] border border-[#23232a] rounded-[6px] flex items-center justify-center text-md shrink-0">💰</div>
                       <div className="flex flex-col min-w-0">
@@ -349,14 +346,6 @@ export default function BrowseProjects() {
                         <span className="text-[0.85rem] font-bold text-white truncate">{project.milestones?.length || project.total_milestones || 0} Stages</span>
                       </div>
                     </div>
-
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-9 h-9 bg-[#121215] border border-[#23232a] rounded-[6px] flex items-center justify-center text-md shrink-0">👥</div>
-                      <div className="flex flex-col min-w-0">
-                        <span className="text-[10px] font-bold text-gray-500 tracking-wider uppercase truncate">APPLICANTS</span>
-                        <span className="text-[0.85rem] font-bold text-white truncate">{project.applications_count || 0} Users</span>
-                      </div>
-                    </div>
                   </div>
 
                   {/* Bottom Action Row */}
@@ -385,30 +374,20 @@ export default function BrowseProjects() {
                         title="Share Project Link"
                       />
                     </span>
+                    
                     <button
-                      onClick={() => navigate(`/projects/${project.id}`)}
-                      className="bg-[#0c0c0e] hover:bg-[#1a1a22] border border-[#23232a] text-white py-[8px] px-[16px] rounded-[6px] text-[0.78rem] font-semibold transition-colors duration-150"
+                      onClick={() => navigate(`/public-projects/${project.id}`)}
+                      className="bg-[#0c0c0e] hover:bg-[#1a1a22] border border-[#23232a] text-white py-[8px] px-[16px] rounded-[6px] text-[0.78rem] font-semibold transition-colors duration-150 cursor-pointer"
                     >
                       View Details
                     </button>
                     
-                    {project.status === 'open' && (
-                      project.my_application ? (
-                        <button
-                          disabled
-                          className="bg-transparent border border-[#70d64d]/30 text-[#70d64d] py-[8px] px-[16px] rounded-[6px] text-[0.78rem] font-bold flex items-center gap-[6px] cursor-not-allowed opacity-80"
-                        >
-                          <Check size={13} /> Proposal Submitted
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => navigate(`/projects/${project.id}`)}
-                          className="bg-[#70d64d] hover:bg-[#8ee67b] text-black border-none py-[8px] px-[16px] rounded-[6px] text-[0.78rem] font-bold flex items-center gap-[6px] transition-colors duration-150"
-                        >
-                          Apply Now <ArrowRight size={13} />
-                        </button>
-                      )
-                    )}
+                    <button
+                      onClick={(e) => handleApplyRedirect(project.id, e)}
+                      className="bg-[#70d64d] hover:bg-[#8ee67b] text-black border-none py-[8px] px-[16px] rounded-[6px] text-[0.78rem] font-bold flex items-center gap-[6px] transition-colors duration-150 cursor-pointer"
+                    >
+                      Apply Now <ArrowRight size={13} />
+                    </button>
                   </footer>
 
                 </article>
