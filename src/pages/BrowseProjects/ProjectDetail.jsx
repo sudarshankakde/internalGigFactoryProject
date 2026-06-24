@@ -249,80 +249,80 @@ export default function ProjectDetail() {
             </span>
           </div>
         </div>
-      </div>
-      {/* Summary grid */}
-      <div className="grid grid-cols-1 min-[375px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 mt-6 pt-6 border-t border-[#23232a] w-full">
-        {/* Budget */}
-        <div className="flex items-start gap-3 min-w-0">
-          <Wallet className="text-[#8a8a8a] mt-1 shrink-0" size={18} />
-          <div className="min-w-0">
-            <span className="text-gray-500 text-[0.68rem] font-bold uppercase tracking-wider block">
-              Budget
-            </span>
-            <span className="text-white font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block truncate">
-              {formattedBudget}
-            </span>
-          </div>
-        </div>
-        {/* Start Date */}
-        <div className="flex items-start gap-3 min-w-0">
-          <Calendar className="text-[#8a8a8a] mt-1 shrink-0" size={18} />
-          <div className="min-w-0">
-            <span className="text-gray-500 text-[0.68rem] font-bold uppercase tracking-wider block">
-              Start Date
-            </span>
-            <span className="text-white font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block">
-              {renderWithTbdTooltip(
-                formattedStartDate,
-                "To Be Decided / Determined by client",
-              )}
-            </span>
-          </div>
-        </div>
-        {/* Est. Hours */}
-        <div className="flex items-start gap-3 min-w-0">
-          <Clock className="text-[#8a8a8a] mt-1 shrink-0" size={18} />
-          <div className="min-w-0">
-            <span className="text-gray-500 text-[0.68rem] font-bold uppercase tracking-wider block">
-              Est. Hours
-            </span>
-            <span className="text-white font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block">
-              {renderWithTbdTooltip(
-                formattedHours,
-                "To Be Determined based on requirements",
-              )}
-            </span>
-          </div>
-        </div>
-        {/* Deadline */}
-        <div className="flex items-start gap-3 min-w-0">
-          <Calendar className="text-[#8a8a8a] mt-1 shrink-0" size={18} />
-          <div className="min-w-0">
-            <span className="text-gray-500 text-[0.68rem] font-bold uppercase tracking-wider block">
-              Deadline
-            </span>
-            <span className="text-white font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block">
-              {renderWithTbdTooltip(
-                formattedDeadline,
-                "To Be Decided / Finalized by client",
-              )}
-            </span>
-          </div>
-        </div>
-        {/* Applicants */}
-        <div className="flex items-start gap-3 min-w-0">
-          <Users className="text-[#8a8a8a] mt-1 shrink-0" size={18} />
-          <div className="min-w-0">
-            <span className="text-gray-500 text-[0.68rem] font-bold uppercase tracking-wider block">
-              Applicants
-            </span>
-            <span className="text-white font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block truncate">
-              {project.applications_count || 0} Users
-            </span>
-          </div>
-        </div>
-      </div>
 
+        {/* Summary grid */}
+        <div className="grid grid-cols-1 min-[375px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 mt-6 pt-6 border-t border-[#23232a] w-full">
+          {/* Budget */}
+          <div className="flex items-start gap-3 min-w-0">
+            <Wallet className="text-[#8a8a8a] mt-1 shrink-0" size={18} />
+            <div className="min-w-0">
+              <span className="text-gray-500 text-[0.68rem] font-bold uppercase tracking-wider block">
+                Budget
+              </span>
+              <span className="text-white font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block truncate">
+                {formattedBudget}
+              </span>
+            </div>
+          </div>
+          {/* Start Date */}
+          <div className="flex items-start gap-3 min-w-0">
+            <Calendar className="text-[#8a8a8a] mt-1 shrink-0" size={18} />
+            <div className="min-w-0">
+              <span className="text-gray-500 text-[0.68rem] font-bold uppercase tracking-wider block">
+                Start Date
+              </span>
+              <span className="text-white font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block">
+                {renderWithTbdTooltip(
+                  formattedStartDate,
+                  "To Be Decided / Determined by client",
+                )}
+              </span>
+            </div>
+          </div>
+          {/* Est. Hours */}
+          <div className="flex items-start gap-3 min-w-0">
+            <Clock className="text-[#8a8a8a] mt-1 shrink-0" size={18} />
+            <div className="min-w-0">
+              <span className="text-gray-500 text-[0.68rem] font-bold uppercase tracking-wider block">
+                Est. Hours
+              </span>
+              <span className="text-white font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block">
+                {renderWithTbdTooltip(
+                  formattedHours,
+                  "To Be Determined based on requirements",
+                )}
+              </span>
+            </div>
+          </div>
+          {/* Deadline */}
+          <div className="flex items-start gap-3 min-w-0">
+            <Calendar className="text-[#8a8a8a] mt-1 shrink-0" size={18} />
+            <div className="min-w-0">
+              <span className="text-gray-500 text-[0.68rem] font-bold uppercase tracking-wider block">
+                Deadline
+              </span>
+              <span className="text-white font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block">
+                {renderWithTbdTooltip(
+                  formattedDeadline,
+                  "To Be Decided / Finalized by client",
+                )}
+              </span>
+            </div>
+          </div>
+          {/* Applicants */}
+          <div className="flex items-start gap-3 min-w-0">
+            <Users className="text-[#8a8a8a] mt-1 shrink-0" size={18} />
+            <div className="min-w-0">
+              <span className="text-gray-500 text-[0.68rem] font-bold uppercase tracking-wider block">
+                Applicants
+              </span>
+              <span className="text-white font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block truncate">
+                {project.applications_count || 0} Users
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
       {/* Details Grid layout */}
       <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_0.9fr] gap-[20px] items-start">
         {/* Left main column */}
@@ -563,20 +563,21 @@ export default function ProjectDetail() {
 
                                 <div className="flex gap-2">
                                   {/* Submit Deliverable Button */}
-                                  {!isProjectCompleted && milestone.status !== "completed" && (
-                                    <button
-                                      onClick={() =>
-                                        setSelectedMilestoneForDeliverable(
-                                          milestone,
-                                        )
-                                      }
-                                      className="bg-[#70d64d]/10 hover:bg-[#70d64d]/20 text-[#70d64d] border border-[#70d64d]/30 font-bold rounded-[4px] px-3 py-1.5 text-xs cursor-pointer transition-colors"
-                                    >
-                                      {milestone.status === "rejected"
-                                        ? "Re-submit Deliverable"
-                                        : "Submit Deliverable"}
-                                    </button>
-                                  )}
+                                  {!isProjectCompleted &&
+                                    milestone.status !== "completed" && (
+                                      <button
+                                        onClick={() =>
+                                          setSelectedMilestoneForDeliverable(
+                                            milestone,
+                                          )
+                                        }
+                                        className="bg-[#70d64d]/10 hover:bg-[#70d64d]/20 text-[#70d64d] border border-[#70d64d]/30 font-bold rounded-[4px] px-3 py-1.5 text-xs cursor-pointer transition-colors"
+                                      >
+                                        {milestone.status === "rejected"
+                                          ? "Re-submit Deliverable"
+                                          : "Submit Deliverable"}
+                                      </button>
+                                    )}
 
                                   {/* View Receipt Button */}
                                   {milestone.payment_status === "paid" &&
@@ -931,11 +932,14 @@ export default function ProjectDetail() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2.5 mb-2">
                   <CheckCircle className="text-[#70d64d] shrink-0" size={18} />
-                  <h3 className="text-white font-bold text-sm">Project Completed</h3>
+                  <h3 className="text-white font-bold text-sm">
+                    Project Completed
+                  </h3>
                 </div>
 
                 <p className="text-gray-500 text-xs leading-relaxed">
-                  This project has been completed, so new proposals are no longer being accepted.
+                  This project has been completed, so new proposals are no
+                  longer being accepted.
                 </p>
               </div>
             ) : (
