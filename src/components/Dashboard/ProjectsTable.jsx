@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Filter, Check, X } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { flexRender } from '@tanstack/react-table';
 
 export const ProjectsTable = ({
@@ -36,13 +36,6 @@ export const ProjectsTable = ({
         ) : (
           <h3>Active Projects</h3>
         )}
-        <div className="controls-inputs-cluster">
-          <div className="search-field-wrapper">
-            <Search size={14} />
-            <input type="text" placeholder="Search entries..." />
-          </div>
-          <button className="ctrl-filter-btn"><Filter size={14} /> Filter</button>
-        </div>
       </div>
 
       {role === 'admin' && activeAdminTab === 'registrations' ? (

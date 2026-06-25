@@ -133,9 +133,28 @@
 }
 .portal-tanstack-native-table td { padding: 14px; border-bottom: 1px solid #23232a; vertical-align: middle; }
 
-.name-details-cell { display: flex; flex-direction: column; gap: 2px; }
+.name-details-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 450px;
+}
 .name-details-cell strong { font-size: 0.88rem; color: #fff; }
-.project-reference-text { font-size: 0.78rem; color: #8a8f98; }
+.project-reference-text {
+  font-size: 0.78rem;
+  color: #8a8f98;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.project-reference-text p {
+  margin: 0;
+  display: inline;
+}
 
 /* Statuses and role badge colorization configurations */
 .role-chip { font-size: 0.68rem; font-weight: 700; padding: 4px 8px; border-radius: 4px; display: inline-block; }

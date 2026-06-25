@@ -199,12 +199,20 @@ export const Dashboard = () => {
     {
       header: 'PROJECT WORKSPACE',
       accessorKey: 'title',
-      cell: info => (
-        <div className="name-details-cell">
-          <strong>{info.getValue()}</strong>
-          <span className="project-reference-text">{info.row.original.subtitle}</span>
-        </div>
-      )
+      cell: info => {
+        const rawSubtitle = info.row.original.subtitle || '';
+        // Replace non-breaking spaces (both HTML entity and unicode character) with regular spaces
+        const cleanSubtitle = rawSubtitle.replace(/&nbsp;/g, ' ').replace(/\u00a0/g, ' ');
+        return (
+          <div className="name-details-cell">
+            <strong>{info.getValue()}</strong>
+            <div 
+              className="project-reference-text"
+              dangerouslySetInnerHTML={{ __html: cleanSubtitle }}
+            />
+          </div>
+        );
+      }
     },
     { header: 'BUDGET', accessorKey: 'budget' },
     {
