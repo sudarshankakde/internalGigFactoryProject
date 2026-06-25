@@ -45,8 +45,8 @@ export default function ProjectMilestones({ project, onClose }) {
       variant,
       promptPlaceholder,
       defaultValue,
-      onConfirm: (val) => {
-        if (onConfirm) onConfirm(val);
+      onConfirm: async (val) => {
+        if (onConfirm) await onConfirm(val);
         setConfirmConfig((prev) => ({ ...prev, isOpen: false }));
       },
     });

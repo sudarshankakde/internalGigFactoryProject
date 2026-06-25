@@ -15,22 +15,32 @@ export default function ConfirmDialog({
   onCancel,
 }) {
   const [inputValue, setInputValue] = useState(defaultValue);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Reset input value when modal opens/changes
   useEffect(() => {
     if (isOpen) {
       setInputValue(defaultValue);
+      setIsSubmitting(false);
     }
   }, [isOpen, defaultValue]);
 
   if (!isOpen) return null;
 
-  const handleConfirm = (e) => {
-    e.preventDefault();
-    if (type === 'prompt') {
-      onConfirm(inputValue);
-    } else {
-      onConfirm();
+  const handleConfirm = async (e) => {
+    if (e) e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      if (type === 'prompt') {
+        await onConfirm(inputValue);
+      } else {
+        await onConfirm();
+      }
+    } catch (err) {
+      console.error('ConfirmDialog submission error:', err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -57,7 +67,7 @@ export default function ConfirmDialog({
   return (
     <>
       {/* Backdrop */}
-      <div onClick={onCancel} className="fixed inset-0 bg-black/80 backdrop-blur-[4px] z-[900]" />
+      <div onClick={isSubmitting ? undefined : onCancel} className="fixed inset-0 bg-black/80 backdrop-blur-[4px] z-[900]" />
       
       {/* Modal Dialog */}
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[92vw] max-w-[480px] bg-[#121215] border border-[#23232a] rounded-[14px] p-6 text-white shadow-[0_24px_60px_rgba(0,0,0,0.7)] z-[901] flex flex-col gap-4">
@@ -72,8 +82,9 @@ export default function ConfirmDialog({
           </div>
           <button 
             type="button"
-            onClick={onCancel} 
-            className="bg-transparent border-none text-gray-500 hover:text-white cursor-pointer transition-colors p-1"
+            onClick={isSubmitting ? undefined : onCancel} 
+            disabled={isSubmitting}
+            className={`bg-transparent border-none text-gray-500 hover:text-white cursor-pointer transition-colors p-1 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <X size={18} />
           </button>
@@ -91,10 +102,11 @@ export default function ConfirmDialog({
                 type="text" 
                 autoFocus
                 required
+                disabled={isSubmitting}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder={promptPlaceholder}
-                className="w-full rounded-[6px] border border-[#23232a] bg-[#0c0c0e] px-3 py-2.5 text-white text-[0.85rem] outline-none focus:border-[#70d64d] transition-colors"
+                className="w-full rounded-[6px] border border-[#23232a] bg-[#0c0c0e] px-3 py-2.5 text-white text-[0.85rem] outline-none focus:border-[#70d64d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
           )}
@@ -105,16 +117,25 @@ export default function ConfirmDialog({
               <button 
                 type="button" 
                 onClick={onCancel} 
-                className="bg-transparent border border-[#2c2c35] text-[#a1a1aa] rounded-[6px] px-4 py-2 text-[0.82rem] font-semibold cursor-pointer hover:bg-white/[0.02] transition-colors"
+                disabled={isSubmitting}
+                className="bg-transparent border border-[#2c2c35] text-[#a1a1aa] rounded-[6px] px-4 py-2 text-[0.82rem] font-semibold cursor-pointer hover:bg-white/[0.02] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {cancelText}
               </button>
             )}
             <button 
               type="submit" 
-              className={`${buttonColors[variant]} border-none rounded-[6px] px-5 py-2 text-[0.82rem] font-bold cursor-pointer transition-colors`}
+              disabled={isSubmitting}
+              className={`${buttonColors[variant]} border-none rounded-[6px] px-5 py-2 text-[0.82rem] font-bold cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
             >
-              {defaultConfirms[type]}
+              {isSubmitting ? (
+                <>
+                  <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                  Processing...
+                </>
+              ) : (
+                defaultConfirms[type]
+              )}
             </button>
           </div>
         </form>

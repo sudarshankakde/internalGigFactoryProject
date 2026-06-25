@@ -67,8 +67,8 @@ export default function ProjectDetailView() {
       cancelText,
       promptPlaceholder,
       defaultValue,
-      onConfirm: (val) => {
-        if (onConfirm) onConfirm(val);
+      onConfirm: async (val) => {
+        if (onConfirm) await onConfirm(val);
         setConfirmConfig((prev) => ({ ...prev, isOpen: false }));
       },
       onCancel: () => {
