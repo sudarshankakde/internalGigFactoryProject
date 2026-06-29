@@ -3,14 +3,6 @@
   --sidebar-width:      220px;
   --sidebar-collapsed:   64px;
   --topbar-height:       60px;
-  --accent:            #70d64d;
-  --bg-page:           #0c0c0e;
-  --bg-card:           #121215;
-  --bg-input:          #1f1f1f;
-  --border:            #23232a;
-  --text:              #f3f4f6;
-  --text-muted:        #6b7280;
-  --text-dim:          #3f3f46;
   --transition:         0.22s ease;
 }
 
@@ -681,5 +673,41 @@
 .app-sidebar.collapsed .sidebar-bottom,
 .app-sidebar.collapsed .sidebar-nav-item {
   overflow: visible !important;
+}
+
+/* ─── Light Mode CSS Overrides ───────────────────────────────────────────── */
+html:not(.dark) .notif-dropdown,
+html:not(.dark) .profile-dropdown {
+  background: var(--bg-card) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .topbar-profile-btn:hover {
+  background: #f4f4f5 !important;
+}
+
+html:not(.dark) .profile-dropdown {
+  background: #ffffff !important;
+}
+
+html:not(.dark) .profile-dd-item:hover {
+  background: #f4f4f5 !important;
+}
+
+html:not(.dark) .notif-item {
+  border-bottom-color: var(--border) !important;
+}
+
+html:not(.dark) .notif-item.unread {
+  background: #f4f4f5/50 !important;
+}
+
+html:not(.dark) input[type="date"] {
+  color-scheme: light;
+}
+
+html:not(.dark) input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0);
 }
 

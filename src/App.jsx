@@ -78,6 +78,10 @@ function App() {
 
   useEffect(() => {
     fetchPublicSettings();
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    const isDark = savedTheme === "dark";
+    document.documentElement.classList.toggle("dark", isDark);
+    document.documentElement.style.colorScheme = isDark ? "dark" : "light";
   }, [fetchPublicSettings]);
 
   useEffect(() => {

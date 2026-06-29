@@ -42,6 +42,8 @@ import {
   ArrowLeft,
   Calendar,
   Mail,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -294,6 +296,19 @@ export default function AppLayout({ children, pageTitle }) {
         ? profile?.logo || user?.profile_photo
         : user?.profile_photo;
   const navItems = NAV_CONFIG[role] || NAV_CONFIG.gig_expert;
+
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem("theme");
+    return saved ? saved === "dark" : true;
+  });
+
+  const toggleTheme = () => {
+    const nextDark = !darkMode;
+    setDarkMode(nextDark);
+    document.documentElement.classList.toggle("dark", nextDark);
+    document.documentElement.style.colorScheme = nextDark ? "dark" : "light";
+    localStorage.setItem("theme", nextDark ? "dark" : "light");
+  };
 
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -562,6 +577,16 @@ export default function AppLayout({ children, pageTitle }) {
                   />
                 )}
               </div>
+
+              {/* Theme Toggle */}
+              <button
+                className="topbar-icon-btn mr-2"
+                onClick={toggleTheme}
+                aria-label="Toggle theme"
+                title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              >
+                {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
 
               {/* Divider */}
               <div className="topbar-divider" />

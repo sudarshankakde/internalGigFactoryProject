@@ -2,6 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 :root {
+  --bg-color: #fafafa;
+  --card-bg: #ffffff;
+  --input-bg: #ffffff;
+  --text-main: #09090b;
+  --text-muted: #71717a;
+  --accent-lime: #70d64d;
+  --input-border: #e4e4e7;
+
+  --sidebar-width:      220px;
+  --sidebar-collapsed:   64px;
+  --topbar-height:       60px;
+  --accent:            #70d64d;
+  --bg-page:           #fafafa;
+  --bg-card:           #ffffff;
+  --bg-input:          #ffffff;
+  --border:            #e4e4e7;
+  --text:              #09090b;
+  --text-muted:        #71717a;
+  --text-dim:          #a1a1aa;
+  --transition:         0.22s ease;
+}
+
+html.dark {
   --bg-color: #121212;
   --card-bg: #181818;
   --input-bg: #1f1f1f;
@@ -9,6 +32,14 @@
   --text-muted: #8a8a8a;
   --accent-lime: #70d64d;
   --input-border: #2c2c2c;
+
+  --bg-page:           #0c0c0e;
+  --bg-card:           #121215;
+  --bg-input:          #1f1f1f;
+  --border:            #23232a;
+  --text:              #f3f4f6;
+  --text-muted:        #6b7280;
+  --text-dim:          #3f3f46;
 }
 
 * {
