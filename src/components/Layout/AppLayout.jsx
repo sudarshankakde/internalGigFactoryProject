@@ -56,7 +56,7 @@ const NAV_CONFIG = {
   admin: [
     { label: "Dashboard", icon: LayoutDashboard, to: "/admin/dashboard" },
     { label: "Reg. Requests", icon: FileSearch, to: "/admin/requests" },
-    { label: "Freelancers", icon: Users, to: "/admin/freelancers" },
+    { label: "Gig Experts", icon: Users, to: "/admin/freelancers" },
     { label: "Agencies", icon: Building2, to: "/admin/agencies" },
     { label: "Projects", icon: Briefcase, to: "/admin/projects" },
     { label: "Analytics", icon: BarChart3, to: "/admin/analytics" },

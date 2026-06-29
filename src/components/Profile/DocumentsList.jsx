@@ -3,8 +3,11 @@ import { createPortal } from 'react-dom';
 import { Plus, FileText, Edit2, Trash2, Download, ExternalLink, X, Loader2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAuthStore } from '../../store/useAuthStore';
+import { UploadDocumentModal } from './UploadDocumentModal';
 
-export const DocumentsList = ({ isFreelancer, resumeUrl, verifications }) => {
+
+
+export const DocumentsList = ({ isAdmin,isFreelancer, resumeUrl, verifications, onUpload,onRename, onDelete,documents }) => {
   const user = useAuthStore((state) => state.user) || {};
 
   const userName = user?.fullName || user?.full_name || "User";
@@ -14,13 +17,13 @@ export const DocumentsList = ({ isFreelancer, resumeUrl, verifications }) => {
   // const [files, setFiles] = useState(null);
 
   const [isUploadOpen, setIsUploadOpen] = useState(false);
-  // const [selectedRole, setSelectedRole] = useState('freelancer');
+  const [selectedRole, setSelectedRole] = useState('freelancer');
   // console.log("userRole",role)
 
   const handleUpload = () => {
 
     setIsUploadOpen(true);
-    // setSelectedRole('freelancer');
+    setSelectedRole('freelancer');
 
   };
   return (
@@ -31,7 +34,8 @@ export const DocumentsList = ({ isFreelancer, resumeUrl, verifications }) => {
         {!isAdmin && (
           <button 
             type="button" 
-            onClick={() => setShowUploadModal(true)} 
+            onClick={()=>setIsUploadOpen(true)}
+            // onClick={onUpload} 
             className="add-document-action-trigger"
           >
             <Plus size={14} /> Add
@@ -76,7 +80,7 @@ export const DocumentsList = ({ isFreelancer, resumeUrl, verifications }) => {
       )}
 
 
-      {isUploadOpen && <UploadDocumentModal onClose={() => setIsUploadOpen(false)} />}
+      {isUploadOpen && <UploadDocumentModal onClose={() => setIsUploadOpen(false)} onSave={() => setIsUploadOpen(true)} />}
 
     </div>
   );

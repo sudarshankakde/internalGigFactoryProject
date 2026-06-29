@@ -31,7 +31,7 @@ export const FreelancerTable = ({ freelancers, isLoading, onSelectFreelancer }) 
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="bg-[#0c0c0e]">
-              {['Freelancer', 'Contact', 'Title & Skills', 'Location', 'Rate', 'Profile', 'Status', 'Registered'].map(h => (
+              {['Gig Expert', 'Contact', 'Title & Skills', 'Location', 'Rate', 'Profile', 'Status', 'Registered'].map(h => (
                 <th key={h} className="text-gray-500 text-[0.65rem] font-bold px-[16px] py-[14px] border-b border-[#23232a] tracking-[0.6px] whitespace-nowrap">
                   {h.toUpperCase()}
                 </th>

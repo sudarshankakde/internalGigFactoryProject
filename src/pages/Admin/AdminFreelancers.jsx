@@ -68,9 +68,9 @@ export default function AdminFreelancers() {
       {/* Header */}
       <div className="flex justify-between items-center flex-wrap gap-[12px]">
         <div>
-          <h2 className="text-white font-extrabold text-[1.4rem] m-0">Freelancers</h2>
+          <h2 className="text-white font-extrabold text-[1.4rem] m-0">Gig Experts</h2>
           <p className="text-gray-500 text-[0.82rem] m-0 mt-[4px]">
-            {isLoading ? 'Loading…' : `${total} freelancers registered on the platform`}
+            {isLoading ? 'Loading…' : `${total} gig experts registered on the platform`}
           </p>
         </div>
         <button 

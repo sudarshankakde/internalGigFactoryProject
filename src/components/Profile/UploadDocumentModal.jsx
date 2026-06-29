@@ -1,15 +1,25 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Upload } from 'lucide-react';
+import { toast } from 'react-toastify';
 
-export const UploadDocumentModal = ({ onClose , onSave }) => {
+export const UploadDocumentModal = ({ onClose, onSave }) => {
   const [name, setName] = useState('');
   const [file, setFile] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!name.trim() || !file) return;
-    onSave({ name: name.trim(), url: URL.createObjectURL(file), uploadedAt: new Date().toISOString() });
+    if (onSave) {
+      onSave(
+        { name: name.trim(), url: URL.createObjectURL(file), uploadedAt: new Date().toISOString() }
+
+      );
+      console.log('Document uploaded:', { name: name.trim(), url: URL.createObjectURL(file), uploadedAt: new Date().toISOString() });
+
+      toast.success('Document uploaded successfully!');
+
+    }
     onClose();
   };
 

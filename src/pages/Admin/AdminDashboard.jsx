@@ -273,7 +273,7 @@ function DetailModal({ request, historyData, isLoadingHistory, onClose, onApprov
                             else if (log.action === 'DECISION_CHANGED') actionColor = '#f59e0b';
 
                             return (
-                              <div key={log.id} style={{ borderLeft: `2px solid ${actionColor}` }} className="pl-[10px] text-[0.75rem]">
+                              <div key={log.id} style={{borderLeft: `2px solid ${actionColor}` }} className="pl-[10px] text-[0.75rem]">
                                 <div className="flex justify-between items-center">
                                   <strong style={{ color: actionColor }}>{log.action}</strong>
                                   <span className="text-gray-500 text-[0.65rem]">

@@ -28,7 +28,7 @@ export const Sidebar = ({ currentRole, onRoleChange }) => {
         <label>Simulate Role:</label>
         <select value={currentRole} onChange={(e) => onRoleChange(e.target.value)}>
           <option value="admin">Admin</option>
-          <option value="freelancer">Freelancer</option>
+          <option value="freelancer">Gig Expert</option>
           <option value="agency">Agency</option>
         </select>
       </div>
@@ -66,7 +66,7 @@ export const Sidebar = ({ currentRole, onRoleChange }) => {
               <Briefcase size={18} /> <span>Projects</span> 
             </a>
             <a href="#freelancers" className="menu-link">
-              <Users size={18} /> <span>Freelancers</span>
+              <Users size={18} /> <span>Gig Expert</span>
             </a>
             <a href="#agencies" className="menu-link">
               <Building size={18} /> <span>Agencies</span> 
