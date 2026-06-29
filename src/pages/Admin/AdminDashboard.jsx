@@ -582,9 +582,8 @@ export default function AdminDashboard() {
   const handleConfirmReject = (id, reason)  => setReviewParams({ id, status: 'rejected', rejectionReason: reason });
   const handleUpdateDecision = (id, params) => setReviewParams({ id, ...params });
 
-  /* ── derived data ── */
   const filtered = useMemo(() => {
-    return requests.filter(r => {
+    const list = requests.filter(r => {
       const matchStatus = statusFilter === 'all' || r.status === statusFilter;
       const q = search.toLowerCase();
       const matchSearch = !q ||
@@ -593,6 +592,7 @@ export default function AdminDashboard() {
         r.mobile?.includes(q);
       return matchStatus && matchSearch;
     });
+    return list.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
   }, [requests, statusFilter, search]);
 
   const stats = useMemo(() => ({

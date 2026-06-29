@@ -34,7 +34,8 @@ export const Dashboard = () => {
     queryKey: ['registrationRequests'],
     queryFn: async () => {
       const response = await api.get('/auth/registration-requests');
-      return response.requests || [];
+      const list = response.requests || [];
+      return list.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
     },
     enabled: role === 'admin',
   });

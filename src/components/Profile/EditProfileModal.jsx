@@ -1,6 +1,8 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { Check } from 'lucide-react';
+import { Check, X, FileText } from 'lucide-react';
+import { api } from '../../utils/api';
+import { toast } from 'react-toastify';
 
 const getInitials = (name) => {
   if (!name) return 'U';
@@ -22,6 +24,52 @@ export const EditProfileModal = ({
   handleSoftwareToggle,
   handleNestedChange
 }) => {
+  const [uploadingPdf, setUploadingPdf] = React.useState(false);
+  const [uploadedPdfName, setUploadedPdfName] = React.useState('');
+  const portfolioPdfInputRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (formData.portfolioPdfUrl) {
+      const parts = formData.portfolioPdfUrl.split('/');
+      setUploadedPdfName(parts[parts.length - 1]);
+    } else {
+      setUploadedPdfName('');
+    }
+  }, [formData.portfolioPdfUrl]);
+
+  const handlePortfolioPdfChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      toast.error('Only PDF files are allowed.');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Max allowed size is 10MB.');
+      return;
+    }
+
+    setUploadingPdf(true);
+    try {
+      const uploadData = new FormData();
+      uploadData.append('file', file);
+
+      const res = await api.postFile('/auth/upload', uploadData);
+      if (res && res.success) {
+        setFormData({ ...formData, portfolioPdfUrl: res.fileUrl });
+        setUploadedPdfName(file.name);
+        toast.success('Portfolio PDF uploaded successfully!');
+      } else {
+        toast.error(res.message || 'Upload failed.');
+      }
+    } catch (err) {
+      toast.error(err.message || 'Upload failed.');
+    } finally {
+      setUploadingPdf(false);
+    }
+  };
   return createPortal(
     <div className="profile-modal-overlay">
       <div className="profile-modal-card">
@@ -501,6 +549,45 @@ export const EditProfileModal = ({
                       placeholder="https://linkedin.com/in/username"
                     />
                   </div>
+                </div>
+
+                <div className="form-group mt-3">
+                  <label>OR UPLOAD PORTFOLIO (PDF)</label>
+                  <div className="flex items-center gap-3 bg-[#0c0c0e] border border-[#232328] rounded-md p-3 relative">
+                    <input 
+                      type="file"
+                      ref={portfolioPdfInputRef}
+                      onChange={handlePortfolioPdfChange}
+                      accept=".pdf"
+                      className="hidden"
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => portfolioPdfInputRef.current && portfolioPdfInputRef.current.click()}
+                      style={{ backgroundColor: 'var(--accent-lime)', color: '#000' }}
+                      className="py-2 px-4 rounded font-bold text-sm hover:opacity-90 transition-opacity flex-shrink-0"
+                      disabled={uploadingPdf}
+                    >
+                      {uploadingPdf ? 'Uploading...' : 'Choose File'}
+                    </button>
+                    <span className="text-[#8a8f98] text-sm truncate flex-1 pr-2">
+                      {uploadedPdfName || (formData.portfolioPdfUrl ? 'Portfolio uploaded (PDF)' : 'No file chosen')}
+                    </span>
+                    {formData.portfolioPdfUrl && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormData({ ...formData, portfolioPdfUrl: '' });
+                          setUploadedPdfName('');
+                        }}
+                        className="text-gray-500 hover:text-white bg-transparent border-none cursor-pointer flex items-center justify-center p-1"
+                        title="Remove file"
+                      >
+                        <X size={14} />
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-[#6c727f] mt-1.5 mb-0">Provide a link or upload a PDF (max 10MB allowed)</p>
                 </div>
               </>
             )}

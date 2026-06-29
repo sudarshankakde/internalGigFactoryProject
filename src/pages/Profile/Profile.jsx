@@ -136,6 +136,7 @@ export const Profile = () => {
         availability: profile?.availability || 'AVAILABLE',
         portfolioUrl: profile?.portfolio_url || '',
         resumeUrl: profile?.resume_url || '',
+        portfolioPdfUrl: profile?.portfolio_pdf_url || '',
         linkedinUrl: profile?.linkedin_url || '',
         legalNamePan: profile?.legal_name_pan || '',
         personalPan: profile?.personal_pan || '',
@@ -156,6 +157,7 @@ export const Profile = () => {
         description: profile?.description || '',
         gstNumber: profile?.gst_number || '',
         website: profile?.website || '',
+        portfolioPdfUrl: profile?.portfolio_pdf_url || '',
         employeeCount: profile?.employee_count || 0,
         foundedYear: profile?.founded_year || 2020,
         industry: profile?.industry || '',
@@ -397,6 +399,7 @@ export const Profile = () => {
          
             isFreelancer={isFreelancer}
             resumeUrl={profile?.resume_url}
+            portfolioPdfUrl={profile?.portfolio_pdf_url}
             verifications={profile?.verifications}
             documents={documents}
             onUpload={handleUploadDocument}

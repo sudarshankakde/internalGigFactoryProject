@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 export const DocumentsList = ({
   isFreelancer,
   resumeUrl,
+  portfolioPdfUrl,
   verifications,
   documents = [],
   onUpload,
@@ -164,7 +165,7 @@ export const DocumentsList = ({
       {/* Main Documents List */}
       <div className="flex flex-col gap-4 mt-4">
         {/* Legacy Resume/CV display for Freelancer */}
-        {!isAdmin && isFreelancer && resumeUrl && (
+        {isFreelancer && resumeUrl && (
           <div className="border-b border-white/5 pb-3">
             <div className="flex items-center justify-between">
               <span className="text-[0.85rem] text-[#70d64d] font-semibold flex items-center gap-2">
@@ -177,6 +178,25 @@ export const DocumentsList = ({
                 className="text-[0.78rem] text-white hover:text-[#70d64d] flex items-center gap-1 bg-[#1c1c22] border border-[#23232a] px-2 py-1 rounded"
               >
                 <Download size={12} /> View CV
+              </a>
+            </div>
+          </div>
+        )}
+
+        {/* Portfolio PDF Document display */}
+        {portfolioPdfUrl && (
+          <div className="border-b border-white/5 pb-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[0.85rem] text-[#70d64d] font-semibold flex items-center gap-2">
+                <FileText size={16} /> Portfolio Document (PDF)
+              </span>
+              <a 
+                href={portfolioPdfUrl} 
+                target="_blank" 
+                rel="noreferrer" 
+                className="text-[0.78rem] text-white hover:text-[#70d64d] flex items-center gap-1 bg-[#1c1c22] border border-[#23232a] px-2 py-1 rounded"
+              >
+                <Download size={12} /> View Portfolio
               </a>
             </div>
           </div>

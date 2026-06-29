@@ -72,6 +72,10 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
   const [errors, setErrors] = useState({});
   const [warnings, setWarnings] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  
+  const portfolioPdfInputRef = useRef(null);
+  const [portfolioPdfFile, setPortfolioPdfFile] = useState(null);
+  const [uploadedPdfName, setUploadedPdfName] = useState('');
 
   // Location Autocomplete States
   const [filteredLocations, setFilteredLocations] = useState([]);
@@ -108,6 +112,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
 
     // Commercials
     portfolioUrl: '',
+    portfolioPdfUrl: '',
     commercialBasis: '',
     baseRate: '',
     noticePeriod: '',
@@ -209,6 +214,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
         fullName: reapplyData.role === 'freelancer' ? (reapplyData.fullName || reapplyData.fullName || prev.fullName) : prev.fullName,
         authPersonName: reapplyData.role === 'agency' ? (reapplyData.authPersonName || reapplyData.fullName || prev.authPersonName) : prev.authPersonName,
         mobile: reapplyData.mobile || prev.mobile,
+        portfolioPdfUrl: reapplyData.portfolioPdfUrl || reapplyData.portfolio_pdf_url || prev.portfolioPdfUrl,
         declarationAccepted: false,
         signatureName: ''
       }));
@@ -219,6 +225,15 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
       }));
     }
   }, [reapplyData, email]);
+
+  useEffect(() => {
+    if (formData.portfolioPdfUrl) {
+      const parts = formData.portfolioPdfUrl.split('/');
+      setUploadedPdfName(parts[parts.length - 1]);
+    } else if (!portfolioPdfFile) {
+      setUploadedPdfName('');
+    }
+  }, [formData.portfolioPdfUrl, portfolioPdfFile]);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -233,6 +248,31 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
   }, [isOpen]);
 
   if (!isOpen) return null;
+
+  const handlePortfolioPdfChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      setErrors((prev) => ({ ...prev, portfolioPdfUrl: 'Only PDF files are allowed.' }));
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setErrors((prev) => ({ ...prev, portfolioPdfUrl: 'Max allowed size is 10MB.' }));
+      return;
+    }
+
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next.portfolioPdfUrl;
+      return next;
+    });
+
+    setPortfolioPdfFile(file);
+    setUploadedPdfName(file.name);
+    setFormData((prev) => ({ ...prev, portfolioPdfUrl: '' }));
+  };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -349,45 +389,52 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
       setErrors({});
       setSubmitting(true);
 
-      const payload = {
-        email: formData.email,
-        fullName: role === 'freelancer' ? formData.fullName : formData.authPersonName,
-        mobile: formData.mobile,
-        roleName: role,
-        applicationData: {
-          ...formData,
-          title: role === 'freelancer' ? formData.designation : undefined,
-          agencyName: role === 'agency' ? formData.registeredName : undefined,
-          bio: role === 'freelancer'
-            ? `Designation: ${formData.designation}. LinkedIn: ${formData.linkedinUrl || 'N/A'}. Legal PAN Name: ${formData.legalNamePan}`
-            : `Company Website: ${formData.website || 'N/A'}. Authorized signatory: ${formData.authPersonName}`,
-          experienceYears: role === 'freelancer' ? (parseInt(formData.peerReviewDetails?.teamExperience, 10) || 3) : undefined,
-          employeeCount: role === 'agency' ? (parseInt(formData.teamSize, 10) || 5) : undefined,
-          hourlyRate: role === 'freelancer' ? (parseFloat(formData.baseRate) || 0) : undefined,
-          availability: role === 'freelancer' ? (formData.availability ? formData.availability.toLowerCase() : 'project basis') : undefined,
-          portfolioUrl: formData.portfolioUrl || '',
-          gstNumber: role === 'agency' ? formData.gstNumber : undefined,
-          website: role === 'agency' ? formData.website : undefined,
-          address: role === 'agency' ? formData.headquarters : undefined,
-          city: role === 'freelancer'
-            ? (formData.location ? formData.location.split(',')[0]?.trim() || 'Mumbai' : 'Mumbai')
-            : (formData.headquarters ? formData.headquarters.split(',')[0]?.trim() || 'Mumbai' : 'Mumbai'),
-          country: role === 'freelancer'
-            ? (formData.location ? formData.location.split(',')[1]?.trim() || 'India' : 'India')
-            : (formData.headquarters ? formData.headquarters.split(',')[1]?.trim() || 'India' : 'India'),
-          skillsList: formData.selectedServices,
-          serviceDetails: {
-            selectedServices: formData.selectedServices,
-            bimDetails: formData.bimDetails,
-            auditDetails: formData.auditDetails,
-            peerReviewDetails: formData.peerReviewDetails,
-            boqDetails: formData.boqDetails,
-            vizDetails: formData.vizDetails
-          }
+      const regFormData = new FormData();
+      regFormData.append('email', formData.email);
+      regFormData.append('fullName', role === 'freelancer' ? formData.fullName : formData.authPersonName);
+      regFormData.append('mobile', formData.mobile);
+      regFormData.append('roleName', role);
+
+      const appData = {
+        ...formData,
+        title: role === 'freelancer' ? formData.designation : undefined,
+        agencyName: role === 'agency' ? formData.registeredName : undefined,
+        bio: role === 'freelancer'
+          ? `Designation: ${formData.designation}. LinkedIn: ${formData.linkedinUrl || 'N/A'}. Legal PAN Name: ${formData.legalNamePan}`
+          : `Company Website: ${formData.website || 'N/A'}. Authorized signatory: ${formData.authPersonName}`,
+        experienceYears: role === 'freelancer' ? (parseInt(formData.peerReviewDetails?.teamExperience, 10) || 3) : undefined,
+        employeeCount: role === 'agency' ? (parseInt(formData.teamSize, 10) || 5) : undefined,
+        hourlyRate: role === 'freelancer' ? (parseFloat(formData.baseRate) || 0) : undefined,
+        availability: role === 'freelancer' ? (formData.availability ? formData.availability.toLowerCase() : 'project basis') : undefined,
+        portfolioUrl: formData.portfolioUrl || '',
+        portfolioPdfUrl: formData.portfolioPdfUrl || '',
+        gstNumber: role === 'agency' ? formData.gstNumber : undefined,
+        website: role === 'agency' ? formData.website : undefined,
+        address: role === 'agency' ? formData.headquarters : undefined,
+        city: role === 'freelancer'
+          ? (formData.location ? formData.location.split(',')[0]?.trim() || 'Mumbai' : 'Mumbai')
+          : (formData.headquarters ? formData.headquarters.split(',')[0]?.trim() || 'Mumbai' : 'Mumbai'),
+        country: role === 'freelancer'
+          ? (formData.location ? formData.location.split(',')[1]?.trim() || 'India' : 'India')
+          : (formData.headquarters ? formData.headquarters.split(',')[1]?.trim() || 'India' : 'India'),
+        skillsList: formData.selectedServices,
+        serviceDetails: {
+          selectedServices: formData.selectedServices,
+          bimDetails: formData.bimDetails,
+          auditDetails: formData.auditDetails,
+          peerReviewDetails: formData.peerReviewDetails,
+          boqDetails: formData.boqDetails,
+          vizDetails: formData.vizDetails
         }
       };
 
-      const response = await api.post('/auth/register', payload);
+      regFormData.append('applicationData', JSON.stringify(appData));
+
+      if (portfolioPdfFile) {
+        regFormData.append('portfolioFile', portfolioPdfFile);
+      }
+
+      const response = await api.postFile('/auth/register', regFormData);
       toast.success(response.message || 'Registration request submitted successfully!');
       
       if (onSubmitSuccess) {
@@ -981,6 +1028,47 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                   />
                 </div>
                 {errors.portfolioUrl && <span className="validation-error">{errors.portfolioUrl}</span>}
+              </div>
+
+              {/* PDF portfolio upload */}
+              <div className="input-group col-span-2">
+                <label>OR UPLOAD PORTFOLIO (PDF)</label>
+                <div className="flex items-center gap-3 bg-[#0c0c0e] border border-[#232328] rounded-md p-3 relative">
+                  <input 
+                    type="file"
+                    ref={portfolioPdfInputRef}
+                    onChange={handlePortfolioPdfChange}
+                    accept=".pdf"
+                    className="hidden"
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => portfolioPdfInputRef.current && portfolioPdfInputRef.current.click()}
+                    style={{ backgroundColor: 'var(--accent-lime)', color: '#000' }}
+                    className="py-2 px-4 rounded font-bold text-sm hover:opacity-90 transition-opacity flex-shrink-0"
+                  >
+                    Choose File
+                  </button>
+                  <span className="text-[#8a8f98] text-sm truncate flex-1 pr-2">
+                    {uploadedPdfName || (formData.portfolioPdfUrl ? 'Portfolio uploaded (PDF)' : 'No file chosen')}
+                  </span>
+                  {(formData.portfolioPdfUrl || portfolioPdfFile) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData(prev => ({ ...prev, portfolioPdfUrl: '' }));
+                        setPortfolioPdfFile(null);
+                        setUploadedPdfName('');
+                      }}
+                      className="text-gray-500 hover:text-white bg-transparent border-none cursor-pointer flex items-center justify-center p-1"
+                      title="Remove file"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+                <p className="text-[11px] text-[#6c727f] mt-1.5 mb-0 font-medium">Provide a link or upload a PDF (max 10MB allowed)</p>
+                {errors.portfolioPdfUrl && <span className="validation-error">{errors.portfolioPdfUrl}</span>}
               </div>
 
               <div className="input-group">

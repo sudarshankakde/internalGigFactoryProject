@@ -317,6 +317,16 @@ export const FreelancerModal = ({ freelancer, onClose }) => {
                         <Globe size={14} /> Portfolio Site <ExternalLink size={11} />
                       </a>
                     )}
+                    {fp.portfolio_pdf_url && (
+                      <a
+                        href={fp.portfolio_pdf_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center justify-center gap-[6px] border border-[#23232a] text-white text-[0.8rem] font-bold p-[8px] rounded-[6px] text-center no-underline bg-[#0c0c0e] transition-colors hover:border-gray-500"
+                      >
+                        <FileText size={14} /> Portfolio PDF <ExternalLink size={11} />
+                      </a>
+                    )}
                     {fp.linkedin_url && (
                       <a
                         href={fp.linkedin_url}
@@ -376,6 +386,7 @@ export const FreelancerModal = ({ freelancer, onClose }) => {
                   <DocumentsList
                     isFreelancer={true}
                     resumeUrl={fp.resume_url}
+                    portfolioPdfUrl={fp.portfolio_pdf_url}
                     verifications={freelancer.verifications}
                     isAdmin={true}
                   />

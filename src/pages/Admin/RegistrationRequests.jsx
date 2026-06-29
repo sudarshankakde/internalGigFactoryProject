@@ -115,7 +115,8 @@ export default function RegistrationRequests() {
       const matchSearch = !q || r.full_name?.toLowerCase().includes(q) || r.email?.toLowerCase().includes(q) || r.mobile?.includes(q);
       return matchStatus && matchRole && matchSearch;
     });
-    if (sortBy === 'oldest')    arr.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    if (sortBy === 'newest')    arr.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+    else if (sortBy === 'oldest')    arr.sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
     else if (sortBy === 'name') arr.sort((a, b) => (a.full_name || '').localeCompare(b.full_name || ''));
     return arr;
   }, [allRequests, statusFilter, roleFilter, dSearch, sortBy]);

@@ -385,6 +385,7 @@ export const AdminUserProfile = () => {
               <DocumentsList   role={user.role}
                 isFreelancer={isFreelancer}
                 resumeUrl={isFreelancer ? fp.resume_url : undefined}
+                portfolioPdfUrl={isFreelancer ? fp.portfolio_pdf_url : ap.portfolio_pdf_url}
                 verifications={user.verifications}
                 documents={data?.profileDocuments || []}
                 isAdmin={true}

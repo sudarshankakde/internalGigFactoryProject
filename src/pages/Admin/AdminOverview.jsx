@@ -114,7 +114,9 @@ export default function AdminOverview() {
   }, [freelancersData, agenciesData]);
 
   const stats = statsData?.stats || {};
-  const recentRequests = (reqData || []).slice(0, 5);
+  const recentRequests = [...(reqData || [])]
+    .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
+    .slice(0, 5);
   const recentBids = statsData?.recentBids || [];
 
   return (

@@ -275,6 +275,7 @@ export default function ProjectDetail() {
             setSelectedMilestoneForReceipt={setSelectedMilestoneForReceipt}
             setSelectedPaymentForReceipt={setSelectedPaymentForReceipt}
             setSelectedDeliverableForEdit={setSelectedDeliverableForEdit}
+            onRefresh={refetch}
           />
         </div>
 

@@ -31,6 +31,7 @@ export const freelancerSchema = yup.object().shape({
 
   // Step 4: Portfolio & Commercials
   portfolioUrl: optionalUrl(),
+  portfolioPdfUrl: yup.string().nullable(),
   commercialBasis: yup.string().required('Commercial basis is required'),
   baseRate: yup.number().typeError('Base rate must be a number').positive('Base rate must be positive').required('Base rate is required'),
   noticePeriod: yup.string().required('Notice period is required'),
@@ -62,6 +63,7 @@ export const agencySchema = yup.object().shape({
 
   // Step 4: Portfolio & Commercials
   portfolioUrl: optionalUrl(),
+  portfolioPdfUrl: yup.string().nullable(),
   commercialBasis: yup.string().required('Commercial basis is required'),
   baseRate: yup.number().typeError('Base rate must be a number').positive('Base rate must be positive').required('Base rate is required'),
   noticePeriod: yup.string().required('Notice period is required'),

@@ -145,6 +145,7 @@ export const RegistrationRequestDetailModal = ({ request, historyData, isLoading
                     ))}
                   </div>
                   {app.portfolioUrl && <div><strong className="text-[0.82rem]">Portfolio: </strong><a href={app.portfolioUrl} target="_blank" rel="noreferrer" className="text-[#70d64d] text-[0.82rem] hover:underline">Open Link</a></div>}
+                  {app.portfolioPdfUrl && <div className="mt-1"><strong className="text-[0.82rem]">Portfolio PDF: </strong><a href={app.portfolioPdfUrl} target="_blank" rel="noreferrer" className="text-[#70d64d] text-[0.82rem] hover:underline">View PDF</a></div>}
                 </div>
                 <div className="bg-[#1c1c20] border border-[#2c2c2c] rounded-[8px] p-[16px]">
                   <p className="text-[0.75rem] font-bold uppercase tracking-[0.5px] text-[#70d64d] m-0 mb-[12px] pb-[8px] border-b border-[#2c2c2c]">Commercial Rates</p>

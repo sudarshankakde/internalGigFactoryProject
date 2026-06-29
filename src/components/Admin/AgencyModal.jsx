@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Globe, Users, Briefcase, Mail, Phone, MapPin, ExternalLink } from 'lucide-react';
+import { X, Globe, Users, Briefcase, Mail, Phone, MapPin, ExternalLink, FileText } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { api } from '../../utils/api';
@@ -346,6 +346,16 @@ export const AgencyModal = ({ agency, onClose }) => {
                       <Globe size={14} /> Visit Corporate Website <ExternalLink size={11} color="#000" />
                     </a>
                   )}
+                  {ap.portfolio_pdf_url && (
+                    <a
+                      href={ap.portfolio_pdf_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center justify-center gap-1.5 border border-[#23232a] text-white no-underline text-[0.8rem] font-bold p-2 rounded-md text-center bg-[#0c0c0e] transition-colors hover:border-gray-500"
+                    >
+                      <FileText size={14} /> Portfolio PDF <ExternalLink size={11} />
+                    </a>
+                  )}
                   {ap.linkedin_url && (
                     <a
                       href={ap.linkedin_url}
@@ -403,6 +413,7 @@ export const AgencyModal = ({ agency, onClose }) => {
                   <ServiceSpecs serviceDetails={ap.service_details} />
                   <DocumentsList
                     isFreelancer={false}
+                    portfolioPdfUrl={ap.portfolio_pdf_url}
                     verifications={agency.verifications}
                     isAdmin={true}
                   />
