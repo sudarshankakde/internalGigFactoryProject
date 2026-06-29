@@ -183,7 +183,7 @@ export default function AdminProjectMilestones({
                                     : "text-amber-400"
                               }`}
                             >
-                              {del.status}
+                              {del.status === 'rejected' ? 'not selected' : del.status}
                             </span>
                           </div>
 
@@ -203,7 +203,7 @@ export default function AdminProjectMilestones({
                                 }
                                 className="bg-red-500/20 text-red-400 border border-red-500/30 font-bold rounded-[4px] px-[8px] py-[3px] text-[0.68rem] cursor-pointer hover:bg-red-500/30"
                               >
-                                Reject
+                                Not Select
                               </button>
                             </div>
                           )}

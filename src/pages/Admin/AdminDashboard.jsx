@@ -495,13 +495,13 @@ function RejectModal({ request, onClose, onConfirm, isPending }) {
           {!noReason && (
             <div className="mt-[12px]">
               <label className="text-gray-500 text-[0.75rem] font-semibold uppercase tracking-[0.5px] pr-[12px] shrink-0 block mb-[8px]">
-                Reason for Rejection
+                Reason for Not Selecting
               </label>
               <textarea
                 rows={4}
                 value={reason}
                 onChange={e => setReason(e.target.value)}
-                placeholder="Describe why this application is being rejected…"
+                placeholder="Describe why this application is not being selected…"
                 className="w-full bg-[#1f1f1f] border border-[#2c2c2c] rounded-[6px] text-white text-[0.85rem] px-[12px] py-[10px] outline-none resize-y font-inherit"
                 autoFocus
               />
@@ -510,7 +510,7 @@ function RejectModal({ request, onClose, onConfirm, isPending }) {
 
           <div className="flex gap-[10px] mt-[20px]">
             <button type="submit" className="inline-flex items-center gap-[5px] rounded-[5px] text-[0.72rem] font-bold cursor-pointer border-none transition-opacity duration-150 bg-[rgba(239,68,68,0.12)] text-[#ef4444] border border-[rgba(239,68,68,0.3)] px-[16px] py-[8px] flex-1" disabled={isPending}>
-              <X size={14} /> {isPending ? 'Rejecting…' : 'Confirm Rejection'}
+              <X size={14} /> {isPending ? 'Processing…' : 'Confirm Not Selected'}
             </button>
             <button type="button" onClick={onClose} className="inline-flex items-center gap-[5px] rounded-[5px] text-[0.72rem] font-bold cursor-pointer transition-opacity duration-150 bg-transparent border border-[#23232a] text-[#8a8a8a] px-[12px] py-[7px]">
               Cancel
@@ -610,7 +610,7 @@ export default function AdminDashboard() {
         <StatCard label="TOTAL REQUESTS"  value={isLoading ? <span className="skeleton-pulse inline-block w-[40px] h-[28px] rounded-[4px] align-middle" /> : stats.total}    Icon={FileText}  />
         <StatCard label="PENDING REVIEW"  value={isLoading ? <span className="skeleton-pulse inline-block w-[40px] h-[28px] rounded-[4px] align-middle" /> : stats.pending}  Icon={Clock}     accent />
         <StatCard label="APPROVED"        value={isLoading ? <span className="skeleton-pulse inline-block w-[40px] h-[28px] rounded-[4px] align-middle" /> : stats.approved} Icon={Users}     />
-        <StatCard label="REJECTED"        value={isLoading ? <span className="skeleton-pulse inline-block w-[40px] h-[28px] rounded-[4px] align-middle" /> : stats.rejected} Icon={Building2} />
+        <StatCard label="NOT SELECTED"     value={isLoading ? <span className="skeleton-pulse inline-block w-[40px] h-[28px] rounded-[4px] align-middle" /> : stats.rejected} Icon={Building2} />
       </div>
 
       {/* Table card */}
@@ -636,7 +636,7 @@ export default function AdminDashboard() {
                   statusFilter === s ? 'bg-[#70d64d] text-black border-[#70d64d] font-bold' : 'text-gray-500'
                 }`}
               >
-                {s.charAt(0).toUpperCase() + s.slice(1)}
+                {s === 'rejected' ? 'Not Selected' : (s.charAt(0).toUpperCase() + s.slice(1))}
               </button>
             ))}
             <button

@@ -511,7 +511,7 @@ export default function AdminSettings() {
             </div>
             <Section>
               <FormRow label="Default Cooldown Period" id="reg-cooldown"
-                hint="Applied to rejected applicants before they can re-apply">
+                hint="Applied to applicants not selected before they can re-apply">
                 <select id="reg-cooldown" className="settings-select"
                   value={registration.reg_default_cooldown_days}
                   onChange={e => setRegistration(s => ({ ...s, reg_default_cooldown_days: Number(e.target.value) }))}>
@@ -523,7 +523,7 @@ export default function AdminSettings() {
                 </select>
               </FormRow>
               <FormRow label="Max Registration Attempts" id="reg-max"
-                hint="After this many rejections, the applicant is flagged">
+                hint="After this many times of not being selected, the applicant is flagged">
                 <input id="reg-max" type="number" min={1} max={20} className="settings-input"
                   value={registration.reg_max_attempts}
                   onChange={e => setRegistration(s => ({ ...s, reg_max_attempts: Number(e.target.value) }))} />

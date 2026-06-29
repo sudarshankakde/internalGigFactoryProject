@@ -176,7 +176,7 @@ export const RegistrationRequestDetailModal = ({ request, historyData, isLoading
                         return (
                           <div key={log.id} style={{ borderLeft: `2px solid ${c}` }} className="pl-[10px] text-[0.75rem]">
                             <div className="flex justify-between">
-                              <strong style={{ color: c }}>{log.action}</strong>
+                              <strong style={{ color: c }}>{log.action === 'REJECTED' ? 'NOT SELECTED' : log.action}</strong>
                               <span className="text-gray-500 text-[0.65rem]">{new Date(log.created_at).toLocaleDateString()}</span>
                             </div>
                             <div className="text-[#d1d5db] mt-[2px]">
@@ -211,7 +211,7 @@ export const RegistrationRequestDetailModal = ({ request, historyData, isLoading
                 {['approved', 'rejected'].map(v => (
                   <label key={v} className="flex items-center gap-[8px] text-white cursor-pointer">
                     <input type="radio" name="newStatus" value={v} checked={newStatus === v} onChange={() => setNewStatus(v)} className="accent-[#70d64d]" />
-                    {v.charAt(0).toUpperCase() + v.slice(1)} Request
+                    {v === 'rejected' ? 'Not Selected' : (v.charAt(0).toUpperCase() + v.slice(1))} Request
                   </label>
                 ))}
               </div>

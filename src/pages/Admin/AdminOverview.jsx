@@ -220,7 +220,7 @@ export default function AdminOverview() {
                             style={{ background: `${statusColor}18`, color: statusColor }} 
                             className="text-[0.62rem] font-bold px-[7px] py-[2px] rounded-[4px]"
                           >
-                            {req.status?.toUpperCase()}
+                            {req.status === 'rejected' ? 'NOT SELECTED' : req.status?.toUpperCase()}
                           </span>
                           <span className="text-[#4b4b57] text-[0.68rem]">{fmtDate(req.created_at)}</span>
                         </div>
@@ -302,7 +302,7 @@ export default function AdminOverview() {
                             style={{ background: `${statusColor}18`, color: statusColor }} 
                             className="text-[0.62rem] font-bold px-[7px] py-[2px] rounded-[4px]"
                           >
-                            {bid.status?.toUpperCase()}
+                            {bid.status === 'rejected' ? 'NOT SELECTED' : bid.status?.toUpperCase()}
                           </span>
                           <span className="text-[#4b4b57] text-[0.68rem]">{fmtDate(bid.applied_at)}</span>
                         </div>

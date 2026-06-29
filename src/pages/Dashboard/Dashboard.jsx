@@ -107,7 +107,7 @@ export const Dashboard = () => {
 
   useEffect(() => {
     if (rejectQuery.data) {
-      toast.success('Registration request rejected.');
+      toast.success('Registration request set to not selected.');
       queryClient.invalidateQueries({ queryKey: ['registrationRequests'] });
       setRejectTarget(null);
       setRejectParams(null);
@@ -116,7 +116,7 @@ export const Dashboard = () => {
 
   useEffect(() => {
     if (rejectQuery.error) {
-      toast.error(rejectQuery.error.message || 'Rejection failed.');
+      toast.error(rejectQuery.error.message || 'Failed to update status.');
       setRejectParams(null);
     }
   }, [rejectQuery.error]);

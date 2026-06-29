@@ -550,7 +550,7 @@ export const AdminUserProfile = () => {
                               <span className={`text-[0.65rem] font-bold px-2 py-0.5 rounded uppercase ${
                                 app.status === 'accepted' ? 'bg-[#70d64d]/12 text-[#70d64d]' : app.status === 'rejected' ? 'bg-red-500/12 text-red-400' : app.status === 'shortlisted' ? 'bg-amber-500/12 text-amber-400' : 'bg-gray-500/12 text-gray-400'
                               }`}>
-                                {app.status || 'applied'}
+                                {app.status === 'rejected' ? 'not selected' : (app.status || 'applied')}
                               </span>
                             </td>
                             <td className="p-4">
@@ -577,7 +577,7 @@ export const AdminUserProfile = () => {
                                       onClick={() => handleUpdateBidStatus(app.id, 'rejected')}
                                       className="bg-transparent border border-[#ef4444]/40 hover:bg-[#ef4444]/10 text-[#ef4444] text-[0.65rem] px-2 py-0.5 rounded font-bold cursor-pointer transition-all"
                                     >
-                                      Reject
+                                      Not Select
                                     </button>
                                   </>
                                 ) : app.status === 'accepted' ? (
@@ -619,7 +619,7 @@ export const AdminUserProfile = () => {
                                       onClick={() => handleUpdateBidStatus(app.id, 'rejected')}
                                       className="bg-transparent border border-[#ef4444]/40 hover:bg-[#ef4444]/10 text-[#ef4444] text-[0.65rem] px-2 py-0.5 rounded font-bold cursor-pointer transition-all"
                                     >
-                                      Reject
+                                      Not Select
                                     </button>
                                   </>
                                 )}

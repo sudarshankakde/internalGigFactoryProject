@@ -100,7 +100,7 @@ export default function ProjectDetailView() {
   const handleApprove = (appId) => {
     showConfirm({
       title: 'Approve Bid & Assign Project',
-      message: 'Are you sure you want to approve this application and assign the project? All other bids will be auto-rejected.',
+      message: 'Are you sure you want to approve this application and assign the project? All other bids will automatically be set to not selected.',
       onConfirm: async () => {
         try {
           await api.post(`/projects/applications/${appId}/approve`, { remarks: 'Approved from details portal' });
@@ -116,13 +116,13 @@ export default function ProjectDetailView() {
 
   const handleReject = (appId) => {
     showConfirm({
-      title: 'Reject Bid',
-      message: 'Are you sure you want to reject this bid?',
+      title: 'Not Select Bid',
+      message: "Are you sure you want to set this bid's status to not selected?",
       variant: 'danger',
       onConfirm: async () => {
         try {
           await api.put(`/projects/applications/${appId}/status`, { status: 'rejected', remarks: 'Rejected from details portal' });
-          toast.success('Bid rejected successfully.');
+          toast.success('Bid set to not selected successfully.');
           queryClient.invalidateQueries({ queryKey: ['admin-project-detail', id] });
           queryClient.invalidateQueries({ queryKey: ['admin-projects'] });
         } catch (err) {

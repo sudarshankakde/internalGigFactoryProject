@@ -130,7 +130,7 @@ export default function ProjectSidebar({
                         : "#f59e0b",
                 }}
               >
-                {myApplication.status || "applied"}
+                {myApplication.status === 'rejected' ? 'not selected' : (myApplication.status || "applied")}
               </span>
             </div>
           </div>
