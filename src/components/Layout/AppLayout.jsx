@@ -582,8 +582,8 @@ export default function AppLayout({ children, pageTitle }) {
                     </span>
                     <span className="topbar-profile-role">
                       {role === "admin"
-                        ? "Super Admin"
-                        : role.charAt(0).toUpperCase() + role.slice(1)}
+                        ? "Super Admin" 
+                        : role === "gig_expert" ? "Gig Expert" : role.charAt(0).toUpperCase() + role.slice(1)}
                     </span>
                   </div>
                   {avatarUrl ? (
