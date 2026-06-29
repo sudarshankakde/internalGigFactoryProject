@@ -165,7 +165,7 @@ export const AdminUserProfile = () => {
 
   const { user, assignedProjects = [], applications = [], paymentTracking = [], milestonePayments = [] } = data;
   const isGigExpert = user.role === "gig_expert";
-  const fp = user.freelancer_profile || {};
+  const fp = user.gig_expert_profile || {};
   const ap = user.agency_profile || {};
 
 
@@ -187,7 +187,7 @@ export const AdminUserProfile = () => {
   const initials = getInitials(name);
 
   const skills = isGigExpert
-    ? fp.freelancer_skills || []
+    ? fp.gig_expert_skills || []
     : (ap.service_details?.selectedServices || []).map((code) => ({
         skill_name: SERVICE_LABELS[code] || code,
       }));

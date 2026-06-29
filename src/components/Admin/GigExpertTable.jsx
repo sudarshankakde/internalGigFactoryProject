@@ -56,8 +56,8 @@ export const GigExpertTable = ({ gigExperts, isLoading, onSelectGigExpert, statu
                 </td>
               </tr>
             ) : gigExperts.map(f => {
-              const fp = f.freelancer_profile;
-              const skills = fp?.freelancer_skills?.slice(0, 3).map(s => s.skill_name) || [];
+              const fp = f.gig_expert_profile;
+              const skills = fp?.gig_expert_skills?.slice(0, 3).map(s => s.skill_name) || [];
               return (
                 <tr 
                   key={f.id}
@@ -94,8 +94,8 @@ export const GigExpertTable = ({ gigExperts, isLoading, onSelectGigExpert, statu
                       {skills.map(s => (
                         <span key={s} className="bg-[#1e293b] text-[#38bdf8] text-[0.62rem] font-semibold px-[6px] py-[2px] rounded-[4px]">{s}</span>
                       ))}
-                      {(fp?.freelancer_skills?.length || 0) > 3 && (
-                        <span className="text-gray-500 text-[0.62rem] px-[4px] py-[2px]">+{fp.freelancer_skills.length - 3}</span>
+                      {(fp?.gig_expert_skills?.length || 0) > 3 && (
+                        <span className="text-gray-500 text-[0.62rem] px-[4px] py-[2px]">+{fp.gig_expert_skills.length - 3}</span>
                       )}
                     </div>
                   </td>

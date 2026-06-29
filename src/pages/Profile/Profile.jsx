@@ -143,7 +143,7 @@ export const Profile = () => {
         commercialBasis: profile?.commercial_basis || '',
         noticePeriod: profile?.notice_period || '',
         selectedServices: initialSelectedServices,
-        skillsList: (profile?.freelancer_skills || []).map(s => s.skill_name).join(', '),
+        skillsList: (profile?.gig_expert_skills || []).map(s => s.skill_name).join(', '),
         bimDetails,
         auditDetails,
         peerReviewDetails,
@@ -342,7 +342,7 @@ export const Profile = () => {
   const initials = getInitials(name);
 
   const skills = isGigExpert 
-    ? (profile?.freelancer_skills || [])
+    ? (profile?.gig_expert_skills || [])
     : (profile?.service_details?.selectedServices || []).map(code => ({ skill_name: SERVICE_LABELS[code] || code }));
   
   return (

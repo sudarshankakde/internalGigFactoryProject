@@ -77,8 +77,8 @@ export const GigExpertModal = ({ gigExpert, onClose }) => {
   });
 
   if (!gigExpert) return null;
-  const fp = gigExpert.freelancer_profile || {};
-  const skills = fp?.freelancer_skills?.map(s => s.skill_name) || [];
+  const fp = gigExpert.gig_expert_profile || {};
+  const skills = fp?.gig_expert_skills?.map(s => s.skill_name) || [];
 
   const statusCfg = STATUS_CFG[gigExpert.account_status] || STATUS_CFG.pending;
 
@@ -380,7 +380,7 @@ export const GigExpertModal = ({ gigExpert, onClose }) => {
                 <div className="profile-details-right-pane">
                   <CapabilityCloud
                     isGigExpert={true}
-                    skills={fp.freelancer_skills || []}
+                    skills={fp.gig_expert_skills || []}
                   />
                   <ServiceSpecs serviceDetails={fp.service_details} />
                   <DocumentsList

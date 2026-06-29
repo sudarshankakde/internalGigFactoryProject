@@ -306,7 +306,7 @@ const Login = () => {
 
         {/* Header */}
         <h1 className="login-title">LOGIN TO PORTAL</h1> 
-        <p className="login-subtitle">GET BEST GIG OUT THERE</p> 
+        <p className="login-subtitle">Building Intelligence, Growing Together.</p> 
 
         <hr className="divider-line" />
 

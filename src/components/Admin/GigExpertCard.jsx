@@ -63,8 +63,8 @@ export const GigExpertCard = ({ gigExperts, isLoading, onSelectGigExpert, status
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-[16px]">
       {gigExperts.map(f => {
-        const fp = f.freelancer_profile;
-        const skills = fp?.freelancer_skills?.slice(0, 3).map(s => s.skill_name) || [];
+        const fp = f.gig_expert_profile;
+        const skills = fp?.gig_expert_skills?.slice(0, 3).map(s => s.skill_name) || [];
         return (
           <div
             key={f.id}
@@ -112,9 +112,9 @@ export const GigExpertCard = ({ gigExperts, isLoading, onSelectGigExpert, status
                   {s}
                 </span>
               ))}
-              {(fp?.freelancer_skills?.length || 0) > 3 && (
+              {(fp?.gig_expert_skills?.length || 0) > 3 && (
                 <span className="text-gray-500 text-[0.62rem] px-[4px] py-[2px] self-center">
-                  +{fp.freelancer_skills.length - 3} more
+                  +{fp.gig_expert_skills.length - 3} more
                 </span>
               )}
               {skills.length === 0 && (
