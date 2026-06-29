@@ -64,7 +64,7 @@ const NAV_CONFIG = {
     { label: "Communication", icon: Mail, to: "/admin/communication" },
     { label: "Settings", icon: Settings, to: "/admin/settings" },
   ],
-  gigExpert: [
+  gig_expert: [
     { label: "Dashboard", icon: LayoutDashboard, to: "/dashboard" },
     { label: "Browse Projects", icon: Briefcase, to: "/projects" },
     { label: "My Applications", icon: FileCheck, to: "/applications" },

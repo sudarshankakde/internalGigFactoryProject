@@ -6,7 +6,7 @@ const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
 
 const ROLE_STYLES = {
-  gigExpert: { bg: '#1e293b', color: '#38bdf8' },
+  gig_expert: { bg: '#1e293b', color: '#38bdf8' },
   agency:     { bg: '#2e1065', color: '#c084fc' },
 };
 

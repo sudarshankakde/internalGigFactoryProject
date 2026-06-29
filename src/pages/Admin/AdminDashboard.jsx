@@ -17,7 +17,7 @@ const STATUS_STYLES = {
   rejected: { bg: 'rgba(239,68,68,0.12)',   color: '#ef4444' },
 };
 const ROLE_STYLES = {
-  gigExpert: { bg: '#1e293b', color: '#38bdf8' },
+  gig_expert: { bg: '#1e293b', color: '#38bdf8' },
   agency:     { bg: '#2e1065', color: '#c084fc' },
 };
 
