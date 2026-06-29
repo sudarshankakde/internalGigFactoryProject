@@ -97,7 +97,7 @@ export default function BrowseProjects() {
       {/* Header Block */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="space-y-1">
-          <h2 className="text-white font-extrabold text-[1.4rem] m-0">Available Projects</h2>
+          <h2 className="font-extrabold text-[1.4rem] m-0" style={{color:'var(--text)'}}>Available Projects</h2>
           <p className="text-gray-500 text-[0.82rem] m-0">Browse and apply to projects that match your skills</p>
         </div>
         
@@ -233,7 +233,8 @@ export default function BrowseProjects() {
               return (
                 <article 
                   key={project.id} 
-                  className="bg-[#121215] border border-[#23232a] rounded-[10px] p-6 hover:border-[#70d64d] hover:shadow-[0_4px_20px_rgba(112,214,77,0.08)] hover:-translate-y-[2px] transition-all duration-200 flex flex-col relative"
+                  className="rounded-[10px] p-6 hover:border-[#70d64d] hover:shadow-[0_4px_20px_rgba(112,214,77,0.08)] hover:-translate-y-[2px] transition-all duration-200 flex flex-col relative"
+                  style={{backgroundColor:'var(--bg-card)',border:'1px solid var(--border)'}}
                 >
                                    {/* Header Row */}
                   <header className="flex flex-col sm:flex-row justify-between items-start gap-3 mb-3 min-w-0 w-full">
@@ -308,7 +309,7 @@ export default function BrowseProjects() {
                       <div className="w-9 h-9 bg-[#121215] border border-[#23232a] rounded-[6px] flex items-center justify-center text-md shrink-0">💰</div>
                       <div className="flex flex-col min-w-0">
                         <span className="text-[10px] font-bold text-gray-500 tracking-wider uppercase truncate">BUDGET</span>
-                        <span className="text-[0.85rem] font-bold text-white truncate">{formattedBudget}</span>
+                  <span className="font-bold text-[0.85rem] truncate" style={{color:'var(--text)'}}>{formattedBudget}</span>
                       </div>
                     </div>
                     
@@ -316,9 +317,7 @@ export default function BrowseProjects() {
                       <div className="w-9 h-9 bg-[#121215] border border-[#23232a] rounded-[6px] flex items-center justify-center text-md shrink-0">📅</div>
                       <div className="flex flex-col min-w-0">
                         <span className="text-[10px] font-bold text-gray-500 tracking-wider uppercase truncate">START DATE</span>
-                        <span className="text-[0.85rem] font-bold text-white">
-                          {renderWithTbdTooltip(formattedStartDate, "To Be Decided / Determined by client")}
-                        </span>
+                          <span className="text-[0.85rem] font-bold" style={{color:'var(--text)'}}>{renderWithTbdTooltip(formattedStartDate, "To Be Decided / Determined by client")}</span>
                       </div>
                     </div>
                     
@@ -326,9 +325,7 @@ export default function BrowseProjects() {
                       <div className="w-9 h-9 bg-[#121215] border border-[#23232a] rounded-[6px] flex items-center justify-center text-md shrink-0">⏱️</div>
                       <div className="flex flex-col min-w-0">
                         <span className="text-[10px] font-bold text-gray-500 tracking-wider uppercase truncate">EST. HOURS</span>
-                        <span className="text-[0.85rem] font-bold text-white">
-                          {renderWithTbdTooltip(formattedHours, "To Be Determined based on requirements")}
-                        </span>
+                          <span className="text-[0.85rem] font-bold" style={{color:'var(--text)'}}>{renderWithTbdTooltip(formattedHours, "To Be Determined based on requirements")}</span>
                       </div>
                     </div>
 
@@ -336,9 +333,7 @@ export default function BrowseProjects() {
                       <div className="w-9 h-9 bg-[#121215] border border-[#23232a] rounded-[6px] flex items-center justify-center text-md shrink-0">📅</div>
                       <div className="flex flex-col min-w-0">
                         <span className="text-[10px] font-bold text-gray-500 tracking-wider uppercase truncate">DEADLINE</span>
-                        <span className="text-[0.85rem] font-bold text-white">
-                          {renderWithTbdTooltip(formattedDeadline, "To Be Decided / Finalized by client")}
-                        </span>
+                          <span className="text-[0.85rem] font-bold" style={{color:'var(--text)'}}>{renderWithTbdTooltip(formattedDeadline, "To Be Decided / Finalized by client")}</span>
                       </div>
                     </div>
 

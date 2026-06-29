@@ -482,3 +482,90 @@
 .settings-signature-row {
   align-items: center;
 }
+
+/* ─── Light Mode Overrides ─────────────────────────────────────────── */
+html:not(.dark) .settings-tab-nav-horizontal {
+  border-bottom-color: var(--border) !important;
+}
+
+html:not(.dark) .settings-tab-btn-horizontal {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .settings-tab-btn-horizontal:hover {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .settings-section {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .settings-section-header,
+html:not(.dark) .settings-pane-header {
+  border-bottom-color: var(--border) !important;
+}
+
+html:not(.dark) .settings-pane-header h2,
+html:not(.dark) .settings-section-title,
+html:not(.dark) .settings-label,
+html:not(.dark) .notif-matrix-label {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .settings-hint,
+html:not(.dark) .settings-section-desc,
+html:not(.dark) .notif-matrix-desc {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .settings-input,
+html:not(.dark) .settings-textarea,
+html:not(.dark) .settings-select {
+  background: var(--bg-page) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .settings-form-row,
+html:not(.dark) .notif-matrix-header,
+html:not(.dark) .notif-matrix-row {
+  border-bottom-color: var(--border) !important;
+}
+
+html:not(.dark) .settings-row-actions {
+  background: var(--bg-page) !important;
+  border-top: 1px solid var(--border) !important;
+}
+
+html:not(.dark) .settings-toggle.off {
+  background: var(--border) !important;
+}
+
+html:not(.dark) .signature-canvas-wrapper {
+  background: var(--bg-page) !important;
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .pwd-toggle {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .pwd-toggle:hover {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .settings-secondary-btn {
+  border-color: #70d64d !important;
+  color: #70d64d !important;
+}
+
+html:not(.dark) .settings-signature-upload-btn {
+  border-color: var(--border) !important;
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .settings-signature-preview-wrap {
+  border-color: var(--border) !important;
+}
+

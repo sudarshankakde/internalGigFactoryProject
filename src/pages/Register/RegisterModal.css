@@ -620,3 +620,46 @@
     right: 16px;
   }
 }
+
+/* Light Mode Overrides */
+html:not(.dark) .register-modal-card {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .register-modal-card input,
+html:not(.dark) .register-modal-card select,
+html:not(.dark) .register-modal-card textarea {
+  background-color: var(--bg-page) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .nav-step-item {
+  background-color: var(--bg-card) !important;
+}
+
+html:not(.dark) .nested-service-panel {
+  background-color: var(--bg-page) !important;
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .nested-panel-title {
+  border-bottom-color: var(--border) !important;
+}
+
+html:not(.dark) .software-chip {
+  background-color: var(--bg-page) !important;
+  border-color: var(--border) !important;
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .software-chip:hover {
+  border-color: var(--accent-lime) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .wizard-back-btn:hover {
+  background-color: var(--bg-page) !important;
+}
+

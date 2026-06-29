@@ -169,3 +169,39 @@
   cursor: pointer;
   text-align: left;
 }
+
+/* ─── Light Mode Overrides ─────────────────────────────────────────── */
+html:not(.dark) .portal-sidebar {
+  background-color: var(--bg-card) !important;
+  border-right-color: var(--border) !important;
+}
+
+html:not(.dark) .brand-logo-accent {
+  background-color: var(--bg-page) !important;
+}
+
+html:not(.dark) .brand-text {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .sidebar-nav-label,
+html:not(.dark) .sidebar-section-label {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .sidebar-nav-item,
+html:not(.dark) .sidebar-nav-link {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .sidebar-nav-item:hover,
+html:not(.dark) .sidebar-nav-link:hover {
+  background-color: var(--bg-page) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .sidebar-nav-item.active,
+html:not(.dark) .sidebar-nav-link.active {
+  background-color: rgba(112, 214, 77, 0.1) !important;
+  color: #70d64d !important;
+}

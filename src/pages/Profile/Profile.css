@@ -770,12 +770,14 @@ html:not(.dark) .work-history-card,
 html:not(.dark) .capability-cloud-card,
 html:not(.dark) .service-specs-card,
 html:not(.dark) .documents-list-card,
-html:not(.dark) .team-structure-card {
+html:not(.dark) .team-structure-card,
+html:not(.dark) .pane-content-card {
   background-color: var(--bg-card) !important;
   border-color: var(--border) !important;
   background: var(--bg-card) !important;
 }
 
+html:not(.dark) .pane-content-card h3,
 html:not(.dark) .profile-identity-main h1,
 html:not(.dark) .profile-about-card h2,
 html:not(.dark) .work-history-card h2,
@@ -831,4 +833,92 @@ html:not(.dark) .history-timeline-line {
 html:not(.dark) .history-timeline-dot {
   background-color: var(--accent) !important;
   border-color: var(--bg-card) !important;
+}
+
+/* Light Mode Overrides for Edit Profile Modal */
+html:not(.dark) .profile-modal-card {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.1) !important;
+}
+
+html:not(.dark) .profile-modal-header,
+html:not(.dark) .profile-modal-tabs,
+html:not(.dark) .profile-modal-footer {
+  border-color: var(--border) !important;
+  background-color: var(--bg-page) !important;
+}
+
+html:not(.dark) .profile-modal-header h2 {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .tab-link {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .tab-link:hover {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .tab-link.active {
+  color: #70d64d !important;
+  border-bottom-color: #70d64d !important;
+}
+
+html:not(.dark) .form-group label {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .form-group input,
+html:not(.dark) .form-group select,
+html:not(.dark) .form-group textarea {
+  background-color: var(--bg-page) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .profile-modal-footer .btn-cancel {
+  border-color: var(--border) !important;
+  color: var(--text-muted) !important;
+  background: transparent !important;
+}
+
+html:not(.dark) .profile-modal-footer .btn-cancel:hover {
+  color: var(--text) !important;
+  border-color: var(--text-muted) !important;
+}
+
+html:not(.dark) .service-checkbox-card {
+  background-color: var(--bg-page) !important;
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .service-checkbox-card:hover {
+  border-color: #b5ff14 !important;
+}
+
+html:not(.dark) .checkbox-label {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .nested-service-panel {
+  background-color: var(--bg-page) !important;
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .nested-panel-title {
+  color: var(--text) !important;
+  border-bottom-color: var(--border) !important;
+}
+
+html:not(.dark) .software-chip {
+  background-color: var(--bg-page) !important;
+  border-color: var(--border) !important;
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .software-chip:hover {
+  border-color: var(--text-muted) !important;
+  color: var(--text) !important;
 }

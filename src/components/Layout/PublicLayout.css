@@ -149,3 +149,24 @@
     padding: 0 16px;
   }
 }
+
+/* Light Mode Overrides */
+html:not(.dark) .public-layout-container {
+  background-color: #fafafa;
+  color: #18181b;
+}
+
+html:not(.dark) .public-header {
+  background: rgba(255, 255, 255, 0.8);
+  border-bottom-color: #e4e4e7;
+}
+
+html:not(.dark) .public-nav-link:hover {
+  color: #09090b;
+}
+
+html:not(.dark) .public-footer {
+  background-color: #ffffff;
+  border-top-color: #e4e4e7;
+}
+

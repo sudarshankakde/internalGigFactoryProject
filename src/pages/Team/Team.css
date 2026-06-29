@@ -427,3 +427,111 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* ─── Light Mode Overrides ─────────────────────────────────────────── */
+html:not(.dark) .team-header-panel,
+html:not(.dark) .team-controls-bar,
+html:not(.dark) .member-card,
+html:not(.dark) .team-empty-placeholder,
+html:not(.dark) .team-modal-overlay .team-modal-card {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .team-header-info h1,
+html:not(.dark) .member-name,
+html:not(.dark) .team-empty-placeholder h3,
+html:not(.dark) .team-modal-card h2 {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .team-header-info p,
+html:not(.dark) .team-empty-placeholder p,
+html:not(.dark) .detail-item,
+html:not(.dark) .card-action-btn {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .member-avatar {
+  background-color: var(--bg-page) !important;
+  border-color: #b5ff14 !important;
+}
+
+html:not(.dark) .search-input-field {
+  background-color: var(--bg-page) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .search-input-field:focus {
+  border-color: #b5ff14 !important;
+}
+
+html:not(.dark) .designation-badge {
+  background-color: var(--bg-page) !important;
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .member-details-list {
+  border-top-color: var(--border) !important;
+  border-bottom-color: var(--border) !important;
+}
+
+html:not(.dark) .card-action-btn {
+  background-color: var(--bg-page) !important;
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .card-action-btn:hover {
+  color: var(--text) !important;
+  border-color: var(--text-muted) !important;
+}
+
+html:not(.dark) .team-modal-overlay {
+  background: rgba(0, 0, 0, 0.35) !important;
+}
+
+html:not(.dark) .team-modal-card {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .team-modal-header {
+  border-bottom-color: var(--border) !important;
+}
+
+html:not(.dark) .team-modal-footer {
+  border-top-color: var(--border) !important;
+}
+
+html:not(.dark) .team-form-group label {
+  color: var(--text-muted) !important;
+}
+
+
+html:not(.dark) .team-form-input,
+html:not(.dark) .team-form-select {
+  background-color: var(--bg-page) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .team-modal-footer {
+  background-color: var(--bg-page) !important;
+}
+
+html:not(.dark) .team-modal-footer .btn-cancel {
+  border-color: var(--border) !important;
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .team-modal-footer .btn-cancel:hover {
+  color: var(--text) !important;
+  border-color: var(--text-muted) !important;
+}
+
+html:not(.dark) .team-add-member-card {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+

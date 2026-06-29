@@ -711,3 +711,136 @@ html:not(.dark) input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(0);
 }
 
+/* Sidebar nav items in light mode */
+html:not(.dark) .app-sidebar {
+  background: var(--bg-card) !important;
+  border-right-color: var(--border) !important;
+}
+
+html:not(.dark) .sidebar-nav-item {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .sidebar-nav-item:hover {
+  background: var(--bg-page) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .sidebar-nav-item.active {
+  background: rgba(112, 214, 77, 0.1) !important;
+  color: #4a8a2c !important;
+}
+
+html:not(.dark) .sidebar-nav-item.active .nav-icon {
+  color: #4a8a2c !important;
+}
+
+html:not(.dark) .nav-section-label {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .sidebar-bottom {
+  border-top-color: var(--border) !important;
+}
+
+/* Topbar in light mode */
+html:not(.dark) .app-topbar {
+  background: var(--bg-card) !important;
+  border-bottom-color: var(--border) !important;
+}
+
+html:not(.dark) .topbar-page-title {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .topbar-hamburger,
+html:not(.dark) .topbar-icon-btn {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .topbar-hamburger:hover,
+html:not(.dark) .topbar-icon-btn:hover {
+  background: var(--bg-page) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .topbar-divider {
+  background: var(--border) !important;
+}
+
+html:not(.dark) .topbar-name {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .topbar-profile-role {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .topbar-profile-avatar-circle {
+  background: #e4e4e7 !important;
+  color: var(--text) !important;
+}
+
+/* Notification panel in light mode */
+html:not(.dark) .notif-dropdown {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .notif-header {
+  border-bottom-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .notif-mark-all-btn,
+html:not(.dark) .notif-close {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .notif-item-title {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .notif-item-time,
+html:not(.dark) .notif-item-body {
+  color: var(--text-muted) !important;
+}
+
+/* Profile dropdown in light mode */
+html:not(.dark) .profile-dd-header {
+  border-bottom-color: var(--border) !important;
+}
+
+html:not(.dark) .profile-dd-name {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .profile-dd-role {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .profile-dd-item {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .profile-dd-footer {
+  border-top-color: var(--border) !important;
+}
+
+/* Scrollbar in light mode */
+html:not(.dark) ::-webkit-scrollbar-track {
+  background: #f4f4f5;
+}
+
+html:not(.dark) ::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+}
+
+html:not(.dark) ::-webkit-scrollbar-thumb:hover {
+  background: #70d64d;
+}
+
+html:not(.dark) * {
+  scrollbar-color: #d4d4d8 #f4f4f5;
+}
+

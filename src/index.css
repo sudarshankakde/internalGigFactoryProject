@@ -435,3 +435,131 @@ html:not(.dark) .sidebar-logo-text {
 html:not(.dark) .sidebar-brand {
   border-bottom-color: var(--border) !important;
 }
+
+/* ─── Tailwind inline-class overrides for light mode ─────────────────────── */
+
+/* 1. Main card and outer container backgrounds: #121215, #141416, #121212, #18181b */
+html:not(.dark) [class*="bg-[#121215]"],
+html:not(.dark) [class*="bg-[#141416]"],
+html:not(.dark) [class*="bg-[#121212]"],
+html:not(.dark) [class*="bg-[#18181b]"] {
+  background-color: var(--bg-card) !important;
+}
+
+/* 2. Page, input, inner container, icon box backgrounds: #0c0c0e, #0c0c10, #0d0d11, #111114, #111115 */
+html:not(.dark) [class*="bg-[#0c0c0e]"],
+html:not(.dark) [class*="bg-[#0c0c10]"],
+html:not(.dark) [class*="bg-[#0d0d11]"],
+html:not(.dark) [class*="bg-[#111114]"],
+html:not(.dark) [class*="bg-[#111115]"] {
+  background-color: var(--bg-page) !important;
+}
+
+/* 3. Outer modals, items, hover highlights: #1c1c22, #18181b, #1a1a20, #1a1a22, #1f1f23, #252530 */
+html:not(.dark) [class*="bg-[#1c1c22]"],
+html:not(.dark) [class*="bg-[#18181b]"],
+html:not(.dark) [class*="bg-[#1a1a20]"],
+html:not(.dark) [class*="bg-[#1a1a22]"],
+html:not(.dark) [class*="bg-[#1f1f23]"],
+html:not(.dark) [class*="bg-[#252530]"] {
+  background-color: #f4f4f5 !important;
+}
+
+/* 4. Borders: #23232a, #232328, #2d2d30, #2d2d38, #1f1f24 */
+html:not(.dark) [class*="border-[#23232a]"],
+html:not(.dark) [class*="border-[#232328]"],
+html:not(.dark) [class*="border-[#2d2d30]"],
+html:not(.dark) [class*="border-[#2d2d38]"],
+html:not(.dark) [class*="border-[#1f1f24]"] {
+  border-color: var(--border) !important;
+}
+
+/* 5. Text colors - White/light text inside cards: text-white, text-gray-100, text-gray-200 */
+html:not(.dark) [class*="text-white"],
+html:not(.dark) [class*="text-gray-100"],
+html:not(.dark) [class*="text-gray-200"] {
+  color: var(--text) !important;
+}
+
+/* 6. Muted text: text-gray-300, text-gray-400, text-gray-500, text-[#8a8f98], text-[#6c727f], text-[#a1a1aa], text-[#8a8a8a] */
+html:not(.dark) [class*="text-gray-300"],
+html:not(.dark) [class*="text-gray-400"],
+html:not(.dark) [class*="text-gray-500"],
+html:not(.dark) [class*="text-[#8a8f98]"],
+html:not(.dark) [class*="text-[#6c727f]"],
+html:not(.dark) [class*="text-[#a1a1aa]"],
+html:not(.dark) [class*="text-[#8a8a8a]"] {
+  color: var(--text-muted) !important;
+}
+
+/* 7. Hover text: hover:text-white */
+html:not(.dark) [class*="hover:text-white"]:hover {
+  color: var(--text) !important;
+}
+
+/* 8. Neutral button background */
+html:not(.dark) [class*="bg-[#1a1a20]"],
+html:not(.dark) [class*="bg-[#1e1e24]"] {
+  background-color: #f4f4f5 !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+html:not(.dark) [class*="bg-[#1a1a20]"]:hover,
+html:not(.dark) [class*="bg-[#1e1e24]"]:hover {
+  background-color: #e4e4e7 !important;
+}
+
+/* Heading text colors inside portal in light mode */
+html:not(.dark) .app-shell h1,
+html:not(.dark) .app-shell h2,
+html:not(.dark) .app-shell h3 { color: var(--text) !important; }
+
+/* Inline text color fix for text-white spans in card body */
+html:not(.dark) .app-shell span[class*="text-white"] { color: var(--text) !important; }
+
+/* Global selects */
+html:not(.dark) select {
+  color: var(--text) !important;
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+
+/* Modals */
+html:not(.dark) .apply-modal-overlay,
+html:not(.dark) .modal-overlay { background: rgba(0, 0, 0, 0.4) !important; }
+html:not(.dark) .apply-modal,
+html:not(.dark) .modal-card {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+
+/* Quill editor in light mode */
+html:not(.dark) .gf-quill-wrapper {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+html:not(.dark) .gf-quill-wrapper .ql-container,
+html:not(.dark) .gf-quill-wrapper .ql-editor {
+  background: var(--bg-card) !important;
+  color: var(--text) !important;
+}
+html:not(.dark) .gf-quill-wrapper .ql-toolbar {
+  background: var(--bg-page) !important;
+  border-bottom-color: var(--border) !important;
+}
+html:not(.dark) .gf-quill-wrapper .ql-toolbar .ql-stroke { stroke: var(--text-muted) !important; }
+html:not(.dark) .gf-quill-wrapper .ql-toolbar .ql-fill { fill: var(--text-muted) !important; }
+html:not(.dark) .gf-quill-wrapper .ql-toolbar .ql-picker-label { color: var(--text-muted) !important; }
+
+/* Date input in light mode */
+html:not(.dark) input[type="date"] {
+  color-scheme: light;
+  background-color: var(--bg-card) !important;
+  color: var(--text) !important;
+}
+
+/* Scrollbar in light mode */
+html:not(.dark) ::-webkit-scrollbar-track { background: #f4f4f5; }
+html:not(.dark) ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 4px; }
+html:not(.dark) ::-webkit-scrollbar-thumb:hover { background: #70d64d; }
+html:not(.dark) * { scrollbar-color: #d4d4d8 #f4f4f5; }

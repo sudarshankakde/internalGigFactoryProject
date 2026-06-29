@@ -357,3 +357,88 @@
     gap: 10px;
   }
 }
+
+/* ─── Light Mode Overrides ─────────────────────────────────────────── */
+html:not(.dark) .empty-projects-card-panel {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .empty-projects-card-panel h2 {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .empty-projects-card-panel p,
+html:not(.dark) .projects-loading-screen,
+html:not(.dark) .projects-error-screen {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .empty-illustrative-icon {
+  background-color: var(--bg-page) !important;
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .engagement-tracker-card,
+html:not(.dark) .recent-activity-card {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .tracker-card-header {
+  border-bottom-color: var(--border) !important;
+}
+
+html:not(.dark) .tracker-card-header h3,
+html:not(.dark) .progress-label-row strong,
+html:not(.dark) .m-value,
+html:not(.dark) .activity-card-header h3,
+html:not(.dark) .event-content-body strong,
+html:not(.dark) .milestone-check-row .text-pending {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .client-attribution-text,
+html:not(.dark) .m-label,
+html:not(.dark) .progress-label-row,
+html:not(.dark) .tracker-milestones-block h4,
+html:not(.dark) .event-timestamp,
+html:not(.dark) .milestone-check-row .text-done {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .tracker-metrics-row {
+  background-color: var(--bg-page) !important;
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .progress-bar-track {
+  background-color: var(--border) !important;
+}
+
+html:not(.dark) .milestones-checklist-grid {
+  border-left-color: var(--border) !important;
+}
+
+html:not(.dark) .view-details-action-btn {
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .event-icon-wrapper {
+  background-color: var(--bg-page) !important;
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .insight-summary-card {
+  background: linear-gradient(135deg, var(--bg-card) 0%, #f0f9e8 100%) !important;
+  border-color: #c7e8a0 !important;
+}
+
+html:not(.dark) .insight-summary-card h3 {
+  color: #3a7a00 !important;
+}
+
+html:not(.dark) .insight-summary-card p {
+  color: var(--text) !important;
+}

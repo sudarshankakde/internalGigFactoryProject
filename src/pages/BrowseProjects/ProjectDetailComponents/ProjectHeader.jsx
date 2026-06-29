@@ -30,12 +30,12 @@ export default function ProjectHeader({
   formattedHours,
 }) {
   return (
-    <div className="bg-[#121215] border border-[#23232a] rounded-[10px] p-6 sm:p-8 flex flex-col gap-6 relative">
+    <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-[10px] p-6 sm:p-8 flex flex-col gap-6 relative" style={{backgroundColor:'var(--bg-card)',borderColor:'var(--border)'}}>
       <div className="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
         <div>
           {/* Badges */}
           <div className="flex items-center gap-[8px] flex-wrap">
-            <span className="bg-[#0c0c0e] border border-[#23232a] text-white text-[0.65rem] px-[10px] py-[4px] rounded-[4px] font-bold uppercase tracking-wider">
+            <span className="border text-[0.65rem] px-[10px] py-[4px] rounded-[4px] font-bold uppercase tracking-wider" style={{backgroundColor:'var(--bg-page)',borderColor:'var(--border)',color:'var(--text)'}}>
               {project.project_type || "FIXED"}
             </span>
             <span
@@ -50,7 +50,7 @@ export default function ProjectHeader({
           </div>
 
           {/* Title */}
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mt-4 mb-2 leading-tight break-words">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mt-4 mb-2 leading-tight break-words" style={{color:'var(--text)'}}>
             {project.title}
           </h1>
 
@@ -119,7 +119,7 @@ export default function ProjectHeader({
       </div>
 
       {/* Summary grid */}
-      <div className="grid grid-cols-1 min-[375px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 mt-6 pt-6 border-t border-[#23232a] w-full">
+      <div className="grid grid-cols-1 min-[375px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 mt-6 pt-6 border-t w-full" style={{borderColor:'var(--border)'}}>
         {/* Budget */}
         <div className="flex items-start gap-3 min-w-0">
           <Wallet className="text-[#8a8a8a] mt-1 shrink-0" size={18} />
@@ -127,7 +127,7 @@ export default function ProjectHeader({
             <span className="text-gray-500 text-[0.68rem] font-bold uppercase tracking-wider block">
               Budget
             </span>
-            <span className="text-white font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block truncate">
+            <span className="font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block truncate" style={{color:'var(--text)'}}>
               {formattedBudget}
             </span>
           </div>
@@ -139,7 +139,7 @@ export default function ProjectHeader({
             <span className="text-gray-500 text-[0.68rem] font-bold uppercase tracking-wider block">
               Start Date
             </span>
-            <span className="text-white font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block">
+            <span className="font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block" style={{color:'var(--text)'}}>
               {renderWithTbdTooltip(
                 formattedStartDate,
                 "To Be Decided / Determined by client",
@@ -154,7 +154,7 @@ export default function ProjectHeader({
             <span className="text-gray-500 text-[0.68rem] font-bold uppercase tracking-wider block">
               Est. Hours
             </span>
-            <span className="text-white font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block">
+            <span className="font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block" style={{color:'var(--text)'}}>
               {renderWithTbdTooltip(
                 formattedHours,
                 "To Be Determined based on requirements",
@@ -169,7 +169,7 @@ export default function ProjectHeader({
             <span className="text-gray-500 text-[0.68rem] font-bold uppercase tracking-wider block">
               Deadline
             </span>
-            <span className="text-white font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block">
+            <span className="font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block" style={{color:'var(--text)'}}>
               {renderWithTbdTooltip(
                 formattedDeadline,
                 "To Be Decided / Finalized by client",
@@ -184,7 +184,7 @@ export default function ProjectHeader({
             <span className="text-gray-500 text-[0.68rem] font-bold uppercase tracking-wider block">
               Applicants
             </span>
-            <span className="text-white font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block truncate">
+            <span className="font-extrabold text-[1.1rem] sm:text-[1.2rem] mt-1 block truncate" style={{color:'var(--text)'}}>
               {project.applications_count || 0} Users
             </span>
           </div>

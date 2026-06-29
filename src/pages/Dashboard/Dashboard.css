@@ -240,3 +240,106 @@
   color: white;
   border-bottom-color: #b5ff14;
 }
+
+/* ─── Light Mode Overrides ─────────────────────────────────────────── */
+html:not(.dark) .app-portal-layout-frame,
+html:not(.dark) .portal-main-workspace {
+  background-color: var(--bg-page) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .metric-card-item,
+html:not(.dark) .content-table-card,
+html:not(.dark) .content-activity-card {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .insight-gradient {
+  background: linear-gradient(135deg, var(--bg-card) 0%, #f0f9e8 100%) !important;
+  border-color: #c7e8a0 !important;
+}
+
+html:not(.dark) .m-card-head,
+html:not(.dark) .project-reference-text,
+html:not(.dark) .node-body p,
+html:not(.dark) .table-footer-pagination-bar,
+html:not(.dark) .workspace-header-node p {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .m-card-val,
+html:not(.dark) .workspace-header-node h1,
+html:not(.dark) .name-details-cell strong,
+html:not(.dark) .node-body strong,
+html:not(.dark) .admin-tab-btn.active {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .search-field-wrapper input,
+html:not(.dark) .ctrl-filter-btn {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .portal-tanstack-native-table th {
+  color: var(--text-muted) !important;
+  border-bottom-color: var(--border) !important;
+}
+
+html:not(.dark) .portal-tanstack-native-table td {
+  border-bottom-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .p-nav,
+html:not(.dark) .p-num {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .p-num.active {
+  background-color: #b5ff14 !important;
+  color: #000 !important;
+}
+
+html:not(.dark) .btn-act.reset {
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+  background: var(--bg-page) !important;
+}
+
+html:not(.dark) .btn-details-action {
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .header-greeting-banner {
+  background-color: #e8ffd0 !important;
+  color: #3a7a00 !important;
+}
+
+html:not(.dark) .header-avatar-circle-btn {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .settings-tab-nav-horizontal,
+html:not(.dark) .admin-tab-headers {
+  border-bottom-color: var(--border) !important;
+}
+
+html:not(.dark) .admin-tab-btn {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .admin-tab-btn:hover {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .admin-tab-btn.active {
+  color: var(--text) !important;
+  border-bottom-color: #70d64d !important;
+}

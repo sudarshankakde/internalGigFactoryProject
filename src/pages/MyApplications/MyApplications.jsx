@@ -134,7 +134,7 @@ export default function MyApplications() {
       {/* Header Row */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="space-y-1">
-          <h2 className="text-white font-extrabold text-[1.6rem] m-0">My Applications</h2>
+          <h2 className="font-extrabold text-[1.6rem] m-0" style={{color:'var(--text)'}}>My Applications</h2>
           <p className="text-gray-500 text-[0.85rem] m-0">
             Track and manage all your {userRole === 'agency' ? "agency's" : "gig expert's"} project proposals
           </p>
@@ -154,47 +154,47 @@ export default function MyApplications() {
       {/* Metrics Cards Grid */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric card 1: Total */}
-        <div className="bg-[#121215] border border-[#23232a] p-5 rounded-[8px] flex flex-col justify-between min-h-[110px]">
+        <div className="p-5 rounded-[8px] flex flex-col justify-between min-h-[110px]" style={{backgroundColor:'var(--bg-card)',border:'1px solid var(--border)'}}>
           <div className="flex justify-between items-center text-[#8a8a8a] text-[0.7rem] font-bold tracking-wider uppercase">
             <span>Total Applications</span>
-            <div className="w-7 h-7 bg-[#1c1c22] rounded-full flex items-center justify-center text-gray-400 border border-[#23232a]">
+            <div className="w-7 h-7 rounded-full flex items-center justify-center text-gray-400" style={{backgroundColor:'var(--bg-page)',border:'1px solid var(--border)'}}>
               <ClipboardList size={13} />
             </div>
           </div>
-          <span className="text-[2.2rem] font-extrabold text-white leading-none mt-2">{stats.total}</span>
+          <span className="text-[2.2rem] font-extrabold leading-none mt-2" style={{color:'var(--text)'}}>{stats.total}</span>
         </div>
 
         {/* Metric card 2: Pending */}
-        <div className="bg-[#121215] border border-[#23232a] p-5 rounded-[8px] flex flex-col justify-between min-h-[110px]">
+        <div className="p-5 rounded-[8px] flex flex-col justify-between min-h-[110px]" style={{backgroundColor:'var(--bg-card)',border:'1px solid var(--border)'}}>
           <div className="flex justify-between items-center text-[#8a8a8a] text-[0.7rem] font-bold tracking-wider uppercase">
             <span>Pending</span>
-            <div className="w-7 h-7 bg-[#1c1c22] rounded-full flex items-center justify-center text-amber-500/80 border border-[#23232a]">
+            <div className="w-7 h-7 rounded-full flex items-center justify-center text-amber-500/80" style={{backgroundColor:'var(--bg-page)',border:'1px solid var(--border)'}}>
               <Clock size={13} />
             </div>
           </div>
-          <span className="text-[2.2rem] font-extrabold text-white leading-none mt-2">{stats.pending}</span>
+          <span className="text-[2.2rem] font-extrabold leading-none mt-2" style={{color:'var(--text)'}}>{stats.pending}</span>
         </div>
 
         {/* Metric card 3: Approved/Selected */}
-        <div className="bg-[#121215] border border-[#23232a] p-5 rounded-[8px] flex flex-col justify-between min-h-[110px]">
+        <div className="p-5 rounded-[8px] flex flex-col justify-between min-h-[110px]" style={{backgroundColor:'var(--bg-card)',border:'1px solid var(--border)'}}>
           <div className="flex justify-between items-center text-[#8a8a8a] text-[0.7rem] font-bold tracking-wider uppercase">
             <span>Approved</span>
-            <div className="w-7 h-7 bg-[#1c1c22] rounded-full flex items-center justify-center text-[#70d64d] border border-[#23232a]">
+            <div className="w-7 h-7 rounded-full flex items-center justify-center text-[#70d64d]" style={{backgroundColor:'var(--bg-page)',border:'1px solid var(--border)'}}>
               <Check size={13} />
             </div>
           </div>
-          <span className="text-[2.2rem] font-extrabold text-white leading-none mt-2">{stats.approved}</span>
+          <span className="text-[2.2rem] font-extrabold leading-none mt-2" style={{color:'var(--text)'}}>{stats.approved}</span>
         </div>
 
         {/* Metric card 4: Rejected */}
-        <div className="bg-[#121215] border border-[#23232a] p-5 rounded-[8px] flex flex-col justify-between min-h-[110px]">
+        <div className="p-5 rounded-[8px] flex flex-col justify-between min-h-[110px]" style={{backgroundColor:'var(--bg-card)',border:'1px solid var(--border)'}}>
           <div className="flex justify-between items-center text-[#8a8a8a] text-[0.7rem] font-bold tracking-wider uppercase">
             <span>Not Selected</span>
-            <div className="w-7 h-7 bg-[#1c1c22] rounded-full flex items-center justify-center text-red-500/80 border border-[#23232a]">
+            <div className="w-7 h-7 rounded-full flex items-center justify-center text-red-500/80" style={{backgroundColor:'var(--bg-page)',border:'1px solid var(--border)'}}>
               <XCircle size={13} />
             </div>
           </div>
-          <span className="text-[2.2rem] font-extrabold text-white leading-none mt-2">{stats.rejected}</span>
+          <span className="text-[2.2rem] font-extrabold leading-none mt-2" style={{color:'var(--text)'}}>{stats.rejected}</span>
         </div>
       </section>
 
@@ -344,27 +344,28 @@ export default function MyApplications() {
               return (
                 <div 
                   key={app.id} 
-                  className="bg-[#121215] border border-[#23232a] rounded-[8px] p-5 flex items-center justify-between hover:border-[#70d64d]/60 hover:shadow-[0_4px_15px_rgba(112,214,77,0.05)] transition-all duration-150 cursor-pointer"
+                  className="rounded-[8px] p-5 flex items-center justify-between hover:border-[#70d64d]/60 hover:shadow-[0_4px_15px_rgba(112,214,77,0.05)] transition-all duration-150 cursor-pointer"
+                  style={{backgroundColor:'var(--bg-card)',border:'1px solid var(--border)'}}
                   onClick={() => navigate(`/projects/${project.id}`)}
                 >
                   <div className="flex items-center gap-4 min-w-0 flex-1">
                     {/* Circle Avatar */}
-                    <div className="w-11 h-11 bg-[#1c1c22] border border-[#23232a] rounded-full flex items-center justify-center text-white text-md font-bold shrink-0">
+                    <div className="w-11 h-11 border rounded-full flex items-center justify-center text-md font-bold shrink-0" style={{backgroundColor:'var(--bg-page)',borderColor:'var(--border)',color:'var(--text)'}}>
                       {firstLetter}
                     </div>
                     
                     {/* Project and Application Details */}
                     <div className="min-w-0 space-y-1">
-                      <h3 className="text-white text-[0.95rem] font-bold truncate hover:text-[#70d64d] transition-colors duration-100">
+                      <h3 className="text-[0.95rem] font-bold truncate hover:text-[#70d64d] transition-colors duration-100" style={{color:'var(--text)'}}>
                         {project.title || 'Untitled Project'}
                       </h3>
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-gray-500 text-[0.78rem]">
                         <span className="font-semibold uppercase tracking-wider text-[0.7rem] text-gray-400">
-                          Budget: <span className="text-white normal-case font-bold">{formattedBudget}</span>
+                          Budget: <span className="normal-case font-bold" style={{color:'var(--text)'}}>{formattedBudget}</span>
                         </span>
                         <span className="w-1.5 h-1.5 rounded-full bg-[#23232a]" />
                         <span className="font-semibold uppercase tracking-wider text-[0.7rem] text-gray-400">
-                          Applied: <span className="text-white normal-case font-bold">{appliedDate}</span>
+                          Applied: <span className="normal-case font-bold" style={{color:'var(--text)'}}>{appliedDate}</span>
                         </span>
                       </div>
                     </div>
@@ -385,7 +386,7 @@ export default function MyApplications() {
 
       {/* Pagination Footer */}
       {!isLoading && !error && total > 0 && (
-        <div className="bg-[#121215] border border-[#23232a] rounded-[8px] px-5 py-4 flex justify-between items-center flex-wrap gap-3">
+        <div className="rounded-[8px] px-5 py-4 flex justify-between items-center flex-wrap gap-3" style={{backgroundColor:'var(--bg-card)',border:'1px solid var(--border)'}}>
           <span className="text-gray-500 text-[0.8rem]">
             {isLoading ? '…' : `Page ${page} of ${totalPages} · ${total} total`}
           </span>

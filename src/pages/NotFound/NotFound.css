@@ -135,3 +135,47 @@
     width: 100%;
   }
 }
+
+/* Light Mode Overrides */
+html:not(.dark) .notfound-container {
+  background-color: #fafafa;
+  color: #09090b;
+}
+
+html:not(.dark) .notfound-glass-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.05),
+              inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+html:not(.dark) .notfound-code {
+  background: linear-gradient(135deg, #09090b 30%, #70d64d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html:not(.dark) .notfound-title {
+  color: #09090b;
+}
+
+html:not(.dark) .notfound-desc {
+  color: #71717a;
+}
+
+html:not(.dark) .notfound-divider {
+  background: radial-gradient(circle, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0) 80%);
+}
+
+html:not(.dark) .notfound-btn.secondary {
+  background-color: #f4f4f5;
+  color: #18181b;
+  border: 1px solid #e4e4e7;
+}
+
+html:not(.dark) .notfound-btn.secondary:hover {
+  background-color: #e4e4e7;
+  color: #09090b;
+  border-color: #d4d4d8;
+}
+

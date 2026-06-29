@@ -166,3 +166,26 @@
 .spin-fast {
   animation: spin-clockwise 1s infinite linear;
 }
+
+/* Light Mode Overrides */
+html:not(.dark) .maintenance-container {
+  background: radial-gradient(circle at center, #f4f4f5 0%, #e4e4e7 100%);
+  color: #18181b;
+}
+
+html:not(.dark) .maintenance-card {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+}
+
+html:not(.dark) .maintenance-title {
+  background: linear-gradient(135deg, #09090b 0%, #3f3f46 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html:not(.dark) .maintenance-message {
+  color: #71717a;
+}
+
