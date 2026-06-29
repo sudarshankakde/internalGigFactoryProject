@@ -356,3 +356,82 @@ input[type="date"]::-moz-calendar-picker-indicator {
 .rich-text-content iframe {
   max-width: 100% !important;
 }
+
+/* ─── Global Light Mode CSS Overrides ───────────────────────────────────── */
+html:not(.dark) .dashboard-stats-card,
+html:not(.dark) .m-card-metric,
+html:not(.dark) .metric-card,
+html:not(.dark) .chart-card,
+html:not(.dark) .table-card,
+html:not(.dark) .activity-card,
+html:not(.dark) .team-card,
+html:not(.dark) .settings-card,
+html:not(.dark) .project-card,
+html:not(.dark) .detail-card,
+html:not(.dark) .card,
+html:not(.dark) .sidebar-brand,
+html:not(.dark) .app-sidebar,
+html:not(.dark) .app-topbar {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  background: var(--bg-card) !important;
+}
+
+html:not(.dark) body,
+html:not(.dark) .app-shell,
+html:not(.dark) .app-main {
+  background-color: var(--bg-page) !important;
+  background: var(--bg-page) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .m-card-val,
+html:not(.dark) .workspace-header-node h1,
+html:not(.dark) .name-details-cell strong,
+html:not(.dark) .search-field-wrapper input,
+html:not(.dark) select,
+html:not(.dark) input,
+html:not(.dark) textarea,
+html:not(.dark) .p-nav,
+html:not(.dark) .p-num {
+  color: var(--text) !important;
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+
+html:not(.dark) .search-field-wrapper input::placeholder {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .header-greeting-banner {
+  background-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .portal-tanstack-native-table th {
+  border-bottom-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .portal-tanstack-native-table td {
+  border-bottom-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .nav-section-label {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .sidebar-role-badge {
+  background-color: #f4f4f5 !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .sidebar-logo-text {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .sidebar-brand {
+  border-bottom-color: var(--border) !important;
+}

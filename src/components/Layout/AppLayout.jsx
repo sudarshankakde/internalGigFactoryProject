@@ -437,11 +437,35 @@ export default function AppLayout({ children, pageTitle }) {
       <div
         className={`sidebar-brand ${effectiveCollapsed ? "brand-collapsed" : ""}`}
       >
-        <img
-          src={effectiveCollapsed ? gigfactoryIcon : gigfactoryLogo}
-          alt="GigFactory"
-          className={`sidebar-logo ${effectiveCollapsed ? "sidebar-logo-collapsed" : ""}`}
-        />
+        {effectiveCollapsed ? (
+          <img
+            src={gigfactoryIcon}
+            alt="GigFactory"
+            className="sidebar-logo sidebar-logo-collapsed"
+          />
+        ) : !darkMode ? (
+          <div className="relative h-8 w-full inline-block group-hover:scale-[1.02] transition-transform origin-left select-none pointer-events-none">
+            {/* Black "factory" part */}
+            <img
+              src={gigfactoryLogo}
+              alt="GigFactory Logo"
+              className="relative z-0 block h-full w-auto object-contain object-left [filter:grayscale(1)_contrast(1.45)_brightness(0)] [clip-path:inset(0_0_0_31%)]"
+            />
+            {/* Green "Gig" part */}
+            <img
+              src={gigfactoryLogo}
+              alt=""
+              aria-hidden="true"
+              className="absolute left-0 top-0 h-full w-auto object-contain object-left [clip-path:inset(0_69%_0_0)]"
+            />
+          </div>
+        ) : (
+          <img
+            src={gigfactoryLogo}
+            alt="GigFactory"
+            className="sidebar-logo"
+          />
+        )}
       </div>
 
       {/* role badge */}

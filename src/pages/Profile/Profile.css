@@ -761,3 +761,74 @@ body.modal-open {
   padding: 2px 8px;
   border-radius: 4px;
 }
+
+/* ─── Light Mode CSS Overrides ───────────────────────────────────────────── */
+html:not(.dark) .profile-identity-banner,
+html:not(.dark) .stat-metric-box,
+html:not(.dark) .profile-about-card,
+html:not(.dark) .work-history-card,
+html:not(.dark) .capability-cloud-card,
+html:not(.dark) .service-specs-card,
+html:not(.dark) .documents-list-card,
+html:not(.dark) .team-structure-card {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  background: var(--bg-card) !important;
+}
+
+html:not(.dark) .profile-identity-main h1,
+html:not(.dark) .profile-about-card h2,
+html:not(.dark) .work-history-card h2,
+html:not(.dark) .capability-cloud-card h2,
+html:not(.dark) .service-specs-card h2,
+html:not(.dark) .documents-list-card h2,
+html:not(.dark) .team-structure-card h2,
+html:not(.dark) .stat-value,
+html:not(.dark) .history-role,
+html:not(.dark) .spec-item-label,
+html:not(.dark) .doc-name-text,
+html:not(.dark) .member-name,
+html:not(.dark) .spec-val {
+  color: var(--text) !important;
+}
+
+html:not(.dark) .profile-subtitle-text,
+html:not(.dark) .meta-contact-links-grid,
+html:not(.dark) .stat-label,
+html:not(.dark) .history-company,
+html:not(.dark) .history-desc,
+html:not(.dark) .doc-meta-text,
+html:not(.dark) .member-role,
+html:not(.dark) .member-meta,
+html:not(.dark) .spec-label {
+  color: var(--text-muted) !important;
+}
+
+html:not(.dark) .spec-chip {
+  background-color: var(--bg-page) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .edit-profile-action-btn {
+  background-color: var(--bg-page) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark) .edit-profile-action-btn:hover {
+  background-color: var(--border) !important;
+}
+
+html:not(.dark) .profile-large-avatar {
+  background-color: var(--bg-page) !important;
+}
+
+html:not(.dark) .history-timeline-line {
+  background-color: var(--border) !important;
+}
+
+html:not(.dark) .history-timeline-dot {
+  background-color: var(--accent) !important;
+  border-color: var(--bg-card) !important;
+}
