@@ -86,7 +86,7 @@ const AuthStatusModal = ({ isOpen, onClose, statusData, email, onRegisterTrigger
     if (onReapplyTrigger) {
       onReapplyTrigger(
         applicationData,
-        role || 'freelancer',
+        role || 'gig_expert',
         email || statusData.email,
         fullName || statusData.fullName,
         mobile || statusData.mobile

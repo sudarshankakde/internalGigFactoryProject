@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { Upload, X, Loader } from 'lucide-react';
 import { api } from '../../utils/api';
 
-export default function ApplyModal({ project, onClose, defaultRole = 'freelancer', onApplied }) {
+export default function ApplyModal({ project, onClose, defaultRole = 'gig_expert', onApplied }) {
   const [bidAmount, setBidAmount] = useState('');
   const [estimatedDays, setEstimatedDays] = useState('');
   const [proposal, setProposal] = useState('');

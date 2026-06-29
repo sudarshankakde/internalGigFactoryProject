@@ -89,8 +89,8 @@ export default function AdminOverview() {
   });
 
   const { data: freelancersData } = useQuery({
-    queryKey: ['admin-freelancers-list'],
-    queryFn: () => api.get('/profiles/admin/freelancers?limit=100').then(r => r.freelancers || []),
+    queryKey: ['admin-gigExperts-list'],
+    queryFn: () => api.get('/profiles/admin/gigExperts?limit=100').then(r => r.gigExperts || []),
   });
 
   const { data: agenciesData } = useQuery({
@@ -102,7 +102,7 @@ export default function AdminOverview() {
     const list = [];
     if (freelancersData) {
       freelancersData.forEach(f => {
-        list.push({ id: f.id, name: `${f.full_name} (Freelancer)`, email: f.email });
+        list.push({ id: f.id, name: `${f.full_name} (Gig Expert)`, email: f.email });
       });
     }
     if (agenciesData) {
@@ -125,11 +125,11 @@ export default function AdminOverview() {
       {/* Stats Row */}
       <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-[16px]">
         <StatCard
-          label="Active Freelancers"
+          label="Active Gig Experts"
           value={stats.totalFreelancers}
           Icon={Users}
           sub="Approved accounts"
-          onClick={() => navigate('/admin/freelancers')}
+          onClick={() => navigate('/admin/gigExperts')}
         />
         <StatCard
           label="Active Agencies"
@@ -264,7 +264,7 @@ export default function AdminOverview() {
                 ) : (
                   recentBids.map(bid => {
                     const bidderName = bid.applicant?.full_name || 'Bidder';
-                    const role = bid.applicant_type || bid.applicant?.role || 'freelancer';
+                    const role = bid.applicant_type || bid.applicant?.role || 'gig_expert';
                     const roleColor = role === 'agency' ? '#c084fc' : '#38bdf8';
                     const statusColor = bid.status === 'accepted' ? '#70d64d' : bid.status === 'rejected' ? '#ef4444' : '#f59e0b';
                     const proj = bid.project || {};
@@ -319,7 +319,7 @@ export default function AdminOverview() {
         <div className="flex flex-col gap-[12px]">
           <h2 className="text-white text-[1rem] font-extrabold m-0 mb-[4px]">Quick Access</h2>
           <QuickLink icon={FileSearch}  label="Reg. Requests" desc="Review & approve applications" to="/admin/requests"    color="#f59e0b" />
-          <QuickLink icon={Users}       label="Freelancers"    desc="Manage freelancer accounts"    to="/admin/freelancers" color="#38bdf8" />
+          <QuickLink icon={Users}       label="Gig Experts"    desc="Manage gigExpert accounts"    to="/admin/gigExperts" color="#38bdf8" />
           <QuickLink icon={Building2}   label="Agencies"       desc="Manage agency accounts"        to="/admin/agencies"    color="#c084fc" />
           <QuickLink icon={TrendingUp}  label="Analytics"      desc="Platform performance metrics"  to="/admin/analytics"   color="#70d64d" />
           

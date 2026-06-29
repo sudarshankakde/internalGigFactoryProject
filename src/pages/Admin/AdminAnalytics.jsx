@@ -490,7 +490,7 @@ export default function AdminAnalytics() {
           label="Total Bids Submitted"
           value={totalBidsVal}
           Icon={FileText}
-          subText={`Freelancer & Agency proposals (${timeLabel})`}
+          subText={`Gig Expert & Agency proposals (${timeLabel})`}
           accentColor={COLORS.purple}
           isLoading={isLoading}
         />
@@ -776,7 +776,7 @@ export default function AdminAnalytics() {
                 />
                 <Area 
                   type="monotone" 
-                  dataKey="Freelancers" 
+                  dataKey="Gig Experts" 
                   stroke={COLORS.green} 
                   strokeWidth={2}
                   fillOpacity={1} 
@@ -939,7 +939,7 @@ export default function AdminAnalytics() {
         <div className="lg:col-span-2">
           <ChartCard
             title="Monthly Payout Revenue"
-            subtitle="Aggregated amount paid to freelancers/agencies"
+            subtitle="Aggregated amount paid to gig experts/agencies"
             icon={BarChart3}
             iconColor={COLORS.green}
             isLoading={isLoading}
@@ -1051,7 +1051,7 @@ export default function AdminAnalytics() {
         <div className="lg:col-span-1">
           <ChartCard
             title="Top Application Bidders"
-            subtitle="Most active freelancers and agencies by bid counts"
+            subtitle="Most active gig experts and agencies by bid counts"
             icon={Award}
             iconColor={COLORS.purple}
             isLoading={isLoading}

@@ -12,7 +12,7 @@ import { Pagination, PageSizeSelector } from '../../components/AdminShared';
 export default function MyApplications() {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user) || {};
-  const userRole = user.role || 'freelancer';
+  const userRole = user.role || 'gig_expert';
 
   // Search, Filter & Pagination states
   const [searchTerm, setSearchTerm] = useState('');
@@ -136,7 +136,7 @@ export default function MyApplications() {
         <div className="space-y-1">
           <h2 className="text-white font-extrabold text-[1.6rem] m-0">My Applications</h2>
           <p className="text-gray-500 text-[0.85rem] m-0">
-            Track and manage all your {userRole === 'agency' ? "agency's" : "freelancer's"} project proposals
+            Track and manage all your {userRole === 'agency' ? "agency's" : "gig expert's"} project proposals
           </p>
         </div>
         

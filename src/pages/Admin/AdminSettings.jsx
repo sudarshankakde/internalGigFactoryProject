@@ -461,7 +461,7 @@ export default function AdminSettings() {
               <NotifRow
                 id="notif-reg"
                 label="New Registration Request"
-                desc="When a freelancer or agency submits a new registration"
+                desc="When a gig expert or agency submits a new registration"
                 inApp={notif.notif_new_registration_inapp}
                 email={notif.notif_new_registration_email}
                 onInApp={v => setNotif(s => ({ ...s, notif_new_registration_inapp: v }))}
@@ -507,7 +507,7 @@ export default function AdminSettings() {
           <div className="settings-pane">
             <div className="settings-pane-header">
               <h2>Registration & Onboarding Rules</h2>
-              <p>Controls how new freelancers and agencies are admitted to the platform.</p>
+              <p>Controls how new gig experts and agencies are admitted to the platform.</p>
             </div>
             <Section>
               <FormRow label="Default Cooldown Period" id="reg-cooldown"

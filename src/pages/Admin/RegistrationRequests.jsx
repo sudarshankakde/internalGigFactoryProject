@@ -198,7 +198,7 @@ export default function RegistrationRequests() {
             {/* Role filter */}
             <select value={roleFilter} onChange={e => setRoleFilter(e.target.value)} className={selectClass}>
               <option value="all">All Roles</option>
-              <option value="freelancer">Freelancer</option>
+              <option value="gig_expert">Gig Expert</option>
               <option value="agency">Agency</option>
             </select>
             {/* Sort */}

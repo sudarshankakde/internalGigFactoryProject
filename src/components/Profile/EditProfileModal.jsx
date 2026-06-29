@@ -10,7 +10,7 @@ const getInitials = (name) => {
 };
 
 export const EditProfileModal = ({
-  isFreelancer,
+  isGigExpert,
   formData,
   setFormData,
   activeTab,
@@ -102,7 +102,7 @@ export const EditProfileModal = ({
               <>
                 <div className="form-group avatar-upload-group flex flex-row items-center gap-5 mb-5 border-b border-[#23232a] pb-5">
                   <div className="avatar-preview-box w-20 h-20 rounded-xl border border-[#23232a] bg-[#1c1c22] flex items-center justify-center overflow-hidden text-[#8a8f98] text-2xl font-extrabold">
-                    {isFreelancer ? (
+                    {isGigExpert ? (
                       formData.profilePhoto ? (
                         <img src={formData.profilePhoto} alt="Preview" className="w-full h-full object-cover" />
                       ) : (
@@ -117,7 +117,7 @@ export const EditProfileModal = ({
                     )}
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="m-0">{isFreelancer ? 'Profile Photo' : 'Agency Logo'}</label>
+                    <label className="m-0">{isGigExpert ? 'Profile Photo' : 'Agency Logo'}</label>
                     <input
                       type="file"
                       accept="image/*"
@@ -135,7 +135,7 @@ export const EditProfileModal = ({
                   </div>
                 </div>
 
-                {isFreelancer ? (
+                {isGigExpert ? (
                   <>
                     <div className="form-row-2">
                       <div className="form-group">
@@ -384,7 +384,7 @@ export const EditProfileModal = ({
                       <h4 className="nested-panel-title">Peer Review Details</h4>
                       <div className="form-row-2">
                         <div className="form-group">
-                          <label>{isFreelancer ? 'TOTAL YEARS OF EXPERIENCE *' : 'TOTAL TEAM EXPERIENCE *'}</label>
+                          <label>{isGigExpert ? 'TOTAL YEARS OF EXPERIENCE *' : 'TOTAL TEAM EXPERIENCE *'}</label>
                           <input 
                             type="text"
                             placeholder="e.g., 5, 8"
@@ -479,7 +479,7 @@ export const EditProfileModal = ({
                   )}
                 </div>
 
-                {isFreelancer && (
+                {isGigExpert && (
                   <div className="form-group mt-5">
                     <label>Additional Custom Skills (comma separated)</label>
                     <input
@@ -526,12 +526,12 @@ export const EditProfileModal = ({
 
                 <div className="form-row-2">
                   <div className="form-group">
-                    <label>{isFreelancer ? 'Portfolio URL' : 'Website URL'}</label>
+                    <label>{isGigExpert ? 'Portfolio URL' : 'Website URL'}</label>
                     <input
                       type="url"
-                      value={isFreelancer ? (formData.portfolioUrl || '') : (formData.website || '')}
+                      value={isGigExpert ? (formData.portfolioUrl || '') : (formData.website || '')}
                       onChange={(e) => {
-                        if (isFreelancer) {
+                        if (isGigExpert) {
                           setFormData({ ...formData, portfolioUrl: e.target.value });
                         } else {
                           setFormData({ ...formData, website: e.target.value });
@@ -593,7 +593,7 @@ export const EditProfileModal = ({
             )}
 
             {activeTab === 'legal' && (
-              isFreelancer ? (
+              isGigExpert ? (
                 <>
                   <div className="form-row-2">
                     <div className="form-group">

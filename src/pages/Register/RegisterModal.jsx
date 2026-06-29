@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Mail, Phone, User, Building2, FileText, ArrowRight, ArrowLeft, Check, CheckSquare, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { api } from '../../utils/api';
-import { freelancerSchema, agencySchema } from './RegisterSchema';
+import { gigExpertSchema, agencySchema } from './RegisterSchema';
 import './RegisterModal.css';
 import gigfactoryLogo from '../../assets/logo.png';
 
@@ -68,7 +68,7 @@ const locationSuggestions = [
 ];
 
 const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubmitSuccess }) => {
-  const [role, setRole] = useState('freelancer');
+  const [role, setRole] = useState('gig_expert');
   const [errors, setErrors] = useState({});
   const [warnings, setWarnings] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -130,7 +130,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
   }, [formData]);
 
   const validateField = async (name, value) => {
-    const schema = role === 'freelancer' ? freelancerSchema : agencySchema;
+    const schema = role === 'gig_expert' ? gigExpertSchema : agencySchema;
     try {
       const currentFormData = { ...formDataRef.current, [name]: value };
       await schema.validateAt(name, currentFormData);
@@ -206,12 +206,12 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
   // Prefill check on mount / props change
   useEffect(() => {
     if (reapplyData) {
-      setRole(reapplyData.role || 'freelancer');
+      setRole(reapplyData.role || 'gig_expert');
       setFormData((prev) => ({
         ...prev,
         ...reapplyData,
         email: email || reapplyData.email || prev.email,
-        fullName: reapplyData.role === 'freelancer' ? (reapplyData.fullName || reapplyData.fullName || prev.fullName) : prev.fullName,
+        fullName: reapplyData.role === 'gig_expert' ? (reapplyData.fullName || reapplyData.fullName || prev.fullName) : prev.fullName,
         authPersonName: reapplyData.role === 'agency' ? (reapplyData.authPersonName || reapplyData.fullName || prev.authPersonName) : prev.authPersonName,
         mobile: reapplyData.mobile || prev.mobile,
         portfolioPdfUrl: reapplyData.portfolioPdfUrl || reapplyData.portfolio_pdf_url || prev.portfolioPdfUrl,
@@ -344,7 +344,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
   };
 
   const handleLocationBlur = () => {
-    const fieldName = role === 'freelancer' ? 'location' : 'headquarters';
+    const fieldName = role === 'gig_expert' ? 'location' : 'headquarters';
     setTimeout(() => {
       setShowLocations(false);
       validateField(fieldName, formDataRef.current[fieldName]);
@@ -382,7 +382,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const schema = role === 'freelancer' ? freelancerSchema : agencySchema;
+    const schema = role === 'gig_expert' ? gigExpertSchema : agencySchema;
     try {
       // Validate all fields together
       await schema.validate(formData, { abortEarly: false });
@@ -391,30 +391,30 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
 
       const regFormData = new FormData();
       regFormData.append('email', formData.email);
-      regFormData.append('fullName', role === 'freelancer' ? formData.fullName : formData.authPersonName);
+      regFormData.append('fullName', role === 'gig_expert' ? formData.fullName : formData.authPersonName);
       regFormData.append('mobile', formData.mobile);
       regFormData.append('roleName', role);
 
       const appData = {
         ...formData,
-        title: role === 'freelancer' ? formData.designation : undefined,
+        title: role === 'gig_expert' ? formData.designation : undefined,
         agencyName: role === 'agency' ? formData.registeredName : undefined,
-        bio: role === 'freelancer'
+        bio: role === 'gig_expert'
           ? `Designation: ${formData.designation}. LinkedIn: ${formData.linkedinUrl || 'N/A'}. Legal PAN Name: ${formData.legalNamePan}`
           : `Company Website: ${formData.website || 'N/A'}. Authorized signatory: ${formData.authPersonName}`,
-        experienceYears: role === 'freelancer' ? (parseInt(formData.peerReviewDetails?.teamExperience, 10) || 3) : undefined,
+        experienceYears: role === 'gig_expert' ? (parseInt(formData.peerReviewDetails?.teamExperience, 10) || 3) : undefined,
         employeeCount: role === 'agency' ? (parseInt(formData.teamSize, 10) || 5) : undefined,
-        hourlyRate: role === 'freelancer' ? (parseFloat(formData.baseRate) || 0) : undefined,
-        availability: role === 'freelancer' ? (formData.availability ? formData.availability.toLowerCase() : 'project basis') : undefined,
+        hourlyRate: role === 'gig_expert' ? (parseFloat(formData.baseRate) || 0) : undefined,
+        availability: role === 'gig_expert' ? (formData.availability ? formData.availability.toLowerCase() : 'project basis') : undefined,
         portfolioUrl: formData.portfolioUrl || '',
         portfolioPdfUrl: formData.portfolioPdfUrl || '',
         gstNumber: role === 'agency' ? formData.gstNumber : undefined,
         website: role === 'agency' ? formData.website : undefined,
         address: role === 'agency' ? formData.headquarters : undefined,
-        city: role === 'freelancer'
+        city: role === 'gig_expert'
           ? (formData.location ? formData.location.split(',')[0]?.trim() || 'Mumbai' : 'Mumbai')
           : (formData.headquarters ? formData.headquarters.split(',')[0]?.trim() || 'Mumbai' : 'Mumbai'),
-        country: role === 'freelancer'
+        country: role === 'gig_expert'
           ? (formData.location ? formData.location.split(',')[1]?.trim() || 'India' : 'India')
           : (formData.headquarters ? formData.headquarters.split(',')[1]?.trim() || 'India' : 'India'),
         skillsList: formData.selectedServices,
@@ -494,13 +494,13 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
           <div className="role-tab-container">
             <button 
               type="button"
-              className={`role-tab-btn ${role === 'freelancer' ? 'active' : ''}`}
+              className={`role-tab-btn ${role === 'gig_expert' ? 'active' : ''}`}
               onClick={() => {
-                setRole('freelancer');
+                setRole('gig_expert');
                 setErrors({});
               }}
             >
-              <User size={16} /> Freelancer
+              <User size={16} /> Gig Expert
             </button>
             <button 
               type="button"
@@ -523,21 +523,21 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
             <h3 className="register-section-title">1. Profile Details</h3>
             <div className="form-grid-2">
               <div className="input-group">
-                <label htmlFor="fullName">{role === 'freelancer' ? 'Full Name *' : 'Name of Authorised Person *'}</label>
+                <label htmlFor="fullName">{role === 'gig_expert' ? 'Full Name *' : 'Name of Authorised Person *'}</label>
                 <div className="input-wrapper">
                   <span className="input-icon"><User size={18} /></span>
                   <input 
                     type="text" 
                     id="fullName"
-                    name={role === 'freelancer' ? 'fullName' : 'authPersonName'}
-                    value={role === 'freelancer' ? formData.fullName : formData.authPersonName}
-                    placeholder={role === 'freelancer' ? 'Your professional name' : 'Submitting representative'}
+                    name={role === 'gig_expert' ? 'fullName' : 'authPersonName'}
+                    value={role === 'gig_expert' ? formData.fullName : formData.authPersonName}
+                    placeholder={role === 'gig_expert' ? 'Your professional name' : 'Submitting representative'}
                     onChange={handleInputChange}
                     onBlur={(e) => validateField(e.target.name, e.target.value)}
                   />
                 </div>
-                {errors[role === 'freelancer' ? 'fullName' : 'authPersonName'] && (
-                  <span className="validation-error">{errors[role === 'freelancer' ? 'fullName' : 'authPersonName']}</span>
+                {errors[role === 'gig_expert' ? 'fullName' : 'authPersonName'] && (
+                  <span className="validation-error">{errors[role === 'gig_expert' ? 'fullName' : 'authPersonName']}</span>
                 )}
               </div>
 
@@ -596,17 +596,17 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
               </div>
 
               <div className="input-group relative">
-                <label htmlFor="location">{role === 'freelancer' ? 'Current Location *' : 'Company Headquarters *'}</label>
+                <label htmlFor="location">{role === 'gig_expert' ? 'Current Location *' : 'Company Headquarters *'}</label>
                 <div className="input-wrapper">
                   <span className="input-icon"><Building2 size={18} /></span>
                   <input 
                     type="text" 
                     id="location"
-                    name={role === 'freelancer' ? 'location' : 'headquarters'}
-                    value={role === 'freelancer' ? formData.location : formData.headquarters}
+                    name={role === 'gig_expert' ? 'location' : 'headquarters'}
+                    value={role === 'gig_expert' ? formData.location : formData.headquarters}
                     placeholder="Type city..."
                     onChange={handleLocationSearch}
-                    onKeyDown={(e) => handleLocationKeyDown(e, role === 'freelancer' ? 'location' : 'headquarters')}
+                    onKeyDown={(e) => handleLocationKeyDown(e, role === 'gig_expert' ? 'location' : 'headquarters')}
                     onBlur={handleLocationBlur}
                     autoComplete="off"
                   />
@@ -617,15 +617,15 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                       <li 
                         key={city} 
                         className={`suggestion-item ${index === activeSuggestionIndex ? 'highlighted' : ''}`}
-                        onMouseDown={() => handleSelectLocation(role === 'freelancer' ? 'location' : 'headquarters', city)}
+                        onMouseDown={() => handleSelectLocation(role === 'gig_expert' ? 'location' : 'headquarters', city)}
                       >
                         {city}
                       </li>
                     ))}
                   </ul>
                 )}
-                {errors[role === 'freelancer' ? 'location' : 'headquarters'] && (
-                  <span className="validation-error">{errors[role === 'freelancer' ? 'location' : 'headquarters']}</span>
+                {errors[role === 'gig_expert' ? 'location' : 'headquarters'] && (
+                  <span className="validation-error">{errors[role === 'gig_expert' ? 'location' : 'headquarters']}</span>
                 )}
               </div>
 
@@ -671,7 +671,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
           <div className="register-form-section">
             <h3 className="register-section-title">2. Legal &amp; Tax Identity</h3>
             <div className="form-grid-2">
-              {role === 'freelancer' ? (
+              {role === 'gig_expert' ? (
                 <>
                   <div className="input-group">
                     <label htmlFor="legalNamePan">Legal Name (as per PAN) *</label>
@@ -900,7 +900,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                   <h4 className="nested-panel-title">Peer Review Details</h4>
                   <div className="form-grid-2">
                     <div className="input-group">
-                      <label>{role === 'freelancer' ? 'TOTAL YEARS OF EXPERIENCE *' : 'TOTAL TEAM EXPERIENCE *'}</label>
+                      <label>{role === 'gig_expert' ? 'TOTAL YEARS OF EXPERIENCE *' : 'TOTAL TEAM EXPERIENCE *'}</label>
                       <div className="input-wrapper">
                         <input 
                           type="text"
@@ -1126,7 +1126,7 @@ const RegisterModal = ({ isOpen, onClose, reapplyData = null, email = '', onSubm
                 {errors.noticePeriod && <span className="validation-error">{errors.noticePeriod}</span>}
               </div>
 
-              {role === 'freelancer' ? (
+              {role === 'gig_expert' ? (
                 <div className="input-group">
                   <label htmlFor="availability">Availability *</label>
                   <select 

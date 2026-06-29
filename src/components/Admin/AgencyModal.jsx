@@ -376,7 +376,7 @@ export const AgencyModal = ({ agency, onClose }) => {
           {activeTab === 'profile' && (
             <div className="profile-workspace-view animate-fade-in p-0 bg-transparent">
               <ProfileHeader
-                isFreelancer={false}
+                isGigExpert={false}
                 name={ap.agency_name || agency.full_name}
                 avatar={ap.logo}
                 subtitle={ap.industry || 'Digital Services Agency'}
@@ -390,7 +390,7 @@ export const AgencyModal = ({ agency, onClose }) => {
               />
 
               <ProfileStats
-                isFreelancer={false}
+                isGigExpert={false}
                 totalProjects={ap.total_projects}
                 commercialBasis={ap.commercial_basis}
                 employeeCount={ap.employee_count}
@@ -399,7 +399,7 @@ export const AgencyModal = ({ agency, onClose }) => {
               <div className="profile-details-split-grid mt-5">
                 <div className="profile-details-left-pane">
                   <ProfileAbout
-                    isFreelancer={false}
+                    isGigExpert={false}
                     description={ap.description}
                   />
                   <TeamStructure employeeCount={ap.employee_count} />
@@ -407,12 +407,12 @@ export const AgencyModal = ({ agency, onClose }) => {
 
                 <div className="profile-details-right-pane">
                   <CapabilityCloud
-                    isFreelancer={false}
+                    isGigExpert={false}
                     skills={(ap.service_details?.selectedServices || []).map(code => ({ skill_name: SERVICE_LABELS[code] || code }))}
                   />
                   <ServiceSpecs serviceDetails={ap.service_details} />
                   <DocumentsList
-                    isFreelancer={false}
+                    isGigExpert={false}
                     portfolioPdfUrl={ap.portfolio_pdf_url}
                     verifications={agency.verifications}
                     isAdmin={true}

@@ -4,7 +4,7 @@ import { Plus, FileText, Edit2, Trash2, Download, ExternalLink, X, Loader2 } fro
 import { toast } from 'react-toastify';
 
 export const DocumentsList = ({
-  isFreelancer,
+  isGigExpert,
   resumeUrl,
   portfolioPdfUrl,
   verifications,
@@ -150,7 +150,7 @@ export const DocumentsList = ({
   return (
     <div className="pane-content-card">
       <div className="card-header-flex-row">
-        <h3>{isAdmin ? 'Profile Documents' : (isFreelancer ? 'Profile Documents' : 'Agency Documents')}</h3>
+        <h3>{isAdmin ? 'Profile Documents' : (isGigExpert ? 'Profile Documents' : 'Agency Documents')}</h3>
         {!isAdmin && (
           <button 
             type="button" 
@@ -164,8 +164,8 @@ export const DocumentsList = ({
 
       {/* Main Documents List */}
       <div className="flex flex-col gap-4 mt-4">
-        {/* Legacy Resume/CV display for Freelancer */}
-        {isFreelancer && resumeUrl && (
+        {/* Legacy Resume/CV display for Gig Expert */}
+        {isGigExpert && resumeUrl && (
           <div className="border-b border-white/5 pb-3">
             <div className="flex items-center justify-between">
               <span className="text-[0.85rem] text-[#70d64d] font-semibold flex items-center gap-2">
@@ -270,7 +270,7 @@ export const DocumentsList = ({
             ))}
           </div>
         ) : (
-          !isFreelancer && verifications && verifications.length > 0 ? (
+          !isGigExpert && verifications && verifications.length > 0 ? (
             <div className="empty-documents-status-placeholder text-left flex flex-col gap-2">
               {verifications.map((v) => (
                 <div key={v.id} className="flex justify-between border-b border-white/5 pb-1.5">
@@ -289,7 +289,7 @@ export const DocumentsList = ({
               <p className="secondary-empty-msg text-gray-500">
                 {isAdmin 
                   ? 'No additional documents have been uploaded to this profile.'
-                  : (isFreelancer 
+                  : (isGigExpert 
                       ? 'Upload certifications, ID proofs, or project reports files.' 
                       : 'Upload verification NDAs, MSAs, or W9 tax files here.')}
               </p>

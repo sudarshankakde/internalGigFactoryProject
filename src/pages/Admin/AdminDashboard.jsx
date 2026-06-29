@@ -17,7 +17,7 @@ const STATUS_STYLES = {
   rejected: { bg: 'rgba(239,68,68,0.12)',   color: '#ef4444' },
 };
 const ROLE_STYLES = {
-  freelancer: { bg: '#1e293b', color: '#38bdf8' },
+  gigExpert: { bg: '#1e293b', color: '#38bdf8' },
   agency:     { bg: '#2e1065', color: '#c084fc' },
 };
 
@@ -36,7 +36,7 @@ function StatusBadge({ status }) {
 }
 
 function RoleChip({ role }) {
-  const r = ROLE_STYLES[role] || ROLE_STYLES.freelancer;
+  const r = ROLE_STYLES[role] || ROLE_STYLES.gig_expert;
   return (
     <span 
       style={{ background: r.bg, color: r.color }} 
@@ -172,7 +172,7 @@ function DetailModal({ request, historyData, isLoadingHistory, onClose, onApprov
                 {/* 2. Legal Details Card */}
                 <div className="bg-[#1c1c20] border border-[#2c2c2c] rounded-[8px] p-[16px] flex flex-col gap-[8px]">
                   <h3 className="text-[0.82rem] font-extrabold uppercase tracking-[0.5px] text-[#70d64d] m-0 mb-[8px] pb-[6px] border-b border-[#2c2c2c]">Legal & Identification</h3>
-                  {request.role === 'freelancer' ? (
+                  {request.role === 'gig_expert' ? (
                     <>
                       <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Legal Name (PAN):</strong> <span>{app.legalNamePan || 'N/A'}</span></div>
                       <div className="flex justify-between text-[0.82rem] border-b border-[#232328] pb-[4px]"><strong>Personal PAN:</strong> <span className="uppercase">{app.personalPan || 'N/A'}</span></div>
