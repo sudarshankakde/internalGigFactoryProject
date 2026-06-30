@@ -52,7 +52,7 @@ export const FreelancerTable = ({ freelancers, isLoading, onSelectFreelancer }) 
             ) : freelancers.length === 0 ? (
               <tr>
                 <td colSpan={8} className="text-center p-[48px] text-gray-500">
-                  No freelancers found.
+                  No gig expert found.
                 </td>
               </tr>
             ) : freelancers.map(f => {

@@ -33,7 +33,7 @@ export default function ProjectApplications({ project, applications = [], onClos
                   </div>
                   <div className="flex gap-2">
                     <button onClick={() => onApprove(a.id)} disabled={a.status==='approved'} className="px-3 py-2 bg-[#70d64d] text-black rounded font-bold flex items-center gap-2"><Check size={14}/>Approve</button>
-                    <button onClick={() => onReject(a.id)} disabled={a.status==='rejected'} className="px-3 py-2 bg-[#ef4444] text-white rounded font-bold flex items-center gap-2"><XCircle size={14}/>Reject</button>
+                    <button onClick={() => onReject(a.id)} disabled={a.status==='rejected'} className="px-3 py-2 bg-[#ef4444] text-white rounded font-bold flex items-center gap-2"><XCircle size={14}/>Not Select</button>
                   </div>
                 </div>
               ))}

@@ -84,7 +84,7 @@ export default function ProjectDetailView() {
   const handleApprove = (appId) => {
     showConfirm({
       title: 'Approve Bid & Assign Project',
-      message: 'Are you sure you want to approve this application and assign the project? All other bids will be auto-rejected.',
+      message: 'Are you sure you want to approve this application and assign the project? All other bids will be automatically marked as not selected.',
       onConfirm: async () => {
         try {
           await api.post(`/projects/applications/${appId}/approve`, { remarks: 'Approved from details portal' });
@@ -100,17 +100,17 @@ export default function ProjectDetailView() {
 
   const handleReject = (appId) => {
     showConfirm({
-      title: 'Reject Bid',
-      message: 'Are you sure you want to reject this bid?',
+      title: 'Not Select Bid',
+      message: 'Are you sure you want to not select this bid?',
       variant: 'danger',
       onConfirm: async () => {
         try {
-          await api.put(`/projects/applications/${appId}/status`, { status: 'rejected', remarks: 'Rejected from details portal' });
-          toast.success('Bid rejected successfully.');
+          await api.put(`/projects/applications/${appId}/status`, { status: 'not select', remarks: 'Not Selected from details portal' });
+          toast.success('Bid Not Selected successfully.');
           queryClient.invalidateQueries({ queryKey: ['admin-project-detail', id] });
           queryClient.invalidateQueries({ queryKey: ['admin-projects'] });
         } catch (err) {
-          toast.error(err.message || 'Rejection failed');
+          toast.error(err.message || 'Not Selecting bid failed');
         }
       }
     });
@@ -379,7 +379,7 @@ export default function ProjectDetailView() {
   const handleReviewDeliverable = (milestoneId, status) => {
     showConfirm({
       title: `Submit Review Remarks`,
-      message: `Please enter review remarks for this milestone ${status === 'approved' ? 'approval' : 'rejection'}:`,
+      message: `Please enter review remarks for this milestone ${status === 'approved' ? 'approval' : 'not selection'}:`,
       type: 'prompt',
       promptPlaceholder: 'Enter review remarks...',
       variant: status === 'approved' ? 'success' : 'warning',
@@ -938,7 +938,7 @@ export default function ProjectDetailView() {
                                       onClick={() => handleReviewDeliverable(ms.id, 'rejected')}
                                       className="bg-red-500/20 text-red-400 border border-red-500/30 font-bold rounded-[4px] px-[8px] py-[3px] text-[0.68rem] cursor-pointer hover:bg-red-500/30"
                                     >
-                                      Reject
+                                      Not Select
                                     </button>
                                   </div>
                                 )}
@@ -1145,7 +1145,7 @@ export default function ProjectDetailView() {
                               onClick={() => handleReject(app.id)}
                               className="bg-[#ef444433] text-[#ef4444] border-none font-bold rounded-[6px] px-[12px] py-[6px] text-[0.72rem] cursor-pointer hover:bg-[#ef444455] transition-colors"
                             >
-                              Reject
+                              Not Select
                             </button>
                           </>
                         )}
@@ -1191,7 +1191,7 @@ export default function ProjectDetailView() {
                               onClick={() => handleReject(app.id)}
                               className="bg-[#ef444433] text-[#ef4444] border-none font-bold rounded-[6px] px-[12px] py-[6px] text-[0.72rem] cursor-pointer hover:bg-[#ef444455] transition-colors"
                             >
-                              Reject
+                              Not Select
                             </button>
                             <button
                               onClick={() => handleChangeBidStatus(app.id, 'pending', 'Pending')}
@@ -1808,7 +1808,7 @@ export default function ProjectDetailView() {
                         }}
                         className="bg-[#ef444433] text-[#ef4444] border-none font-bold rounded-[6px] px-[14px] py-[8px] text-[0.75rem] cursor-pointer hover:bg-[#ef444455] transition-colors"
                       >
-                        Reject
+                        Not Select
                       </button>
                     </>
                   )}
@@ -1832,7 +1832,7 @@ export default function ProjectDetailView() {
                         }}
                         className="bg-[#ef444433] text-[#ef4444] border-none font-bold rounded-[6px] px-[14px] py-[8px] text-[0.75rem] cursor-pointer hover:bg-[#ef444455] transition-colors"
                       >
-                        Reject
+                        Not Select
                       </button>
                       <button
                         onClick={() => {

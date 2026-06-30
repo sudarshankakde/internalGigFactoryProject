@@ -128,7 +128,7 @@ export const ProjectsTable = ({
                             onClick={() => handleOpenReject(req)}
                             disabled={rejectQuery.isFetching}
                           >
-                            <X size={12} /> REJECT
+                            <X size={12} /> Not Selected
                           </button>
                         </div>
                       ) : (

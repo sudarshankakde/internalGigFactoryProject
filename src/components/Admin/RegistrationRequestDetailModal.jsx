@@ -17,7 +17,9 @@ function RoleChip({ role }) {
       style={{ background: r.bg, color: r.color }} 
       className="text-[0.68rem] font-bold px-[8px] py-[3px] rounded-[4px]"
     >
-      {role?.toUpperCase()}
+      {role === "freelancer"
+    ? "GIG EXPERT"
+    : role?.toUpperCase()}
     </span>
   );
 }
@@ -161,7 +163,7 @@ export const RegistrationRequestDetailModal = ({ request, historyData, isLoading
                     <div className="grid grid-cols-2 gap-[10px] mb-[12px]">
                       {[
                         ['Total Attempts', historyData.tracker?.total_attempts || 0, '#fff'],
-                        ['Rejections', historyData.tracker?.rejection_count || 0, '#ef4444']
+                        ['Not Selection', historyData.tracker?.rejection_count || 0, '#ef4444']
                       ].map(([l, v, c]) => (
                         <div key={l} className="bg-[#121215] border border-[#2c2c2c] p-[8px] rounded-[6px] text-center">
                           <p className="text-[0.65rem] text-gray-500 uppercase font-bold m-0">{l}</p>
@@ -230,11 +232,11 @@ export const RegistrationRequestDetailModal = ({ request, historyData, isLoading
                   )}
                   <label className="flex items-center gap-[8px] text-white text-[0.8rem] cursor-pointer">
                     <input type="checkbox" checked={noReason} onChange={e => setNoReason(e.target.checked)} className="accent-[#70d64d]" />
-                    Do not provide a rejection reason
+                    Do not provide a reason for not selecting the candidate.
                   </label>
                   {!noReason && (
                     <div>
-                      <label className="text-gray-500 text-[0.75rem] font-semibold uppercase block mb-[6px]">Reason for Rejection</label>
+                      <label className="text-gray-500 text-[0.75rem] font-semibold uppercase block mb-[6px]">Reason for non-selection</label>
                       <textarea rows={3} value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder="Describe why..." className={textareaClass} />
                     </div>
                   )}
@@ -258,7 +260,7 @@ export const RegistrationRequestDetailModal = ({ request, historyData, isLoading
               <Check size={14} /> Approve
             </button>
             <button className={`${btnBaseClass} bg-[rgba(239,68,68,0.12)] text-[#ef4444] border border-[rgba(239,68,68,0.3)] px-[18px] py-[9px]`} onClick={() => onReject(request)} disabled={isPending}>
-              <X size={14} /> Reject
+              <X size={14} /> Not Selected
             </button>
           </div>
         )}

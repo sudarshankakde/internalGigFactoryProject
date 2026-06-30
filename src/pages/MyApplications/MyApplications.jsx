@@ -189,7 +189,7 @@ export default function MyApplications() {
         {/* Metric card 4: Rejected */}
         <div className="bg-[#121215] border border-[#23232a] p-5 rounded-[8px] flex flex-col justify-between min-h-[110px]">
           <div className="flex justify-between items-center text-[#8a8a8a] text-[0.7rem] font-bold tracking-wider uppercase">
-            <span>Rejected</span>
+            <span>Not Selected</span>
             <div className="w-7 h-7 bg-[#1c1c22] rounded-full flex items-center justify-center text-red-500/80 border border-[#23232a]">
               <XCircle size={13} />
             </div>
@@ -226,7 +226,7 @@ export default function MyApplications() {
             <option value="all">All Statuses</option>
             <option value="pending">Pending / Applied</option>
             <option value="accepted">Selected / Approved</option>
-            <option value="rejected">Rejected</option>
+            <option value="rejected">Not Selected</option>
           </select>
         </div>
 
@@ -318,7 +318,7 @@ export default function MyApplications() {
               // Get the first letter of the project title
               const firstLetter = project.title ? project.title.trim().charAt(0).toUpperCase() : 'P';
               
-              // Format applied date
+              //Format applied date
               const appliedDate = app.applied_at
                 ? new Date(app.applied_at).toLocaleDateString('en-CA') // YYYY-MM-DD format
                 : 'N/A';
@@ -337,7 +337,7 @@ export default function MyApplications() {
                 badgeText = 'SELECTED';
                 badgeClass = 'bg-[#70d64d]/10 text-[#70d64d] border border-[#70d64d]/20';
               } else if (statusLower === 'rejected') {
-                badgeText = 'REJECTED';
+                badgeText = 'NOT SELECTED';
                 badgeClass = 'bg-red-500/10 text-red-400 border border-red-500/20';
               }
 

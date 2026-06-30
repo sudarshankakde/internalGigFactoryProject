@@ -55,7 +55,7 @@ export const FreelancerCard = ({ freelancers, isLoading, onSelectFreelancer }) =
   if (freelancers.length === 0) {
     return (
       <div className="bg-[#121215] border border-[#23232a] rounded-[10px] p-[48px] text-center text-gray-500">
-        No freelancers found.
+        No gig expert found.
       </div>
     );
   }

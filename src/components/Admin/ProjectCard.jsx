@@ -26,8 +26,7 @@ export const ProjectCard = ({
 
   const showTrackProgress=   project.status?.toLowerCase() === 'completed' ||   project.status?.toLowerCase() === 'open' ||   project.status?.toLowerCase() === 'NOT STARTED' ;
   // const showTrackProgress =
-  // [
-    
+  // [ 
   //   'in_progress'
   // ].includes(project.status);
 

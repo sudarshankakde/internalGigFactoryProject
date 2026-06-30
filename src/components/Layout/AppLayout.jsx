@@ -434,8 +434,8 @@ export default function AppLayout({ children, pageTitle }) {
         <div className="sidebar-role-badge">
           <Shield size={12} color="#70d64d" />
           <span>
-            {role === "admin"
-              ? "Super Admin"
+            {role === "admin" 
+              ? "Super Admin" : role === "freelancer" ?  "Gig Expert" 
               : role.charAt(0).toUpperCase() + role.slice(1)}
           </span>
         </div>
@@ -582,8 +582,7 @@ export default function AppLayout({ children, pageTitle }) {
                     </span>
                     <span className="topbar-profile-role">
                       {role === "admin"
-                        ? "Super Admin"
-                        : role.charAt(0).toUpperCase() + role.slice(1)}
+                        ? "Super Admin" : role === "freelancer" ? "Gig Expert" : role.charAt(0).toUpperCase() + role.slice(1)}
                     </span>
                   </div>
                   {avatarUrl ? (

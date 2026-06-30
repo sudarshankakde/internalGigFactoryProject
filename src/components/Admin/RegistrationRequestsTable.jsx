@@ -17,7 +17,9 @@ function RoleChip({ role }) {
       style={{ background: r.bg, color: r.color }} 
       className="text-[0.68rem] font-bold px-[8px] py-[3px] rounded-[4px]"
     >
-      {role?.toUpperCase()}
+      {role === "freelancer"
+    ? "GIG EXPERT"
+    :role?.toUpperCase()}
     </span>
   );
 }
@@ -89,7 +91,7 @@ export const RegistrationRequestsTable = ({ pageItems, isLoading, onSelectReq, o
                       disabled={reviewQueryFetching} 
                       className={`${btnBaseClass} bg-[rgba(239,68,68,0.08)] text-[#ef4444] border border-[rgba(239,68,68,0.25)] px-[9px] py-[5px]`}
                     >
-                      <X size={12} /> Reject
+                      <X size={12} /> Not Selected
                     </button>
                   </>)}
                   {req.status !== 'pending' && (

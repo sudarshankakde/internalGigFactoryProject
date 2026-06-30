@@ -35,7 +35,7 @@ export const Navbar = ({ role, currentView, onViewChange }) => {
           title="Go to My Profile"
         >
           <div className="user-text-details">
-            <span className="user-name-txt">{role === 'admin' ? 'Admin User' : 'Sarah Johnson'}</span>
+            <span className="user-name-txt">{role === 'admin' ? 'Admin User'  :  'Sarah Johnson'}</span>
             <span className="user-role-badge">{role.toUpperCase()}</span>
           </div>
           
