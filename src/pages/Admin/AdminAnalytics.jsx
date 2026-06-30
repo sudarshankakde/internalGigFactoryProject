@@ -204,7 +204,7 @@ export default function AdminAnalytics() {
           label="Total Bids Submitted"
           value={totalBidsVal}
           Icon={FileText}
-          subText="Freelancer & Agency proposals"
+          subText="Gig Expert & Agency proposals"
           accentColor={COLORS.purple}
           isLoading={isLoading}
         />
@@ -269,7 +269,7 @@ export default function AdminAnalytics() {
                 />
                 <Area 
                   type="monotone" 
-                  dataKey="Freelancers" 
+                  dataKey="Gig Expert" 
                   stroke={COLORS.green} 
                   strokeWidth={2}
                   fillOpacity={1} 
@@ -417,7 +417,7 @@ export default function AdminAnalytics() {
                 <Area 
                   type="monotone" 
                   stackId="1"
-                  dataKey="Rejected" 
+                  dataKey="Not Selected" 
                   stroke={COLORS.red} 
                   fill={COLORS.red}
                   fillOpacity={0.15}
