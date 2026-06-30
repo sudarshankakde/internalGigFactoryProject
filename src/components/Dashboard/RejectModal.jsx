@@ -28,7 +28,7 @@ export const RejectModal = ({ request, onClose, onConfirm, isPending }) => {
           </div>
           <div className="flex-1">
             <p className="text-white font-extrabold text-[0.95rem] m-0">Not Selected Application</p>
-            <p className="text-[#6b7280] text-[0.78rem] mt-0.5 mb-0 mx-0">{request.full_name} — {request.role}</p>
+            <p className="text-[#6b7280] text-[0.78rem] mt-0.5 mb-0 mx-0">{request.full_name} — {request.role === 'freelancer' ? 'Gig Expert': request.role}</p>
           </div>
           <button 
             onClick={onClose} 

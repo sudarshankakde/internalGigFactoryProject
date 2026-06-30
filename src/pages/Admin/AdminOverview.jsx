@@ -123,7 +123,7 @@ export default function AdminOverview() {
       {/* Stats Row */}
       <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-[16px]">
         <StatCard
-          label="Active Freelancers"
+          label="Active Gig Expert"
           value={stats.totalFreelancers}
           Icon={Users}
           sub="Approved accounts"
@@ -206,7 +206,7 @@ export default function AdminOverview() {
                               style={{ background: `${roleColor}18`, color: roleColor }} 
                               className="text-[0.62rem] font-bold px-[6px] py-[2px] rounded-[4px] shrink-0"
                             >
-                              {req.role?.toUpperCase()}
+                              {req.role === 'freelancer' ? "GIG EXPERT" : req.role?.toUpperCase()}
                             </span>
                           </div>
                           <p className="text-gray-500 text-[0.75rem] m-0 mt-[2px] whitespace-nowrap overflow-hidden text-ellipsis">
@@ -288,7 +288,7 @@ export default function AdminOverview() {
                               style={{ background: `${roleColor}18`, color: roleColor }} 
                               className="text-[0.62rem] font-bold px-[6px] py-[2px] rounded-[4px] shrink-0"
                             >
-                              {role.toUpperCase()}
+                              {role === 'freelancer' ? 'Gig Expert' : role.toUpperCase()}
                             </span>
                           </div>
                           <p className="text-gray-500 text-[0.75rem] m-0 mt-[2px] whitespace-nowrap overflow-hidden text-ellipsis">
@@ -317,7 +317,7 @@ export default function AdminOverview() {
         <div className="flex flex-col gap-[12px]">
           <h2 className="text-white text-[1rem] font-extrabold m-0 mb-[4px]">Quick Access</h2>
           <QuickLink icon={FileSearch}  label="Reg. Requests" desc="Review & approve applications" to="/admin/requests"    color="#f59e0b" />
-          <QuickLink icon={Users}       label="Freelancers"    desc="Manage freelancer accounts"    to="/admin/freelancers" color="#38bdf8" />
+          <QuickLink icon={Users}       label="Gig Expert"    desc="Manage gig expert accounts"    to="/admin/freelancers" color="#38bdf8" />
           <QuickLink icon={Building2}   label="Agencies"       desc="Manage agency accounts"        to="/admin/agencies"    color="#c084fc" />
           <QuickLink icon={TrendingUp}  label="Analytics"      desc="Platform performance metrics"  to="/admin/analytics"   color="#70d64d" />
           

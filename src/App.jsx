@@ -140,7 +140,7 @@ function App() {
           </AdminRoute>
         } />
         <Route path="/admin/freelancers" element={
-          <AdminRoute title="Freelancers">
+          <AdminRoute title="Gig Expert">
             <AdminFreelancers />
           </AdminRoute>
         } />

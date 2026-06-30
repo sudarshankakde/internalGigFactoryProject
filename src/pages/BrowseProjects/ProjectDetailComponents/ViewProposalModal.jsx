@@ -81,7 +81,7 @@ const fmtDate = (d) =>
                   Applicant Role
                 </span>
                 <span className="text-white font-semibold block mt-0.5 capitalize">
-                  {selectedBidForProposal.applicant?.role || "Freelancer"}
+                  {selectedBidForProposal.applicant?.role || "Gig Expert"}
                 </span>
               </div>
               <div>

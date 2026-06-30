@@ -21,7 +21,7 @@ import { ActivityTimeline } from '../../components/Dashboard/ActivityTimeline';
 export const Dashboard = () => {
   const loggedInUser = useAuthStore((state) => state.user) || {};
   const profile = useAuthStore((state) => state.profile);
-  const role = loggedInUser.role || 'freelancer';
+  const role = loggedInUser.role || 'gig expert';
   
   const [activeAdminTab, setActiveAdminTab] = useState('applications');
   const [rejectTarget, setRejectTarget] = useState(null); // drives reject modal
