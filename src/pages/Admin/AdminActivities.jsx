@@ -307,7 +307,7 @@ export default function AdminActivities() {
                               {activity.user.full_name}
                             </p>
                             <p className="text-gray-500 text-[0.72rem] m-0 leading-normal">
-                              {activity.user.role}
+                              {activity.user.role === "freelancer" ? "Gig Expert" : activity.user.role }
                             </p>
                           </div>
                         </div>

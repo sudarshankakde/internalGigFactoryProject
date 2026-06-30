@@ -103,7 +103,7 @@ export default function AdminCommunication() {
         list.push({
           id: f.id,
           email: f.email,
-          name: f.full_name || 'Freelancer',
+          name: f.full_name || 'Gig Expert',
           role: 'freelancer',
           photo: f.profile_photo || null
         });
@@ -519,7 +519,7 @@ export default function AdminCommunication() {
                       <UserCheck size={16} className="text-[#70d64d]" />
                     </div>
                     <div>
-                      <p className="text-white text-[0.85rem] font-bold m-0">Freelancers</p>
+                      <p className="text-white text-[0.85rem] font-bold m-0">Gig Expert</p>
                       <p className="text-gray-500 text-[0.72rem] m-0">All registered independent contractors</p>
                     </div>
                   </div>
@@ -745,7 +745,7 @@ export default function AdminCommunication() {
                                 : 'bg-[rgba(56,189,248,0.12)] text-[#38bdf8] border-[rgba(56,189,248,0.25)]'
                             }`}
                           >
-                            {user.role}
+                            {user.role === 'freelancer' ? 'Gig Expert' : user.role}
                           </span>
                         </div>
                       );
