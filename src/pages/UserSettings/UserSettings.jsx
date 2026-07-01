@@ -6,8 +6,8 @@ import { api } from '../../utils/api';
 import './UserSettings.css';
 
 const TABS = [
-  { id: 'account',       label: 'My Account',         icon: User },
-  { id: 'notifications', label: 'Notifications',       icon: Bell },
+  { id: 'account', label: 'My Account', icon: User },
+  { id: 'notifications', label: 'Notifications', icon: Bell },
 ];
 
 function Toggle({ checked, onChange, id }) {
@@ -77,7 +77,7 @@ export default function UserSettings() {
   // Fetch settings
   const { data: settingsData, isLoading: settingsLoading } = useQuery({
     queryKey: ['user-settings'],
-    queryFn:  () => api.get('/settings'),
+    queryFn: () => api.get('/settings'),
   });
 
   const settings = settingsData?.settings || {};
@@ -203,8 +203,21 @@ export default function UserSettings() {
                   onChange={e => setAccount(s => ({ ...s, email: e.target.value }))} />
               </FormRow>
               <FormRow label="Mobile" id="acc-mobile">
-                <input id="acc-mobile" className="settings-input" value={account.mobile}
-                  onChange={e => setAccount(s => ({ ...s, mobile: e.target.value }))} />
+                <input
+                  id="acc-mobile"
+                  className="settings-input"
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
+                  value={account.mobile}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+                    setAccount((s) => ({
+                      ...s,
+                      mobile: value,
+                    }));
+                  }}
+                />
               </FormRow>
               <div className="settings-row-actions">
                 <SaveBtn onClick={handleSaveAccount} loading={saveMutation.isPending} />
@@ -214,7 +227,7 @@ export default function UserSettings() {
             <Section title="Change Password" description="Use a strong password with at least 8 characters.">
               {[
                 { key: 'currentPassword', label: 'Current Password', id: 'pwd-current', show: 'current' },
-                { key: 'newPassword',     label: 'New Password',     id: 'pwd-new',     show: 'new' },
+                { key: 'newPassword', label: 'New Password', id: 'pwd-new', show: 'new' },
                 { key: 'confirmPassword', label: 'Confirm Password', id: 'pwd-confirm', show: 'confirm' },
               ].map(({ key, label, id, show }) => (
                 <FormRow key={key} label={label} id={id}>
