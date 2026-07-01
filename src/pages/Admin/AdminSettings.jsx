@@ -12,13 +12,13 @@ import './AdminSettings.css';
 
 /* ── Tab definitions ──────────────────────────────────────────── */
 const TABS = [
-  { id: 'account',       label: 'My Account',         icon: User },
-  { id: 'platform',      label: 'Platform',            icon: Globe },
-  { id: 'smtp',          label: 'Email / SMTP',        icon: Mail },
-  { id: 'notifications', label: 'Notifications',       icon: Bell },
-  { id: 'registration',  label: 'Registration Rules',  icon: ClipboardList },
-  { id: 'security',      label: 'Security',            icon: Shield },
-  { id: 'system',        label: 'System',              icon: Wrench },
+  { id: 'account', label: 'My Account', icon: User },
+  { id: 'platform', label: 'Platform', icon: Globe },
+  { id: 'smtp', label: 'Email / SMTP', icon: Mail },
+  { id: 'notifications', label: 'Notifications', icon: Bell },
+  { id: 'registration', label: 'Registration Rules', icon: ClipboardList },
+  { id: 'security', label: 'Security', icon: Shield },
+  { id: 'system', label: 'System', icon: Wrench },
 ];
 
 /* ── Small reusable toggle switch ─────────────────────────────── */
@@ -93,13 +93,13 @@ export default function AdminSettings() {
   /* ── Fetch settings ── */
   const { data: settingsData, isLoading: settingsLoading } = useQuery({
     queryKey: ['admin-settings'],
-    queryFn:  () => api.get('/admin/settings'),
+    queryFn: () => api.get('/admin/settings'),
   });
 
   /* ── Fetch admin profile ── */
   const { data: profileData, isLoading: profileLoading } = useQuery({
     queryKey: ['admin-settings-me'],
-    queryFn:  () => api.get('/admin/settings/me'),
+    queryFn: () => api.get('/admin/settings/me'),
   });
 
   const settings = settingsData?.settings || {};
@@ -122,31 +122,31 @@ export default function AdminSettings() {
   const [notif, setNotif] = useState({
     notif_new_registration_inapp: true,
     notif_new_registration_email: true,
-    notif_user_suspended_inapp:   true,
-    notif_user_suspended_email:   false,
-    notif_failed_login_inapp:     true,
-    notif_failed_login_email:     false,
-    notif_payment_inapp:          true,
-    notif_payment_email:          true,
+    notif_user_suspended_inapp: true,
+    notif_user_suspended_email: false,
+    notif_failed_login_inapp: true,
+    notif_failed_login_email: false,
+    notif_payment_inapp: true,
+    notif_payment_email: true,
   });
 
   const [registration, setRegistration] = useState({
     reg_default_cooldown_days: 30,
-    reg_max_attempts:          5,
-    reg_auto_approve:          false,
-    reg_require_email_verify:  false,
+    reg_max_attempts: 5,
+    reg_auto_approve: false,
+    reg_require_email_verify: false,
   });
 
   const [security, setSecurity] = useState({
-    sec_session_timeout_mins:  60,
-    sec_max_failed_logins:     5,
+    sec_session_timeout_mins: 60,
+    sec_max_failed_logins: 5,
     sec_lockout_duration_mins: 15,
   });
 
   const [system, setSystem] = useState({
-    sys_maintenance_mode:    false,
+    sys_maintenance_mode: false,
     sys_maintenance_message: '',
-    sys_log_retention_days:  90,
+    sys_log_retention_days: 90,
   });
 
   /* ── Sync remote data → local state ── */
@@ -159,12 +159,12 @@ export default function AdminSettings() {
 
   useEffect(() => {
     if (!settings) return;
-    if (settings.platform)      setPlatform(settings.platform);
-    if (settings.smtp)          setSmtp(settings.smtp);
+    if (settings.platform) setPlatform(settings.platform);
+    if (settings.smtp) setSmtp(settings.smtp);
     if (settings.notifications) setNotif(settings.notifications);
-    if (settings.registration)  setRegistration(settings.registration);
-    if (settings.security)      setSecurity(settings.security);
-    if (settings.system)        setSystem(settings.system);
+    if (settings.registration) setRegistration(settings.registration);
+    if (settings.security) setSecurity(settings.security);
+    if (settings.system) setSystem(settings.system);
   }, [settings]);
 
   /* ── Save mutation (generic) ── */
@@ -198,12 +198,12 @@ export default function AdminSettings() {
   });
 
   /* ── Handlers ── */
-  const handleSavePlatform    = () => saveMutation.mutate({ section: 'platform',      data: platform });
-  const handleSaveSmtp        = () => saveMutation.mutate({ section: 'smtp',          data: smtp });
-  const handleSaveNotif       = () => saveMutation.mutate({ section: 'notifications', data: notif });
-  const handleSaveRegistration= () => saveMutation.mutate({ section: 'registration',  data: registration });
-  const handleSaveSecurity    = () => saveMutation.mutate({ section: 'security',      data: security });
-  const handleSaveSystem      = () => saveMutation.mutate({ section: 'system',        data: system });
+  const handleSavePlatform = () => saveMutation.mutate({ section: 'platform', data: platform });
+  const handleSaveSmtp = () => saveMutation.mutate({ section: 'smtp', data: smtp });
+  const handleSaveNotif = () => saveMutation.mutate({ section: 'notifications', data: notif });
+  const handleSaveRegistration = () => saveMutation.mutate({ section: 'registration', data: registration });
+  const handleSaveSecurity = () => saveMutation.mutate({ section: 'security', data: security });
+  const handleSaveSystem = () => saveMutation.mutate({ section: 'system', data: system });
 
   const handleSaveAccount = () => profileMutation.mutate(account);
 
@@ -290,8 +290,21 @@ export default function AdminSettings() {
                   onChange={e => setAccount(s => ({ ...s, email: e.target.value }))} />
               </FormRow>
               <FormRow label="Mobile" id="acc-mobile">
-                <input id="acc-mobile" className="settings-input" value={account.mobile}
-                  onChange={e => setAccount(s => ({ ...s, mobile: e.target.value }))} />
+                <input
+                  id="acc-mobile"
+                  className="settings-input"
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
+                  value={account.mobile}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+                    setAccount((s) => ({
+                      ...s,
+                      mobile: value,
+                    }));
+                  }}
+                />
               </FormRow>
               <div className="settings-row-actions">
                 <SaveBtn onClick={handleSaveAccount} loading={profileMutation.isPending} />
@@ -301,7 +314,7 @@ export default function AdminSettings() {
             <Section title="Change Password" description="Use a strong password with at least 8 characters.">
               {[
                 { key: 'currentPassword', label: 'Current Password', id: 'pwd-current', show: 'current' },
-                { key: 'newPassword',     label: 'New Password',     id: 'pwd-new',     show: 'new' },
+                { key: 'newPassword', label: 'New Password', id: 'pwd-new', show: 'new' },
                 { key: 'confirmPassword', label: 'Confirm Password', id: 'pwd-confirm', show: 'confirm' },
               ].map(({ key, label, id, show }) => (
                 <FormRow key={key} label={label} id={id}>
