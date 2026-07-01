@@ -670,7 +670,7 @@ export default function AdminSettings() {
                 <input id="acc-email" type="email" className="settings-input" value={account.email} disabled />
               </FormRow>
               <FormRow label="Mobile" id="acc-mobile">
-                <input id="acc-mobile" className="settings-input" value={account.mobile}
+                <input id="acc-mobile" className="settings-input" type='number' value={account.mobile}
                   onChange={e => handleAccountChange('mobile', e.target.value)}
                   onBlur={e => validateField('mobile', e.target.value)} />
                 {errors.mobile && <span className="text-[#f87171] text-[0.75rem] mt-1 block">{errors.mobile}</span>}
@@ -806,7 +806,7 @@ export default function AdminSettings() {
               </FormRow>
               <FormRow label="From Email" id="smtp-from-email" hint="Sender email address">
                 <input id="smtp-from-email" type="email" className="settings-input" value={smtp.smtp_from_email}
-                  onChange={e => handleSmtpChange('smtp_from_email', e.target.value)} placeholder="no-reply@gigfactory.com"
+                  onChange={e => handleSmtpChange('smtp_from_email', e.target.value)} placeholder="no-reply@gigfactory.in"
                   onBlur={e => validateField('smtp_from_email', e.target.value)} />
                 {errors.smtp_from_email && <span className="text-[#f87171] text-[0.75rem] mt-1 block">{errors.smtp_from_email}</span>}
               </FormRow>

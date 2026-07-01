@@ -64,7 +64,7 @@ export const RegistrationRequestsTable = ({ pageItems, isLoading, onSelectReq, o
               </td>
               <td className="p-[14px] border-b border-[#1a1a22] text-[#8a8a8a] text-[0.83rem] align-middle">{req.email}</td>
               <td className="p-[14px] border-b border-[#1a1a22] text-[#8a8a8a] text-[0.83rem] align-middle">{req.mobile}</td>
-              <td className="p-[14px] border-b border-[#1a1a22] align-middle"><RoleChip role={req.role} /></td>
+              <td className="p-[14px] border-b border-[#1a1a22] align-middle"><RoleChip role={req.role ? req.role === "gig_expert" ? "GIG EXPERT" : "AGENCY" : "ADMIN"} /></td>
               <td className="p-[14px] border-b border-[#1a1a22] align-middle"><StatusBadge status={req.status} /></td>
               <td className="p-[14px] border-b border-[#1a1a22] text-[#6b6b6b] text-[0.8rem] align-middle">{fmtDate(req.created_at)}</td>
               <td className="p-[14px] border-b border-[#1a1a22] align-middle">
