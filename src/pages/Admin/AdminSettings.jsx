@@ -671,8 +671,11 @@ export default function AdminSettings() {
               </FormRow>
               <FormRow label="Mobile" id="acc-mobile">
                 <input id="acc-mobile" className="settings-input" type='number' value={account.mobile}
-                  onChange={e => handleAccountChange('mobile', e.target.value)}
-                  onBlur={e => validateField('mobile', e.target.value)} />
+                  onChange={e => {
+                    e.target.value.length <=10 && 
+                    handleAccountChange('mobile', e.target.value)}}
+                  onBlur={e => validateField('mobile', e.target.value)}
+                  />
                 {errors.mobile && <span className="text-[#f87171] text-[0.75rem] mt-1 block">{errors.mobile}</span>}
               </FormRow>
               <div className="settings-row-actions">
