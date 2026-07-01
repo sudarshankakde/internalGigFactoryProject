@@ -194,7 +194,8 @@ export default function ProjectDetail() {
         </div>
 
         {/* Summary grid */}
-        <div className="grid grid-cols-1 min-[375px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 mt-6 pt-6 border-t border-[#23232a] w-full">
+        <div className="grid grid-cols-1 min-[375px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 mt-6 pt-6 border-t border-b
+        mb-6 pb-6 border-[#23232a] w-full">
           {/* Budget */}
           <div className="flex items-start gap-3 min-w-0">
             <Wallet className="text-[#8a8a8a] mt-1 shrink-0" size={18} />
@@ -253,7 +254,7 @@ export default function ProjectDetail() {
 
 
 
-              {!isProjectCompleted && (
+              {/* {!isProjectCompleted && (
                 <div className="bg-[#0b0b0d] border border-[#23232a] rounded-[20px] p-6">
                   <div className="mb-4">
                     <h2 className="text-white text-lg font-semibold">Apply</h2>
@@ -266,12 +267,7 @@ export default function ProjectDetail() {
                     >
                       Apply
                     </button>
-                    {/* <button
-                    onClick={() => handleApply('agency')}
-                    className="w-full border border-[#23232a] text-white py-3 rounded-xl hover:bg-white/5 transition"
-                  >
-                    Apply 
-                  </button> */}
+                  
                   </div>
 
 
@@ -279,8 +275,11 @@ export default function ProjectDetail() {
 
 
                 </div>
-              )}
+              )} */}
+
+
             </div>
+
           </div>
         </div>
 

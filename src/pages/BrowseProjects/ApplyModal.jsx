@@ -8,7 +8,7 @@ export default function ApplyModal({ project, onClose, defaultRole = 'freelancer
   const [estimatedDays, setEstimatedDays] = useState('');
   const [proposal, setProposal] = useState('');
   const [coverLetter, setCoverLetter] = useState('');
-  
+
   // Validation Errors State
   const [errors, setErrors] = useState({ bidAmount: '', estimatedDays: '', proposal: '' });
 
@@ -128,10 +128,10 @@ export default function ApplyModal({ project, onClose, defaultRole = 'freelancer
       if (file) {
         formData.append('attachment', file);
       }
-
+      console.log('formData', formData)
       await api.postFile(`/projects/${project.id}/applications`, formData);
       toast.success('Your application/bid has been submitted successfully!');
-      
+
       if (onApplied) {
         onApplied();
       }
@@ -146,11 +146,11 @@ export default function ApplyModal({ project, onClose, defaultRole = 'freelancer
   return (
     <>
       {/* Backdrop */}
-      <div 
-        onClick={onClose} 
-        className="fixed inset-0 bg-black/80 backdrop-blur-[4px] z-[9998] transition-opacity duration-150" 
+      <div
+        onClick={onClose}
+        className="fixed inset-0 bg-black/80 backdrop-blur-[4px] z-[9998] transition-opacity duration-150"
       />
-      
+
       {/* Modal Container */}
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-lg bg-[#0c0c0e] border border-[#23232a] rounded-[10px] p-6 md:p-8 z-[9999] shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto">
         <header className="flex justify-between items-start mb-6">
@@ -158,9 +158,9 @@ export default function ApplyModal({ project, onClose, defaultRole = 'freelancer
             <h3 className="text-lg font-bold text-white tracking-tight">Submit Bid Proposal</h3>
             <p className="text-xs text-gray-500 truncate">{project.title} ({project.project_code})</p>
           </div>
-          <button 
-            onClick={onClose} 
-            className="text-gray-500 hover:text-white border border-[#23232a] rounded-[6px] p-1.5 transition-all duration-150 bg-transparent cursor-pointer" 
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-white border border-[#23232a] rounded-[6px] p-1.5 transition-all duration-150 bg-transparent cursor-pointer"
             aria-label="Close"
           >
             <X size={16} />
@@ -168,12 +168,12 @@ export default function ApplyModal({ project, onClose, defaultRole = 'freelancer
         </header>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="bidAmount" className="text-xs font-bold text-gray-400">Your Bid Amount (₹) *</label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 id="bidAmount"
                 value={bidAmount}
                 onChange={(e) => {
@@ -190,8 +190,8 @@ export default function ApplyModal({ project, onClose, defaultRole = 'freelancer
 
             <div className="flex flex-col gap-1.5">
               <label htmlFor="estimatedDays" className="text-xs font-bold text-gray-400">Estimated Duration (Days) *</label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 id="estimatedDays"
                 value={estimatedDays}
                 onChange={(e) => {
@@ -209,7 +209,7 @@ export default function ApplyModal({ project, onClose, defaultRole = 'freelancer
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="proposal" className="text-xs font-bold text-gray-400">Execution Proposal &amp; Strategy *</label>
-            <textarea 
+            <textarea
               id="proposal"
               rows={4}
               value={proposal}
@@ -231,7 +231,7 @@ export default function ApplyModal({ project, onClose, defaultRole = 'freelancer
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="coverLetter" className="text-xs font-bold text-gray-400">Cover Letter (Optional)</label>
-            <textarea 
+            <textarea
               id="coverLetter"
               rows={3}
               value={coverLetter}
@@ -245,18 +245,17 @@ export default function ApplyModal({ project, onClose, defaultRole = 'freelancer
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-bold text-gray-400">Supporting Attachment (Optional)</label>
             {!file ? (
-              <div 
-                className={`dropzone-container border border-dashed rounded-[6px] p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center min-h-[110px] ${
-                  isDragActive ? 'border-[#70d64d] bg-[#70d64d]/5' : 'border-[#23232a] bg-[#121214] hover:border-white/20'
-                }`}
+              <div
+                className={`dropzone-container border border-dashed rounded-[6px] p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center min-h-[110px] ${isDragActive ? 'border-[#70d64d] bg-[#70d64d]/5' : 'border-[#23232a] bg-[#121214] hover:border-white/20'
+                  }`}
                 onDragEnter={handleDrag}
                 onDragOver={handleDrag}
                 onDragLeave={handleDrag}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current && fileInputRef.current.click()}
               >
-                <input 
-                  type="file" 
+                <input
+                  type="file"
                   ref={fileInputRef}
                   onChange={handleFileChange}
                   accept=".pdf,.zip,.rar,.tar,.doc,.docx"
@@ -275,9 +274,9 @@ export default function ApplyModal({ project, onClose, defaultRole = 'freelancer
                   <span className="text-xs text-gray-300 font-semibold truncate">{file.name}</span>
                   <span className="text-[10px] text-gray-500 shrink-0">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
                 </div>
-                <button 
-                  type="button" 
-                  onClick={handleClearFile} 
+                <button
+                  type="button"
+                  onClick={handleClearFile}
                   className="text-gray-500 hover:text-white p-1 transition bg-transparent border-none cursor-pointer"
                   aria-label="Remove attachment"
                 >
@@ -288,16 +287,16 @@ export default function ApplyModal({ project, onClose, defaultRole = 'freelancer
           </div>
 
           <div className="flex justify-end items-center gap-3 pt-3 border-t border-[#1e1e24]">
-            <button 
-              type="button" 
-              onClick={onClose} 
+            <button
+              type="button"
+              onClick={onClose}
               className="bg-transparent border border-[#23232a] hover:bg-white/5 hover:border-gray-500 text-white font-bold px-5 py-2.5 rounded-[6px] text-xs transition duration-150 cursor-pointer"
               disabled={submitting}
             >
               Cancel
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="bg-[#70d64d] text-black hover:bg-[#60c43d] font-bold px-5 py-2.5 rounded-[6px] text-xs flex items-center gap-1.5 shadow-[0_4px_12px_rgba(112,214,77,0.2)] disabled:opacity-50 transition duration-150 cursor-pointer"
               disabled={submitting}
             >
