@@ -296,11 +296,10 @@ export default function AdminOverview() {
                           </p>
                         </div>
                         <div className="flex flex-col items-end gap-[4px] shrink-0">
-                          <span 
-                            style={{ background: `${statusColor}18`, color: statusColor }} 
+                          <span  style={{ background: `${statusColor}18`, color: statusColor }} 
                             className="text-[0.62rem] font-bold px-[7px] py-[2px] rounded-[4px]"
                           >
-                            {bid.status?.toUpperCase()}
+                            {bid.status === 'rejected' ? 'Not Selected': bid.status?.toUpperCase()}
                           </span>
                           <span className="text-[#4b4b57] text-[0.68rem]">{fmtDate(bid.applied_at)}</span>
                         </div>
