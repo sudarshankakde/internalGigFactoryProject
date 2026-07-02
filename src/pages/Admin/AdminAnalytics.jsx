@@ -69,7 +69,7 @@ function AnalyticCard({ label, value, Icon, subText, accentColor = '#70d64d', is
   return (
     <div className="bg-[#121215] border border-[#23232a] rounded-[12px] p-[24px] flex flex-col gap-[12px] relative overflow-hidden group hover:border-[#2f2f38] transition-all duration-300">
       {/* Decorative gradient overlay */}
-      <div 
+      <div
         className="absolute top-0 right-0 w-[80px] h-[80px] opacity-[0.03] rounded-full blur-[20px] group-hover:opacity-[0.06] transition-all duration-300"
         style={{ backgroundColor: accentColor }}
       />
@@ -86,11 +86,11 @@ function AnalyticCard({ label, value, Icon, subText, accentColor = '#70d64d', is
             )}
           </p>
         </div>
-        <div 
+        <div
           className="w-[44px] h-[44px] rounded-[10px] flex items-center justify-center border transition-all duration-300"
-          style={{ 
-            backgroundColor: `${accentColor}08`, 
-            borderColor: `${accentColor}20` 
+          style={{
+            backgroundColor: `${accentColor}08`,
+            borderColor: `${accentColor}20`
           }}
         >
           <Icon size={20} color={accentColor} />
@@ -220,7 +220,7 @@ export default function AdminAnalytics() {
 
       {/* Grid containing major charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-[24px]">
-        
+
         {/* 2. User Registration Trends (Area Chart - spans 2 cols) */}
         <div className="lg:col-span-2">
           <ChartCard
@@ -237,51 +237,51 @@ export default function AdminAnalytics() {
               >
                 <defs>
                   <linearGradient id="colorFreelancers" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={COLORS.green} stopOpacity={0.2}/>
-                    <stop offset="95%" stopColor={COLORS.green} stopOpacity={0}/>
+                    <stop offset="5%" stopColor={COLORS.green} stopOpacity={0.2} />
+                    <stop offset="95%" stopColor={COLORS.green} stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="colorAgencies" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={COLORS.blue} stopOpacity={0.2}/>
-                    <stop offset="95%" stopColor={COLORS.blue} stopOpacity={0}/>
+                    <stop offset="5%" stopColor={COLORS.blue} stopOpacity={0.2} />
+                    <stop offset="95%" stopColor={COLORS.blue} stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid stroke="#23232a" strokeDasharray="3 3" vertical={false} />
-                <XAxis 
-                  dataKey="name" 
-                  stroke="#4b5563" 
-                  fontSize={11} 
-                  tickLine={false} 
+                <XAxis
+                  dataKey="name"
+                  stroke="#4b5563"
+                  fontSize={11}
+                  tickLine={false}
                   axisLine={false}
                 />
-                <YAxis 
-                  stroke="#4b5563" 
-                  fontSize={11} 
-                  tickLine={false} 
-                  axisLine={false} 
+                <YAxis
+                  stroke="#4b5563"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  verticalAlign="top" 
-                  height={36} 
+                <Legend
+                  verticalAlign="top"
+                  height={36}
                   iconType="circle"
                   iconSize={8}
                   wrapperStyle={{ fontSize: '11px', color: '#9ca3af' }}
                 />
-                <Area 
-                  type="monotone" 
-                  dataKey="Gig Expert" 
-                  stroke={COLORS.green} 
+                <Area
+                  type="monotone"
+                  dataKey="Gig Expert"
+                  stroke={COLORS.green}
                   strokeWidth={2}
-                  fillOpacity={1} 
-                  fill="url(#colorFreelancers)" 
+                  fillOpacity={1}
+                  fill="url(#colorFreelancers)"
                 />
-                <Area 
-                  type="monotone" 
-                  dataKey="Agencies" 
-                  stroke={COLORS.blue} 
+                <Area
+                  type="monotone"
+                  dataKey="Agencies"
+                  stroke={COLORS.blue}
                   strokeWidth={2}
-                  fillOpacity={1} 
-                  fill="url(#colorAgencies)" 
+                  fillOpacity={1}
+                  fill="url(#colorAgencies)"
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -313,9 +313,9 @@ export default function AdminAnalytics() {
                   ))}
                 </Pie>
                 <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  verticalAlign="bottom" 
-                  height={36} 
+                <Legend
+                  verticalAlign="bottom"
+                  height={36}
                   iconType="circle"
                   iconSize={8}
                   wrapperStyle={{ fontSize: '11px' }}
@@ -340,18 +340,18 @@ export default function AdminAnalytics() {
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
                 <CartesianGrid stroke="#23232a" strokeDasharray="3 3" vertical={false} />
-                <XAxis 
-                  dataKey="name" 
-                  stroke="#4b5563" 
-                  fontSize={11} 
-                  tickLine={false} 
+                <XAxis
+                  dataKey="name"
+                  stroke="#4b5563"
+                  fontSize={11}
+                  tickLine={false}
                   axisLine={false}
                 />
-                <YAxis 
-                  stroke="#4b5563" 
-                  fontSize={11} 
-                  tickLine={false} 
-                  axisLine={false} 
+                <YAxis
+                  stroke="#4b5563"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="Projects" fill={COLORS.purple} radius={[4, 4, 0, 0]} barSize={20} />
@@ -375,59 +375,59 @@ export default function AdminAnalytics() {
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
                 <CartesianGrid stroke="#23232a" strokeDasharray="3 3" vertical={false} />
-                <XAxis 
-                  dataKey="name" 
-                  stroke="#4b5563" 
-                  fontSize={11} 
-                  tickLine={false} 
+                <XAxis
+                  dataKey="name"
+                  stroke="#4b5563"
+                  fontSize={11}
+                  tickLine={false}
                   axisLine={false}
                 />
-                <YAxis 
-                  stroke="#4b5563" 
-                  fontSize={11} 
-                  tickLine={false} 
-                  axisLine={false} 
+                <YAxis
+                  stroke="#4b5563"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  verticalAlign="top" 
-                  height={36} 
+                <Legend
+                  verticalAlign="top"
+                  height={36}
                   iconType="circle"
                   iconSize={8}
                   wrapperStyle={{ fontSize: '11px' }}
                 />
-                <Area 
-                  type="monotone" 
+                <Area
+                  type="monotone"
                   stackId="1"
-                  dataKey="Accepted" 
-                  stroke={COLORS.green} 
+                  dataKey="Accepted"
+                  stroke={COLORS.green}
                   fill={COLORS.green}
                   fillOpacity={0.15}
                   strokeWidth={2}
                 />
-                <Area 
-                  type="monotone" 
+                <Area
+                  type="monotone"
                   stackId="1"
-                  dataKey="Pending" 
-                  stroke={COLORS.amber} 
+                  dataKey="Pending"
+                  stroke={COLORS.amber}
                   fill={COLORS.amber}
                   fillOpacity={0.15}
                   strokeWidth={2}
                 />
-                <Area 
-                  type="monotone" 
+                <Area
+                  type="monotone"
                   stackId="1"
-                  dataKey="Not Selected" 
-                  stroke={COLORS.red} 
+                  dataKey="Not Selected"
+                  stroke={COLORS.red}
                   fill={COLORS.red}
                   fillOpacity={0.15}
                   strokeWidth={2}
                 />
-                <Area 
-                  type="monotone" 
+                <Area
+                  type="monotone"
                   stackId="1"
-                  dataKey="Applied" 
-                  stroke={COLORS.blue} 
+                  dataKey="Applied"
+                  stroke={COLORS.blue}
                   fill={COLORS.blue}
                   fillOpacity={0.15}
                   strokeWidth={2}
@@ -452,17 +452,17 @@ export default function AdminAnalytics() {
                 margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
               >
                 <CartesianGrid stroke="#23232a" strokeDasharray="3 3" vertical={false} />
-                <XAxis 
-                  dataKey="name" 
-                  stroke="#4b5563" 
-                  fontSize={11} 
-                  tickLine={false} 
+                <XAxis
+                  dataKey="name"
+                  stroke="#4b5563"
+                  fontSize={11}
+                  tickLine={false}
                   axisLine={false}
                 />
-                <YAxis 
-                  stroke="#4b5563" 
-                  fontSize={11} 
-                  tickLine={false} 
+                <YAxis
+                  stroke="#4b5563"
+                  fontSize={11}
+                  tickLine={false}
                   axisLine={false}
                   tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
                 />
@@ -498,9 +498,9 @@ export default function AdminAnalytics() {
                   ))}
                 </Pie>
                 <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  verticalAlign="bottom" 
-                  height={36} 
+                <Legend
+                  verticalAlign="bottom"
+                  height={36}
                   iconType="circle"
                   iconSize={8}
                   wrapperStyle={{ fontSize: '11px' }}
@@ -526,19 +526,19 @@ export default function AdminAnalytics() {
                 margin={{ top: 10, right: 20, left: 30, bottom: 5 }}
               >
                 <CartesianGrid stroke="#23232a" strokeDasharray="3 3" horizontal={false} />
-                <XAxis 
-                  type="number" 
-                  stroke="#4b5563" 
-                  fontSize={11} 
-                  tickLine={false} 
+                <XAxis
+                  type="number"
+                  stroke="#4b5563"
+                  fontSize={11}
+                  tickLine={false}
                   axisLine={false}
                 />
-                <YAxis 
-                  type="category" 
-                  dataKey="name" 
-                  stroke="#e5e7eb" 
-                  fontSize={11} 
-                  tickLine={false} 
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  stroke="#e5e7eb"
+                  fontSize={11}
+                  tickLine={false}
                   axisLine={false}
                   width={90}
                 />
@@ -565,24 +565,25 @@ export default function AdminAnalytics() {
                 margin={{ top: 10, right: 20, left: 20, bottom: 5 }}
               >
                 <CartesianGrid stroke="#23232a" strokeDasharray="3 3" horizontal={false} />
-                <XAxis 
-                  type="number" 
-                  stroke="#4b5563" 
-                  fontSize={11} 
-                  tickLine={false} 
+                <XAxis
+                  type="number"
+                  stroke="#4b5563"
+                  fontSize={11}
+                  tickLine={false}
                   axisLine={false}
                 />
-                <YAxis 
-                  type="category" 
-                  dataKey="name" 
-                  stroke="#e5e7eb" 
-                  fontSize={11} 
-                  tickLine={false} 
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  stroke="#e5e7eb"
+                  fontSize={11}
+                  tickLine={false}
                   axisLine={false}
                   width={80}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="count" fill={COLORS.purple} radius={[0, 4, 4, 0]} barSize={14} />
+                <Bar dataKey="count"
+                  l={COLORS.purple} radius={[0, 4, 4, 0]} barSize={14} />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
