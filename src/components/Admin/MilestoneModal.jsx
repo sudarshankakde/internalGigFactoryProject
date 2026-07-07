@@ -101,7 +101,7 @@ export default function MilestoneModal({ milestone = null, onClose, onSave, proj
                   onChange={(e) => setWeightPercentage(e.target.value)} 
                   className={inputClass} 
                   placeholder="e.g. 25"
-                  required 
+                  required
                 />
               </div>
             </div>
