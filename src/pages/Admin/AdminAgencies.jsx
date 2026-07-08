@@ -88,7 +88,7 @@ export default function AdminAgencies() {
           <Search size={14} className="absolute left-[12px] top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
           <input
             type="text"
-            placeholder="Search by name, email, agency name…"
+            placeholder="Search by  name, email, industry, or agency name…"
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="w-full bg-[#0c0c0e] border border-[#23232a] rounded-[6px] text-white text-[0.85rem] pl-[36px] pr-[12px] py-[9px] outline-none box-border"
